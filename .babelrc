@@ -1,17 +1,5 @@
 {
-    "plugins": [
-        "transform-decorators-legacy",
-        "transform-class-properties",
-        "system-import-transformer"
-    ],
-    "env": {
-        "test": {
-            "presets" : ["latest"],
-            "plugins": [
-                "transform-decorators-legacy",
-                "transform-class-properties",
-                "system-import-transformer"
-            ]
-        }
-    }
+  "presets": [
+    "module:@revelryengine/babel-preset"
+  ]
 }
