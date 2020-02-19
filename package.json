@@ -1,31 +1,34 @@
 {
-  "name": "@revelryengine/core",
-  "version": "0.0.0",
-  "description": "Revelry ECS Game Engine",
-  "main": "dist/core.js",
-  "module": "dist/core.js",
-  "scripts": {
-    "test": "reveng test",
-    "docs": "esdoc",
-    "pretest": "eslint .",
-    "precommit": "lint-staged"
-  },
-  "author": "Revelry Engine Team",
-  "license": "UNLICENSED",
-  "dependencies": {},
-  "devDependencies": {
-    "@revelryengine/babel-preset": "0.0.0",
-    "@revelryengine/cli": "0.0.0",
-    "babel-eslint": "^8.1.2",
-    "esdoc": "^1.0.4",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^4.14.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "husky": "^0.14.3",
-    "lint-staged": "^6.0.0"
-  },
-  "homepage": "https://revelryengine.com",
-  "repository": "git@git.infiniterocket.com:revelryengine/core.git"
+    "name": "@revelryengine/core",
+    "version": "0.0.1",
+    "description": "Revelry ECS Game Engine",
+    "main": "lib/core.js",
+    "type": "module",
+    "scripts": {
+        "test": "mocha",
+        "coverage": "c8 --check-coverage --lines 100 --all --include=lib/**/*.js mocha --recursive",
+        "pretestx": "eslint .",
+        "precommit": "lint-staged"
+    },
+    "author": "Shannon Poole <shannon.m.poole@gmail.com>",
+    "license": "UNLICENSED",
+    "dependencies": {},
+    "devDependencies": {
+        "c8": "^7.1.0",
+        "chai": "^4.2.0",
+        "eslint": "^4.19.1",
+        "husky": "^0.14.3",
+        "lint-staged": "^6.1.1",
+        "mocha": "^7.0.0-esm1",
+        "request-animation-frame-polyfill": "^1.0.1",
+        "sinon": "^8.1.1",
+        "sinon-chai": "^3.4.0"
+    },
+    "homepage": "https://revelryengine.com",
+    "repository": "git@git.infiniterocket.com:revelryengine/core.git",
+    "mocha": {
+        "ui": "bdd",
+        "reporter": "spec",
+        "spec": "test/**/*.spec.js"
+    }
 }
