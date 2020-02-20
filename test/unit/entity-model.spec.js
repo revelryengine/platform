@@ -30,7 +30,7 @@ describe('EntityModel', () => {
         }
     }
 
-    beforeEach(async () => {
+    beforeEach(() => {
         entity = new UUID();
 
         game   = new Game();
@@ -42,8 +42,6 @@ describe('EntityModel', () => {
 
         ModelA.spawn(stage, { entity, foobar: { value: 'test' } });
         ModelB.spawn(stage, { foobat: [{ value: 'testA' },  { value: 'testB' }] });
-
-        await new Promise(resolve => setTimeout(resolve));
     });
 
     describe('spawn', () => {
@@ -55,9 +53,9 @@ describe('EntityModel', () => {
             expect(system.modelA.foobar.value).to.equal('test');
         });
 
-        it('should throw if component properity is no specified', async () => {
+        it('should throw if component properity is not specified', () => {
             try {
-                await ModelA.spawn(stage, {});
+                ModelA.spawn(stage, {});
                 expect(true).to.be.false;
             } catch(e) {
                 expect(e.message).to.equal('Missing component');
@@ -68,9 +66,9 @@ describe('EntityModel', () => {
             expect(system.modelB.foobat.size).to.equal(2);
         });
 
-        it('should throw if an array is provided but the component descriptior is not a set', async () => {
+        it('should throw if an array is provided but the component descriptior is not a set', () => {
             try {
-                await ModelA.spawn(stage, { foobar: [] });
+                ModelA.spawn(stage, { foobar: [] });
                 expect(true).to.be.false;
             } catch(e) {
                 expect(e.message).to.equal('Component is not a Set');

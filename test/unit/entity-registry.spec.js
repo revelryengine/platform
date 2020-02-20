@@ -9,7 +9,7 @@ import { UUID        } from '../../lib/utils/uuid.js';
 
 /** @test {EntityRegistry} */
 describe('EntityRegistry', () => {
-    let stage, system, entityA, entityB;
+    let stage, systemA, entityA, entityB;
     let componentA, componentB, componentC, componentD, componentE;
 
     class ModelA extends EntityModel {
@@ -24,7 +24,7 @@ describe('EntityRegistry', () => {
         }
     }
 
-    class TestSystem extends System {
+    class SystemA extends System {
         static get models() {
             return {
                 modelA: { model: ModelA },
@@ -33,33 +33,28 @@ describe('EntityRegistry', () => {
         }
     }
 
-    beforeEach(async () => {
+    beforeEach(() => {
         entityA = new UUID();
         entityB = new UUID();
 
-        componentA = { id: new UUID(), entity: entityA, type: 'foobar' };
-        componentB = { id: new UUID(), entity: entityA, type: 'foobat' };
+        componentA = { id: new UUID(), entity: entityA, type: 'foobar', value: 'foobar' };
+        componentB = { id: new UUID(), entity: entityA, type: 'foobat', value: 'foobat' };
 
-        componentC = { id: new UUID(), entity: entityB, type: 'foobar' };
-        componentD = { id: new UUID(), entity: entityB, type: 'foobat' };
-        componentE = { id: new UUID(), entity: entityB, type: 'foobat' };
+        componentC = { id: new UUID(), entity: entityB, type: 'foobar', value: 'foobar' };
+        componentD = { id: new UUID(), entity: entityB, type: 'foobat', value: 'foobat' };
+        componentE = { id: new UUID(), entity: entityB, type: 'foobat', value: 'foobat' };
 
-        stage = new Stage('test-stage');
+        stage = new Stage('stageA');
 
-        system = new TestSystem('test-system');
+        systemA = new SystemA('systemA');
 
-        stage.systems.add(system);
+        stage.systems.add(systemA);
 
-        await new Promise(resolve => setTimeout(resolve));
-
-        stage.components
-            .add(componentA)
-            .add(componentB)
-            .add(componentC)
-            .add(componentD)
-            .add(componentE);
-
-        await new Promise(resolve => setTimeout(resolve));
+        stage.components.add(componentA);
+        stage.components.add(componentB);
+        stage.components.add(componentC);
+        stage.components.add(componentD);
+        stage.components.add(componentE);
     });
 
     it('should have a reference for each entity in system.entities', () => {
@@ -76,53 +71,53 @@ describe('EntityRegistry', () => {
     });
 
     it('should have a reference for each model in each entity', () => {
-        expect(stage.entities.getById(entityA).models.getById(`ModelA:${entityA}`)).not.to.be.undefined;
-        expect(stage.entities.getById(entityA).models.getById(`ModelB:${entityA}`)).not.to.be.undefined;
-        expect(stage.entities.getById(entityB).models.getById(`ModelA:${entityB}`)).not.to.be.undefined;
-        expect(stage.entities.getById(entityB).models.getById(`ModelB:${entityB}`)).not.to.be.undefined;
+        expect(stage.entities.getById(entityA).models.getById(`${systemA.id}:modelA:${entityA}`)).not.to.be.undefined;
+        expect(stage.entities.getById(entityA).models.getById(`${systemA.id}:modelBs:${entityA}`)).not.to.be.undefined;
+        expect(stage.entities.getById(entityB).models.getById(`${systemA.id}:modelA:${entityB}`)).not.to.be.undefined;
+        expect(stage.entities.getById(entityB).models.getById(`${systemA.id}:modelBs:${entityB}`)).not.to.be.undefined;
     });
 
     it('should have a reference for the first matched entity on the system property', () => {
-        expect(system.modelA).not.to.be.undefined;
-        expect(system.modelA.id).to.equal(`ModelA:${entityA}`);
+        expect(systemA.modelA).not.to.be.undefined;
+        expect(systemA.modelA.id).to.equal(`${systemA.id}:modelA:${entityA}`);
     });
 
     it('should have a reference to each matched entity in system property Set', () => {
-        expect(system.modelBs.size).to.equal(2);
-        expect([...system.modelBs][0].id).to.equal(`ModelB:${entityA}`);
-        expect([...system.modelBs][1].id).to.equal(`ModelB:${entityB}`);
+        expect(systemA.modelBs.size).to.equal(2);
+        expect([...systemA.modelBs][0].id).to.equal(`${systemA.id}:modelBs:${entityA}`);
+        expect([...systemA.modelBs][1].id).to.equal(`${systemA.id}:modelBs:${entityB}`);
     });
 
     it('should have a reference for the matched component on the model property', () => {
-        expect(system.modelA.foobar).not.to.be.undefined;
-        expect(system.modelA.foobar.id.toString()).to.equal(componentA.id.toString());
+        expect(systemA.modelA.foobar).not.to.be.undefined;
+        expect(systemA.modelA.foobar.id.toString()).to.equal(componentA.id.toString());
     });
 
     it('should have a reference for each matched component on the model property Set', () => {
-        expect([...system.modelBs][0].foobats.size).to.equal(1);
-        expect([...system.modelBs][1].foobats.size).to.equal(2);
-        expect([...[...system.modelBs][0].foobats][0].id.toString()).to.equal(componentB.id.toString());
-        expect([...[...system.modelBs][1].foobats][0].id.toString()).to.equal(componentD.id.toString());
-        expect([...[...system.modelBs][1].foobats][1].id.toString()).to.equal(componentE.id.toString());
+        expect([...systemA.modelBs][0].foobats.size).to.equal(1);
+        expect([...systemA.modelBs][1].foobats.size).to.equal(2);
+        expect([...[...systemA.modelBs][0].foobats][0].id.toString()).to.equal(componentB.id.toString());
+        expect([...[...systemA.modelBs][1].foobats][0].id.toString()).to.equal(componentD.id.toString());
+        expect([...[...systemA.modelBs][1].foobats][1].id.toString()).to.equal(componentE.id.toString());
     });
 
     it('should use the same proxy if the same component is registered more than once', () => {
-        const original = system.modelA.foobar;
+        const original = systemA.modelA.foobar;
         stage.components.add(componentA);
-        expect(system.modelA.foobar).to.equal(original);
+        expect(systemA.modelA.foobar).to.equal(original);
     });
 
     it('should use the extend the proxy if the same component is registered more than once', () => {
         stage.components.add({ ...componentA, test: 'test' });
-        expect(system.modelA.foobar.test).to.equal('test');
+        expect(systemA.modelA.foobar.test).to.equal('test');
     });
 
     describe('Component deletion', () => {
         let modelA, modelB;
 
-        beforeEach(async () => {
-            ({ modelA } = system);
-            ([modelB] = [...system.modelBs]);
+        beforeEach(() => {
+            ({ modelA } = systemA);
+            ([modelB] = [...systemA.modelBs]);
 
             stage.components.delete(componentA);
             stage.components.delete(componentB);
@@ -132,11 +127,11 @@ describe('EntityRegistry', () => {
         });
 
         it('should not have a reference for a matched entity on the system property', () => {
-            expect(system.modelA).to.be.undefined;
+            expect(systemA.modelA).to.be.undefined;
         });
 
         it('should not have a reference to any matched entities in system property Set', () => {
-            expect(system.modelBs.size).to.equal(0);
+            expect(systemA.modelBs.size).to.equal(0);
         });
 
         it('should not have a reference for a matched component on the model property', () => {
@@ -159,26 +154,97 @@ describe('EntityRegistry', () => {
     });
 
     describe('System deletion', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             stage.components.delete(componentA);
-            stage.systems.delete(system);
+            stage.systems.delete(systemA);
             stage.components.add(componentA)
         });
 
         it('should remove the system from the entityRegistry', () => {
-            expect(system.modelA).to.be.undefined;
+            expect(systemA.modelA).to.be.undefined;
         });
     });
 
     describe('events', () => {
-        let fired = false;
-        beforeEach(async () => {
-            stage.addEventListener('componentchange', () => fired = true);
-            system.modelA.foobar.value = 'test';
+        let event;
+
+        beforeEach(() => {
+            event = undefined;
+        });
+
+        it('should fire ComponentAddEvent when a component is added', () => {
+            stage.addEventListener('componentadd', (e) => event = e);
+            stage.components.add({ id: new UUID(), entity: entityA, type: 'foobar' })
+            expect(event).not.to.be.undefined;
         });
 
         it('should fire ComponentChangeEvent when a component property changes', () => {
-            expect(fired).to.be.true;
+            stage.addEventListener('componentchange', (e) => event = e);
+            systemA.modelA.foobar.value = 'test';
+            expect(event).not.to.be.undefined;
+            expect(event.propertyPath[0]).to.equal('value');
+            expect(event.newValue).to.equal('test');
+            expect(event.oldValue).to.equal('foobar');
+        });
+
+        it('should fire ComponentDeleteEvent when a component is deleted', () => {
+            stage.addEventListener('componentdelete', (e) => event = e);
+            stage.components.delete(componentA)
+            expect(event).not.to.be.undefined;
+        });
+
+
+        it('should fire ModelAddEvent when all the components for that model are added', () => {
+            stage.addEventListener('modeladd', (e) => event = e);
+            stage.components.add({ id: new UUID(), entity: new UUID(), type: 'foobar' })
+            expect(event).not.to.be.undefined;
+            expect(event.model).not.to.be.undefined;
+        });
+
+        it('should fire ModelDeleteEvent when all the components for that model are deleted', () => {
+            const component = { id: new UUID(), entity: new UUID(), type: 'foobar' };
+            stage.addEventListener('modeldelete', (e) => event = e);
+            stage.components.add(component);
+            stage.components.delete(component);
+            expect(event).not.to.be.undefined;
+            expect(event.model).not.to.be.undefined;
+        });
+
+        it('should fire SystemAddEvent when a system is added', () => {
+            const system = new System('new-system');
+            stage.addEventListener('systemadd', (e) => event = e);
+            stage.systems.add(system);
+            expect(event).not.to.be.undefined;
+            expect(event.system).to.equal(system);
+        });
+
+        it('should fire SystemDeleteEvent when a system is deleted', () => {
+            const system = new System('new-system');
+            stage.addEventListener('systemdelete', (e) => event = e);
+            stage.systems.add(system);
+            stage.systems.delete(system);
+            expect(event).not.to.be.undefined;
+            expect(event.system).to.equal(system);
+        });
+    });
+
+    describe('registerSystem', () => {
+        let systemB;
+
+        class SystemB extends System {
+            static get models() {
+                return {
+                    modelA: { model: ModelA }
+                }
+            }
+        }
+        beforeEach(() => {
+            systemB = new SystemB();
+            stage.systems.add(systemB);
+        });
+
+        it('should add existing components to new system', () => {
+            expect(systemB.modelA).not.to.be.undefined;
         });
     });
 });

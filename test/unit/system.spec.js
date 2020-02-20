@@ -30,7 +30,7 @@ describe('System', () => {
         }
     }
 
-    beforeEach(async () => {
+    beforeEach(() => {
         entity = new UUID();
 
         game   = new Game();
@@ -41,8 +41,6 @@ describe('System', () => {
         game.stages.add(stage);
 
         ModelA.spawn(stage, { entity, foobar: { value: 'test' } });
-
-        await new Promise(resolve => setTimeout(resolve));
     });
 
     describe('stage', () => {

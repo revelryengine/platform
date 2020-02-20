@@ -1,6 +1,7 @@
 import { expect, sinon } from '../support/chai.js';
 
 import { Stage    } from '../../lib/stage.js';
+import { System   } from '../../lib/system.js';
 import { Game     } from '../../lib/game.js';
 import { GameNode } from '../../lib/gom/game-node.js';
 
@@ -8,12 +9,12 @@ import { GameNode } from '../../lib/gom/game-node.js';
 describe('Stage', () => {
     let stage, game, systemA, systemB, entityA, entityB;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         stage = new Stage();
         game  = new Game();
 
-        systemA = new GameNode('systemA');
-        systemB = new GameNode('systemB');
+        systemA = new System('systemA');
+        systemB = new System('systemB');
         entityA = new GameNode('entityA');
         entityB = new GameNode('entityB');
 
@@ -23,8 +24,6 @@ describe('Stage', () => {
         stage.entities.add(entityB);
 
         game.stages.add(stage);
-
-        await new Promise(resolve => setTimeout(resolve));
     });
 
     /** @test {Stage#game} */
@@ -55,7 +54,7 @@ describe('Stage', () => {
         });
 
         it('should not call update for an inactive entity', () => {
-            entityB.disabled = true;
+            entityB.inactive = true;
             stage.update();
             expect(entityA.update).to.have.been.called;
             expect(entityB.update).not.to.have.been.called;
@@ -76,7 +75,7 @@ describe('Stage', () => {
         });
 
         it('should not call render for an inactive entity', () => {
-            entityB.disabled = true;
+            entityB.inactive = true;
             stage.render();
             expect(entityA.render).to.have.been.called;
             expect(entityB.render).not.to.have.been.called;

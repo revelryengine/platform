@@ -215,6 +215,18 @@ describe('GameEventTarget', () => {
         });
     });
 
+     /** @test {GameEventTarget#clearDeferredEvents} */
+     describe('clearDeferredEvents', () => {
+        it('should clear deferred events', () => {
+            target1.addEventListener('test', spy);
+            target1.deferEvent(new GameEvent('test'));
+            target1.deferEvent(new GameEvent('test'));
+            target1.clearDeferredEvents();
+            target1.dispatchDeferredEvents();
+            expect(spy).not.to.have.been.called;
+        });
+    });
+
     describe('awaitEvent', () => {
         it('should resolve once an event of specified type is emitted', async () => {
             setTimeout(() => target1.dispatchEvent(new GameEvent('test')));
