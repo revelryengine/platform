@@ -40,8 +40,8 @@ describe('EntityModel', () => {
         stage.systems.add(system);
         game.stages.add(stage);
 
-        ModelA.spawn(stage, { entity, foobar: { value: 'test' } });
-        ModelB.spawn(stage, { foobat: [{ value: 'testA' },  { value: 'testB' }] });
+        ModelA.spawn(stage, { entity, foobar: 'test' });
+        ModelB.spawn(stage, { foobat: ['testA',  'testB'] });
     });
 
     describe('spawn', () => {
