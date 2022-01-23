@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "lib": [
+            "deno.window"
+        ],
+        "strict": true
+    },
+    "lint": {
+        "files": {
+            "include": [
+                "packages/"
+            ]
+        },
+        "rules": {
+            "tags": [
+                "recommended"
+            ],
+            "exclude": [
+                "require-await"
+            ]
+        }
+    },
+    "fmt": {
+        "files": {
+            "include": [
+                "packages/"
+            ]
+        },
+        "options": {
+            "useTabs": false,
+            "lineWidth": 160,
+            "indentWidth": 4,
+            "singleQuote": true,
+            "proseWrap": "preserve"
+        }
+    }
+}

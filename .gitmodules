@@ -1,0 +1,15 @@
+[submodule "site"]
+	path = site
+	url = git@github.com:revelryengine/revelryengine.github.io.git
+[submodule "packages/gltf"]
+	path = packages/gltf
+	url = git@github.com:revelryengine/gltf.git
+[submodule "packages/renderer"]
+	path = packages/renderer
+	url = git@github.com:revelryengine/renderer.git
+[submodule "packages/sample-models"]
+	path = packages/sample-models
+	url = git@github.com:revelryengine/sample-models.git
+[submodule "packages/sample-environments"]
+	path = packages/sample-environments
+	url = git@github.com:revelryengine/sample-environments.git
