@@ -27,13 +27,13 @@ app.use(async (context) => {
         context.response.body = (await Deno.readTextFile('./site/index.html')).replace('<!-- {dev import map} -->', `
         <!-- We can remove this shim once all major browsers support import maps -->
         <script async src="https://ga.jspm.io/npm:es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-        <script type="importmap">
+        <script type="importmap-shim">
             {
                 "imports": {
                     "https://cdn.jsdelivr.net/gh/revelryengine/": "/packages/"
                 }
             }
-        </script>`);
+        </script>`).replaceAll('<script type="module"', '<script type="module-shim"');
     }
 
     context.response.headers.set('Access-Control-Allow-Origin', '*');
