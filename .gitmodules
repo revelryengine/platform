@@ -13,3 +13,6 @@
 [submodule "packages/sample-environments"]
 	path = packages/sample-environments
 	url = git@github.com:revelryengine/sample-environments.git
+[submodule "packages/ecs"]
+	path = packages/ecs
+	url = git@github.com:revelryengine/ecs.git
