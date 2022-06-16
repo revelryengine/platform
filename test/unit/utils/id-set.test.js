@@ -1,8 +1,8 @@
-import { expect } from '../../support/chai.js';
+import { describe, it, beforeEach          } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assert, assertFalse, assertEquals } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 
 import { IdSet } from '../../../lib/utils/id-set.js';
 
-/** @test {IdSet} */
 describe('IdSet', () => {
     let itemA, itemB, idSet;
 
@@ -15,22 +15,22 @@ describe('IdSet', () => {
     });
 
     it('should add items to set', () => {
-        expect(idSet.has(itemA)).to.be.true;
-        expect(idSet.has(itemB)).to.be.true;
+        assert(idSet.has(itemA));
+        assert(idSet.has(itemB));
     });
 
     it('should be able to find item by id', () => {
-        expect(idSet.getById('itemA')).to.equal(itemA);
-        expect(idSet.getById('itemB')).to.equal(itemB);
+        assertEquals(idSet.getById('itemA'), itemA);
+        assertEquals(idSet.getById('itemB'), itemB);
     });
 
     it('should remove item from set', () => {
         idSet.delete(itemA);
-        expect(idSet.has(itemA)).to.be.false;
+        assertFalse(idSet.has(itemA));
     });
 
     it('should not be able to find item by id of removed item', () => {
         idSet.delete(itemA);
-        expect(idSet.getById('itemA')).to.be.undefined;
+        assertEquals(idSet.getById('itemA'), undefined);
     });
 });

@@ -1,8 +1,8 @@
-import { expect } from '../../support/chai.js';
+import { describe, it, beforeEach                            } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assert, assertInstanceOf, assertEquals, assertFalse } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 
 import { SetMap } from '../../../lib/utils/set-map.js';
 
-/** @test {SetMap} */
 describe('SetMap', () => {
     let setMap;
 
@@ -18,19 +18,19 @@ describe('SetMap', () => {
     });
 
     it('should create a new Set for key', () => {
-        expect(setMap.get('foo')).to.be.a('Set');
+        assertInstanceOf(setMap.get('foo'), Set);
     });
 
     it('should add item to set', () => {
-        expect(setMap.get('foo').has('foobat')).to.be.true;
-        expect(setMap.get('foo').has('foobaz')).to.be.true;
+        assert(setMap.get('foo').has('foobat'));
+        assert(setMap.get('foo').has('foobaz'));
     });
 
     it('should remove item from set', () => {
-        expect(setMap.get('foo').has('foobar')).to.be.false;
+        assertFalse(setMap.get('foo').has('foobar'));
     });
 
     it('should remove empty Sets', () => {
-        expect(setMap.get('removed')).to.be.undefined;
+        assertEquals(setMap.get('removed'), undefined);
     });
 });

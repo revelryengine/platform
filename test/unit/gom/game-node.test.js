@@ -1,8 +1,9 @@
-import { expect, sinon } from '../../support/chai.js';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assertEquals                        } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, assertSpyCalls                 } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { GameNode } from '../../../lib/gom/game-node.js';
 
-/** @test {GameNode} */
 describe('GameNode', () => {
     let node, childA, childB, parentA, parentB, event;
 
@@ -22,77 +23,80 @@ describe('GameNode', () => {
         node.children.add(childB);
 
         event = { eventPhase: 0, bubbles: true, path: [] };
+
+
     });
 
-    /** @test {GameNode#update} */
     describe('update', () => {
+        let dispatch, updateA, updateB;
+
         beforeEach(() => {
-            node.dispatchDeferredEvents = sinon.spy(node.dispatchDeferredEvents.bind(node));
-            childA.update = sinon.spy(childA.update.bind(childA));
-            childB.update = sinon.spy(childB.update.bind(childB));
+            dispatch  = spy(node, 'dispatchDeferredEvents');
+            updateA = spy(childA, 'update');
+            updateB = spy(childB, 'update');
         });
 
         it('should call dispatchDeferredEvents ', () => {
             node.update();
-            expect(node.dispatchDeferredEvents).to.have.been.called;
+            assertSpyCalls(dispatch, 1);
         });
 
         it('should call update on all children', () => {
             node.update();
-            expect(childA.update).to.have.been.called;
-            expect(childB.update).to.have.been.called;
+            assertSpyCalls(updateA, 1);
+            assertSpyCalls(updateB, 1);
         });
 
         it('should not call update on inactive children', () => {
             childA.inactive = true;
             node.update();
-            expect(childA.update).not.to.have.been.called;
+            assertSpyCalls(updateA, 0);
         });
     });
 
-    /** @test {GameNode#render} */
     describe('render', () => {
+        let renderA, renderB;
         beforeEach(() => {
-            childA.render = sinon.spy(childA.render.bind(childA));
-            childB.render = sinon.spy(childB.render.bind(childB));
+            renderA = spy(childA, 'render');
+            renderB = spy(childB, 'render');
         });
 
         it('should call render on all children', () => {
             node.render();
-            expect(childA.render).to.have.been.called;
-            expect(childB.render).to.have.been.called;
+            assertSpyCalls(renderA, 1);
+            assertSpyCalls(renderB, 1);
         });
 
         it('should not call render on inactive children', () => {
             childA.inactive = true;
             node.render();
-            expect(childA.render).not.to.have.been.called;
+            assertSpyCalls(renderA, 0);
         });
     });
 
-    /** @test {GameNode#dispatchEvent} */
     describe('dispatchEvent', () => {
+        let dispatch;
         beforeEach(() => {
-            sinon.spy(Object.getPrototypeOf(GameNode).prototype, 'dispatchEvent');
+            dispatch = spy(Object.getPrototypeOf(GameNode).prototype, 'dispatchEvent');
         });
 
         afterEach(() => {
-            Object.getPrototypeOf(GameNode).prototype.dispatchEvent.restore();
+            dispatch.restore();
         });
 
         it('Add parents to GameEvent.path and call super dispatchEvent', () => {
             node.dispatchEvent(event);
-            expect(event.path[0]).to.equal(parentA);
-            expect(event.path[1]).to.equal(parentB);
-            expect(Object.getPrototypeOf(GameNode).prototype.dispatchEvent).to.have.been.called;
+            assertEquals(event.path[0], parentA);
+            assertEquals(event.path[1], parentB);
+            assertSpyCalls(dispatch, 1);
         });
     });
 
-    describe('getRoot', () => {
+    describe('get root', () => {
         let root, childA, childB;
 
         beforeEach(() => {
-            root = new GameNode('root');
+            root   = new GameNode('root');
             childA = new GameNode('childA');
             childB = new GameNode('childB');
 
@@ -101,11 +105,11 @@ describe('GameNode', () => {
         });
 
         it('should return the root node', () => {
-            expect(childA.getRoot()).to.equal(root);
+            assertEquals(childA.root, root);
         });
 
         it('should return undefined for the root node itself', () => {
-            expect(root.getRoot()).to.be.undefined;
+            assertEquals(root.root, undefined);
         });
     });
 });

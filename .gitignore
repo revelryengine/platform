@@ -1,8 +1,2 @@
-npm-debug.log
-
-.transpiled/
-.nyc_output/
-coverage/
-node_modules/
-docs/
-
+*.bak
+cov_profile/

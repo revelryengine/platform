@@ -1,14 +1,14 @@
-import { expect, sinon } from '../../support/chai.js';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { spy, assertSpyCalls      } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { GameEvent       } from '../../../lib/events/game-event.js';
 import { GameEventTarget } from '../../../lib/events/game-event-target.js';
 
-/** @test {GameEvent} */
 describe('GameEvent', () => {
-    let spy, target1, target2, event;
+    let handler, target1, target2, event;
 
     beforeEach(() => {
-        spy = sinon.spy();
+        handler = spy();
         target1 = new GameEventTarget('target1');
         target2 = new GameEventTarget('target2');
     });
@@ -17,28 +17,28 @@ describe('GameEvent', () => {
         it('should not propagate event to second target', () => {
             event = new GameEvent('test');
 
-            target1.addEventListener('test', () => { spy(); }, true);
-            target2.addEventListener('test', (e) => { spy(); e.stopPropagation() }, true);
-            target2.addEventListener('test', () => { spy(); }, true);
+            target1.addEventListener('test', () => { handler(); }, true);
+            target2.addEventListener('test', (e) => { handler(); e.stopPropagation() }, true);
+            target2.addEventListener('test', () => { handler(); }, true);
 
             event.path.push(target2);
 
             target1.dispatchEvent(event);
-            expect(spy).to.have.been.calledTwice;
+            assertSpyCalls(handler, 2);
         });
     });
     describe('stopImmediatePropagation', () => {
         it('should not call second listener on same target', () => {
             event = new GameEvent('test');
 
-            target1.addEventListener('test', () => spy(), true);
-            target2.addEventListener('test', (e) => { spy(); e.stopImmediatePropagation(); }, true);
-            target2.addEventListener('test', () => spy(), true);
+            target1.addEventListener('test', () => handler(), true);
+            target2.addEventListener('test', (e) => { handler(); e.stopImmediatePropagation(); }, true);
+            target2.addEventListener('test', () => handler(), true);
 
             event.path.push(target2);
 
             target1.dispatchEvent(event);
-            expect(spy).to.have.been.calledOnce;
+            assertSpyCalls(handler, 1);
         });
     })
 

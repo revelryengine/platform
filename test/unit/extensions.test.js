@@ -1,9 +1,10 @@
-import { expect } from '../support/chai.js';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assertEquals             } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+
 
 import { Game       } from '../../lib/game.js';
 import { extensions } from '../../lib/extensions.js';
 
-/** @test {extensions} */
 describe('extensions', () => {
     let GameSubClassA, GameSubClassB, GameSubClassC;
     let gameA, gameB, gameC;
@@ -19,8 +20,8 @@ describe('extensions', () => {
     });
 
     it('should have the same instance of extensions across the import and all instances of Game', () => {
-        expect(gameA.extensions).to.equal(extensions);
-        expect(gameB.extensions).to.equal(extensions);
-        expect(gameC.extensions).to.equal(extensions);
+        assertEquals(gameA.extensions, extensions);
+        assertEquals(gameB.extensions, extensions);
+        assertEquals(gameC.extensions, extensions);
     });
 });
