@@ -1,6 +1,6 @@
-import { describe, it, beforeEach                                   } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import {  assertFalse, assertEquals, assertExists, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCall                                         } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach                                  } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assertFalse, assertEquals, assertExists, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, assertSpyCall                                        } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { Registry } from '../../lib/registry.js';
 import { System   } from '../../lib/system.js';
@@ -160,24 +160,23 @@ describe('EntityRegistry', () => {
             assertExists(registry.entities.getById(entityB).components.getById(componentF.id));
         });
     
-        it('should have a reference for each system model in each entity', () => {
+        it('should have a reference for each model in each entity', () => {
             const modelsA = registry.entities.getById(entityA).models;
             const modelsB = registry.entities.getById(entityB).models;
     
-            assertExists(modelsA.getById(`SystemA:ModelA:${entityA}`));
-            assertExists(modelsA.getById(`SystemA:ModelB:${entityA}`));
-            assertExists(modelsB.getById(`SystemA:ModelA:${entityB}`));
-            assertExists(modelsB.getById(`SystemA:ModelB:${entityB}`));
-    
-            assertExists(modelsA.getById(`SystemB:ModelA:${entityA}`));
-            assertExists(modelsA.getById(`SystemB:ModelB:${entityA}`));
-            assertExists(modelsB.getById(`SystemB:ModelA:${entityB}`));
-            assertExists(modelsB.getById(`SystemB:ModelB:${entityB}`));
+            assertExists(modelsA.getByClass(ModelA));
+            assertExists(modelsA.getByClass(ModelB));
+            assertExists(modelsB.getByClass(ModelA));
+            assertExists(modelsB.getByClass(ModelB));
         });
 
         it('should generate a uuid for a component if it is not provided', () => {
             const component = registry.registerComponent({ entity: new UUID(), type: 'a', value: 'valueA' });
             assertInstanceOf(component.id, UUID);
+        });
+
+        it('should only create a single model across multiple systems', () => {
+            assertEquals(systemA.modelA, systemB.modelA);
         })
     });
 

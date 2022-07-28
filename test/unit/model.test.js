@@ -1,12 +1,12 @@
-import { describe, it, beforeEach                                                    } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertNotEquals, assertInstanceOf, assertThrows, assertExists } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCall, assertSpyCalls                                          } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach   } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assertEquals, assertExists } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, assertSpyCall         } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { Model } from '../../lib/model.js';
 import { UUID  } from '../../lib/utils/uuid.js';
 
 describe('Model', () => {
-    let componentA, componentB, entity, stage, model, componentAdd;
+    let componentA, componentB, entity, stage, model;
 
     class ModelA extends Model {
         static get components() {
@@ -24,8 +24,6 @@ describe('Model', () => {
         entity    = { id: new UUID(), components: new Set([componentA, componentB]) };
         stage     = { components: new Set() };
         model     = new ModelA(new UUID(), entity);
-
-        componentAdd = spy(stage.components, 'add');
     });
 
     describe('components', () => {
@@ -43,54 +41,20 @@ describe('Model', () => {
 
         it('should fire ComponentChangeEvent when a component properties change', () => {
             const handler = spy();
-            model.addEventListener('componentchange', (e) => handler(e.component, e.newValue, e.oldValue));
+            model.addEventListener('componentchange', (e) => handler(e.propName, e.newValue, e.oldValue, e.component));
             model.a = 'updatedA';
             model.b = 'updatedB';
-            assertSpyCall(handler, 0, { args: [componentA, 'updatedA', 'valueA']});
-            assertSpyCall(handler, 1, { args: [componentB, 'updatedB', 'valueB']});
+            assertSpyCall(handler, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
+            assertSpyCall(handler, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
         });
 
-        
-    });
-
-    describe('spawn', () => {
-        let entityA, entityB, arrayB = ['b', 'c'];
-
-        beforeEach(() => {
-            entityA = ModelA.spawn(stage, { entity: entity.id , a: 'valueA', b: 'valueB' });
-            entityB = ModelA.spawn(stage, { a: 'valueA', b: arrayB });
+        it('should call onComponentChange when a component properties change', () => {
+            model.onComponentChange = spy();
+            model.a = 'updatedA';
+            model.b = 'updatedB';
+            assertSpyCall(model.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
+            assertSpyCall(model.onComponentChange, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
         });
-
-        it('should spawn an entity by adding all the required components to the stage', () => {
-            assertSpyCalls(componentAdd, 4);
-        });
-
-        it('should return entity uuid', () => {
-            assertEquals(entityA, entity.id);
-        });
-
-        it('should create and return new entity uuid if not specified', () => {
-            assertInstanceOf(entityB, UUID);
-            assertNotEquals(entityB, entity.id);
-        });
-
-        it('should set add component with the specified type and value', () => {
-            assertEquals(componentAdd.calls[0].args[0].value, 'valueA');
-            assertEquals(componentAdd.calls[0].args[0].type, 'a');
-
-            assertEquals(componentAdd.calls[1].args[0].value, 'valueB');
-            assertEquals(componentAdd.calls[1].args[0].type, 'b');
-
-            assertEquals(componentAdd.calls[2].args[0].value, 'valueA');
-            assertEquals(componentAdd.calls[2].args[0].type, 'a');
-
-            assertEquals(componentAdd.calls[3].args[0].value, arrayB);
-            assertEquals(componentAdd.calls[3].args[0].type, 'b');
-        });
-
-        it('should throw if missing component', () => {
-            assertThrows(() => ModelA.spawn(stage, { }), 'Missing component');
-        })
     });
 
     describe('system', () => {

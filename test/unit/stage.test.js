@@ -1,8 +1,10 @@
-import { describe, it, beforeEach       } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { stub, assertSpyCall            } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach                                      } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assertEquals, assertNotEquals, assertInstanceOf, assertThrows } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, stub, assertSpyCall, assertSpyCalls                      } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { Stage    } from '../../lib/stage.js';
+import { System   } from '../../lib/system.js';
+import { Model    } from '../../lib/model.js';
 import { UUID     } from '../../lib/utils/uuid.js';
 
 describe('Stage', () => {
@@ -80,6 +82,73 @@ describe('Stage', () => {
         it('should generate and return a new entity id if not specified', () => {
             assertInstanceOf(stage.createEntity({ a: 'a', b: 'b', c: 'c' }), UUID);
         });
+    });
+
+    describe('spawn', () => {
+        class ModelA extends Model {
+            static get components() {
+                return { 
+                    a: { type: 'a' }, 
+                    b: { type: 'b' }, 
+                };
+            }
+        }
+
+        class SystemA extends System {
+            static get models() {
+                return {
+                    modelA: { model: ModelA },
+                }
+            }
+        }
+
+        let system, entity, modelA, modelB, arrayB = ['b', 'c'], componentAdd;
+
+        beforeEach(() => {
+            stage  = new Stage();
+            system = new SystemA();
+
+            stage.systems.add(system);
+
+            entity = new UUID();
+
+            componentAdd = spy(stage.components, 'add');
+            
+            modelA = stage.spawn(ModelA, { entity , a: 'valueA', b: 'valueB' });
+            modelB = stage.spawn(ModelA, { a: 'valueA', b: arrayB });
+        });
+
+        it('should spawn an entity by adding all the required components to the stage', () => {
+            assertSpyCalls(componentAdd, 4);
+        });
+
+        it('should return instance of model', () => {
+            assertInstanceOf(modelA, ModelA);
+            assertInstanceOf(modelB, ModelA);
+        });
+
+        it('should create new entity uuid if not specified', () => {
+            assertInstanceOf(modelB.entity.id, UUID);
+            assertNotEquals(modelB.entity.id, entity);
+        });
+
+        it('should set add component with the specified type and value', () => {
+            assertEquals(componentAdd.calls[0].args[0].value, 'valueA');
+            assertEquals(componentAdd.calls[0].args[0].type, 'a');
+
+            assertEquals(componentAdd.calls[1].args[0].value, 'valueB');
+            assertEquals(componentAdd.calls[1].args[0].type, 'b');
+
+            assertEquals(componentAdd.calls[2].args[0].value, 'valueA');
+            assertEquals(componentAdd.calls[2].args[0].type, 'a');
+
+            assertEquals(componentAdd.calls[3].args[0].value, arrayB);
+            assertEquals(componentAdd.calls[3].args[0].type, 'b');
+        });
+
+        it('should throw if missing component', () => {
+            assertThrows(() => stage.spawn(ModelA, { }), 'Missing component');
+        })
     });
 
     describe('game', () => {
