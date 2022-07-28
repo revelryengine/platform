@@ -5,6 +5,13 @@ const app = new Application();
 app.use(async (context) => {
     console.log(context.request.url.pathname);
 
+    if(context.request.url.pathname.endsWith('/importmap.js')) {
+        context.response.status = 200;
+        context.response.headers.set('Content-Type', 'text/javascript');
+        context.response.body   = (await Deno.readTextFile('./site/importmap.js')).replaceAll('https://cdn.jsdelivr.net/gh/revelryengine/', '/packages/');
+        return;
+    }
+
     if(context.request.url.pathname.endsWith('/index.html')) {
         return context.response.redirect(context.request.url.pathname.replace(/\/index.html$/, '/'));
     }
@@ -18,22 +25,9 @@ app.use(async (context) => {
 
     if(context.response.status === 404) {
         await send(context, context.request.url.pathname, {
-            root: `${Deno.cwd()}/site`
+            root: `${Deno.cwd()}/site`,
+            index: 'index.html',
         });
-    }
-
-    if(context.response.status === 404) {
-        context.response.status = 200;
-        context.response.body = (await Deno.readTextFile('./site/index.html')).replace('<!-- {dev import map} -->', `
-        <!-- We can remove this shim once all major browsers support import maps -->
-        <script async src="https://ga.jspm.io/npm:es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-        <script type="importmap-shim">
-            {
-                "imports": {
-                    "https://cdn.jsdelivr.net/gh/revelryengine/": "/packages/"
-                }
-            }
-        </script>`).replaceAll('<script type="module"', '<script type="module-shim"');
     }
 
     context.response.headers.set('Access-Control-Allow-Origin', '*');

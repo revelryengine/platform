@@ -16,3 +16,6 @@
 [submodule "packages/ecs"]
 	path = packages/ecs
 	url = git@github.com:revelryengine/ecs.git
+[submodule "packages/core"]
+	path = packages/core
+	url = git@github.com:revelryengine/core.git
