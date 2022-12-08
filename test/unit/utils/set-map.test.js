@@ -33,4 +33,8 @@ describe('SetMap', () => {
     it('should remove empty Sets', () => {
         assertEquals(setMap.get('removed'), undefined);
     });
+
+    it('should return false if deleted but key does not exist', () => {
+        assertFalse(setMap.delete('x'));
+    });
 });

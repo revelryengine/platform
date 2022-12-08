@@ -25,10 +25,6 @@ describe('System', () => {
                 assertInstanceOf(system.modelBs, Set);
             });
         });
-
-        it('should be a reference to the system children', () => {
-            assertEquals(system.models, system.children);
-        });
     });
 
     describe('stage', () => {

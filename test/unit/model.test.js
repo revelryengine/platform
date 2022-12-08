@@ -6,7 +6,7 @@ import { Model } from '../../lib/model.js';
 import { UUID  } from '../../lib/utils/uuid.js';
 
 describe('Model', () => {
-    let componentA, componentB, entity, stage, model;
+    let componentA, componentB, entity, stage, modelA, modelB;
 
     class ModelA extends Model {
         static get components() {
@@ -17,64 +17,67 @@ describe('Model', () => {
         }
     }
 
+    class ModelB extends Model {
+        static get components() {
+            return { 
+                a: { type: 'a' },
+            };
+        }
+    }
+
     beforeEach(() => {
         componentA = { id: new UUID(), type: 'a', value: 'valueA' };
         componentB = { id: new UUID(), type: 'b', value: 'valueB' };
 
-        entity    = { id: new UUID(), components: new Set([componentA, componentB]) };
+        entity    = { id: new UUID(), components: new Set([componentA, componentB]), models: new Set() };
         stage     = { components: new Set() };
-        model     = new ModelA(new UUID(), entity);
+        
+        modelA     = new ModelA(new UUID(), entity);
+        modelB     = new ModelB(new UUID(), entity);
+
+        entity.models.add(modelA).add(modelB);
     });
 
     describe('components', () => {
         it('should have model property references to the component values', () => {
-            assertEquals(model.a, componentA.value);
-            assertEquals(model.b, componentB.value);
+            assertEquals(modelA.a, componentA.value);
+            assertEquals(modelA.b, componentB.value);
         });
 
         it('should have update the component values when updating the model properties', () => {
-            model.a = 'updatedA';
-            model.b = 'updatedB';
+            modelA.a = 'updatedA';
+            modelA.b = 'updatedB';
             assertEquals(componentA.value, 'updatedA');
             assertEquals(componentB.value, 'updatedB');
         });
 
-        it('should fire ComponentChangeEvent when a component properties change', () => {
-            const handler = spy();
-            model.addEventListener('componentchange', (e) => handler(e.propName, e.newValue, e.oldValue, e.component));
-            model.a = 'updatedA';
-            model.b = 'updatedB';
-            assertSpyCall(handler, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
-            assertSpyCall(handler, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
+        it('should call onComponentChange when a component value changes', () => {
+            modelA.onComponentChange = spy();
+            modelA.a = 'updatedA';
+            modelA.b = 'updatedB';
+            assertSpyCall(modelA.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
+            assertSpyCall(modelA.onComponentChange, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
         });
 
-        it('should call onComponentChange when a component properties change', () => {
-            model.onComponentChange = spy();
-            model.a = 'updatedA';
-            model.b = 'updatedB';
-            assertSpyCall(model.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
-            assertSpyCall(model.onComponentChange, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
+        it('should call onComponentChange when a component value change on a different model', () => {
+            modelA.onComponentChange = spy();
+            modelB.a = 'updatedA';
+            assertSpyCall(modelA.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
         });
     });
 
-    describe('system', () => {
-        it('should be a reference to the parent system', () => {
-            model.parent = {};
-            assertEquals(model.system, model.parent);
-        });
-    });
 
     describe('stage', () => {
-        it('should be a reference to the system parent stage', () => {
-            model.parent = { parent: {} };
-            assertEquals(model.stage, model.system.parent);
+        it('should be a reference to the entity stage', () => {
+            modelA.entity = { stage: {} };
+            assertEquals(modelA.stage, modelA.entity.stage);
         });
     });
 
     describe('game', () => {
-        it('should be a reference to the stage parent game', () => {
-            model.parent = { parent: { parent: {} } };
-            assertEquals(model.game, model.stage.parent);
+        it('should be a reference to the entity stage game', () => {
+            modelA.entity = { stage: { game: {} } };
+            assertEquals(modelA.game, modelA.entity.stage.game);
         });
     });
 

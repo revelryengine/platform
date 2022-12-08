@@ -1,7 +1,9 @@
-import { describe, it, beforeEach          } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assert, assertFalse, assertEquals } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { describe, it, beforeEach                            } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { assert, assertFalse, assertEquals, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, assertSpyCall, assertSpyCalls                  } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { IdSet } from '../../../lib/utils/id-set.js';
+import { UUID  } from '../../../lib/utils/uuid.js';
 
 describe('IdSet', () => {
     let itemA, itemB, idSet;
@@ -33,4 +35,45 @@ describe('IdSet', () => {
         idSet.delete(itemA);
         assertEquals(idSet.getById('itemA'), undefined);
     });
+
+    it('should generate a uuid for a item if it is not provided', () => {
+        const item = {};
+        idSet.add(item);
+        assertInstanceOf(item.id, UUID);
+    });
+
+    describe('setRegistrationHandlers', () => {
+        let register, unregister, itemA, itemB;
+        beforeEach(() => {
+            register   = spy();
+            unregister = spy();
+            idSet.setRegistrationHandlers({ register, unregister });
+
+            itemA = {};
+            itemB = {};
+
+            idSet.add(itemA);
+            idSet.add(itemB, false);
+        });
+
+        it('should call register handler when item is added', () => {
+            assertSpyCall(register, 0, { args: [itemA]});
+        });
+    
+        it('should not call register handler when item is added if register = false', () => {
+            assertSpyCalls(register, 1);
+        });
+    
+        it('should call unregister handler when item is deleted', () => {
+            idSet.delete(itemA);
+            assertSpyCall(unregister, 0, { args: [itemA]});
+        });
+    
+        it('should not call register handler when item is deleted if unregister = false', () => {
+            idSet.delete(itemB, false);
+            assertSpyCalls(unregister, 0);
+        });
+    });
+
+    
 });

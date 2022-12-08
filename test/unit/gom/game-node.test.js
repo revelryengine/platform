@@ -46,12 +46,6 @@ describe('GameNode', () => {
             assertSpyCalls(updateA, 1);
             assertSpyCalls(updateB, 1);
         });
-
-        it('should not call update on inactive children', () => {
-            childA.inactive = true;
-            node.update();
-            assertSpyCalls(updateA, 0);
-        });
     });
 
     describe('render', () => {
@@ -65,12 +59,6 @@ describe('GameNode', () => {
             node.render();
             assertSpyCalls(renderA, 1);
             assertSpyCalls(renderB, 1);
-        });
-
-        it('should not call render on inactive children', () => {
-            childA.inactive = true;
-            node.render();
-            assertSpyCalls(renderA, 0);
         });
     });
 
