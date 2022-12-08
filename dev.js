@@ -14,11 +14,13 @@ app.use(async (context, next) => {
     );
 });
 
+const regex = /https\:\/\/cdn.jsdelivr.net\/gh\/revelryengine\/(.*?)@(.*?)\//g;
 app.use(async (context, next) => {
+
     if(context.request.url.pathname.endsWith('/importmap.js')) {
         context.response.status = 200;
         context.response.headers.set('Content-Type', 'text/javascript');
-        context.response.body   = (await Deno.readTextFile('./site/importmap.js')).replaceAll('https://cdn.jsdelivr.net/gh/revelryengine/', '/packages/');
+        context.response.body   = (await Deno.readTextFile(`./site/${context.request.url.pathname}`)).replaceAll(regex, (match, p1) => `/packages/${p1}/`);
     } else {
         await next();
     }
