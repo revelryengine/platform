@@ -62,6 +62,20 @@ describe('GameNode', () => {
         });
     });
 
+    describe('preload', () => {
+        let preloadA, preloadB;
+        beforeEach(() => {
+            preloadA = spy(childA, 'preload');
+            preloadB = spy(childB, 'preload');
+        });
+
+        it('should call preload on all children', async () => {
+            await node.preload();
+            assertSpyCalls(preloadA, 1);
+            assertSpyCalls(preloadB, 1);
+        });
+    });
+
     describe('dispatchEvent', () => {
         let dispatch;
         beforeEach(() => {

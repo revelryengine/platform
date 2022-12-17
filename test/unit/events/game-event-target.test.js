@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertFalse, assertExists             } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, stub, assertSpyCall, assertSpyCalls      } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { assertEquals, assertFalse, assertExists  } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { spy, stub, assertSpyCall, assertSpyCalls } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { GameEvent       } from '../../../lib/events/game-event.js';
 import { GameEventTarget } from '../../../lib/events/game-event-target.js';

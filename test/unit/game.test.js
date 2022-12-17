@@ -3,6 +3,7 @@ import { assertEquals                        } from 'https://deno.land/std@0.143
 import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.143.0/testing/time.ts';
 
+import 'https://esm.sh/raf/polyfill';
 import { Game } from '../../lib/game.js';
 
 describe('Game', () => {
