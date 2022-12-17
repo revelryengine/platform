@@ -3,7 +3,7 @@ version: "3"
 services:
   dev:
     container_name: revelry
-    image: denoland/deno:1.16.4
+    image: denoland/deno:1.28.2
     command: deno run -A dev.js
     working_dir: /usr/src/app
     environment:
