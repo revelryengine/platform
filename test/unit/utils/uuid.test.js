@@ -1,43 +1,63 @@
 import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assert, assertEquals     } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { assert, assertEquals, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 
 import { UUID } from '../../../lib/utils/uuid.js';
 
 const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
 
-// This string and Array are equivalent
+// This string and bytes are equivalent
 const UUID_STRING = 'b47b93ce-4c65-4aba-bf15-287a8934656f';
-const UUID_ARRAY  = [180, 123, 147, 206, 76, 101, 74, 186, 191, 21, 40, 122, 137, 52, 101, 111];
+const UUID_BYTES  = new Uint8Array([180, 123, 147, 206, 76, 101, 74, 186, 191, 21, 40, 122, 137, 52, 101, 111]);
 
 describe('UUID', () => {
-    let id, idFromString, idFromArray;
+    let id;
     beforeEach(() => {
-        id = new UUID();
-        idFromString = new UUID(UUID_STRING);
-        idFromArray  = new UUID(UUID_ARRAY);
+        id = UUID();
     });
 
-    it('should generate random 128 bit UUID', () => {
-        assertEquals(id.length, 16);
+    it('should generate random UUID in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format', () => {
+        assert(UUID_REGEX.test(id));
     });
 
-    describe('toString', () => {
-        it('should output xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format', () => {
-            assert(UUID_REGEX.test(id.toString()));
+    describe('toBytes', () => {
+        let bytes;
+        beforeEach(() => {
+            bytes = UUID.toBytes(UUID_STRING);
+        });
+
+        it('should result in 128 bit Uint8Array', () => {
+            assertInstanceOf(bytes, Uint8Array);
+            assertEquals(bytes.length, 16);
+        });
+
+        it('should result in an equivlanent byte array', () => {
+            assertEquals(bytes, UUID_BYTES);
         });
     });
 
-    describe('toJSON', () => {
-        it('should output string format when include in JSON.stringify', () => {
-            assert(UUID_REGEX.test(JSON.stringify(id)));
+    describe('fromBytes', () => {
+        let bytes;
+        beforeEach(() => {
+            bytes = UUID.fromBytes(UUID_BYTES);
+        });
+
+        it('should result in an equivalent string ', () => {
+            assertEquals(bytes, UUID_STRING);
         });
     });
 
-    it('should rebuild UUID from string', () => {
-        assertEquals([...idFromString], UUID_ARRAY);
-    });
+    describe('isUUID', () => {
+        let bytes;
+        beforeEach(() => {
+            bytes = UUID.fromBytes(UUID_BYTES);
+        });
 
-    it('should rebuild UUID from array', () => {
-        assertEquals(idFromArray.toString(), UUID_STRING);
+        it('should return true if string is in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx hex format', () => {
+            assert(UUID.isUUID(UUID_STRING));
+        });
+
+        it('should return false if string is not in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx hex format', () => {
+            assert(!UUID.isUUID('xxxx-xxxx-xxxx'));
+        });
     });
 });

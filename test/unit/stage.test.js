@@ -1,5 +1,6 @@
-import { describe, it, beforeEach           } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.180.0/testing/time.ts';
 import { 
     assert,
     assertEquals, 
@@ -16,12 +17,17 @@ import { Model    } from '../../lib/model.js';
 import { UUID     } from '../../lib/utils/uuid.js';
 
 describe('Stage', () => {
+    let time;
     let stage, systemA, systemB, entityA, entityB;
     let componentA, componentB, componentC, componentD, componentE, componentF;
 
+    class Initializer {
+
+    }
+
     class ModelA extends Model {
         static get components() {
-            return { a: { type: 'a' } };
+            return { a: { type: 'a', } };
         }
     }
 
@@ -36,7 +42,9 @@ describe('Stage', () => {
 
     class ModelC extends Model {
         static get components() {
-            return { c: { type: 'c' } };
+            return { 
+                c: { type: 'c', initializer: Initializer },
+            };
         }
     }
 
@@ -61,19 +69,18 @@ describe('Stage', () => {
     }
 
     beforeEach(() => {
+        time = new FakeTime();
         stage = new Stage();
 
-        entityA = new UUID();
-        entityB = new UUID();
+        entityA = UUID();
+        entityB = UUID();
 
-        componentA = { id: new UUID(), entity: entityA, type: 'a', value: 'a' };
-        componentB = { id: new UUID(), entity: entityA, type: 'b', value: 'b' };
-        componentC = { id: new UUID(), entity: entityA, type: 'c', value: 'c' };
-
-        componentD = { id: new UUID(), entity: entityB, type: 'a', value: 'a' };
-        componentE = { id: new UUID(), entity: entityB, type: 'b', value: 'b' };
-        componentF = { id: new UUID(), entity: entityB, type: 'c', value: 'c' };
-
+        componentA = UUID();
+        componentB = UUID();
+        componentC = UUID();
+        componentD = UUID();
+        componentE = UUID();
+        componentF = UUID();
 
         systemA  = new SystemA('systemA');
         systemB  = new SystemB('systemB');
@@ -81,12 +88,17 @@ describe('Stage', () => {
         stage.systems.add(systemA);
         stage.systems.add(systemB);
 
-        stage.components.add(componentA);
-        stage.components.add(componentB);
-        stage.components.add(componentC);
-        stage.components.add(componentD);
-        stage.components.add(componentE);
-        stage.components.add(componentF);
+        stage.components.add({ id: componentA, entityId: entityA, type: 'a', value: 'a' });
+        stage.components.add({ id: componentB, entityId: entityA, type: 'b', value: 'b' });
+        stage.components.add({ id: componentC, entityId: entityA, type: 'c', value: 'c' });
+
+        stage.components.add({ id: componentD, entityId: entityB, type: 'a', value: 'a' });
+        stage.components.add({ id: componentE, entityId: entityB, type: 'b', value: 'b' });
+        stage.components.add({ id: componentF, entityId: entityB, type: 'c', value: 'c' });
+    });
+
+    afterEach(() => {
+        time.restore();
     });
 
     describe('components.add', () => {
@@ -119,24 +131,19 @@ describe('Stage', () => {
             assertEquals([...systemA.modelCs][1].entity.id, entityB);
         });
     
-        it('should update component when updating model property', () => {
-            systemA.modelA.a = 'updated';
-            assertEquals(componentA.value, 'updated');
-        });
     
         it('should share component between models matching the same entity', () => {
-            systemA.modelA.a = 'updated';
-            assertEquals(systemA.modelB.a, 'updated');
+            assertEquals(systemA.modelA.components.get('a'), systemA.modelB.components.get('a'));
         });
         
         
         it('should have a reference for each component in each entity', () => {
-            assertExists(stage.getEntityById(entityA).components.getById(componentA.id));
-            assertExists(stage.getEntityById(entityA).components.getById(componentB.id));
-            assertExists(stage.getEntityById(entityA).components.getById(componentC.id));
-            assertExists(stage.getEntityById(entityB).components.getById(componentD.id));
-            assertExists(stage.getEntityById(entityB).components.getById(componentE.id));
-            assertExists(stage.getEntityById(entityB).components.getById(componentF.id));
+            assertExists(stage.getEntityById(entityA).components.getById(componentA));
+            assertExists(stage.getEntityById(entityA).components.getById(componentB));
+            assertExists(stage.getEntityById(entityA).components.getById(componentC));
+            assertExists(stage.getEntityById(entityB).components.getById(componentD));
+            assertExists(stage.getEntityById(entityB).components.getById(componentE));
+            assertExists(stage.getEntityById(entityB).components.getById(componentF));
         });
     
         it('should have a reference for each model in each entity', () => {
@@ -150,22 +157,26 @@ describe('Stage', () => {
         });
 
         it('should generate a uuid for a component if it is not provided', () => {
-            const component = { entity: new UUID(), type: 'a', value: 'valueA' }
+            const component = { entityId: UUID(), type: 'a', value: 'valueA' }
             stage.components.add(component);
-            assertInstanceOf(component.id, UUID);
+            assert(UUID.isUUID(component.id));
         });
 
         it('should only create a single model across multiple systems', () => {
             assertEquals(systemA.modelA, systemB.modelA);
         });
+
+        it('should initialize the component value if an initializer is specified', () => {
+            assertInstanceOf([...systemA.modelCs][0].c, Initializer);
+        });
     });
 
     describe('components.delete', () => {
         beforeEach(() => {
-            stage.components.delete(componentB);
-            stage.components.delete(componentD);
-            stage.components.delete(componentE);
-            stage.components.delete(componentF);
+            stage.components.delete({ id: componentB });
+            stage.components.delete({ id: componentD });
+            stage.components.delete({ id: componentE });
+            stage.components.delete({ id: componentF });
         });
 
         describe('getEntityById', () => {
@@ -184,42 +195,64 @@ describe('Stage', () => {
         });
 
         it('should return false if component is not present', () => {
-            assertFalse(stage.components.delete({ id: new UUID(), entity: entityA }));
+            assertFalse(stage.components.delete({ id: UUID(), entityId: entityA }));
         });
 
         it('should return false if entity is not present', () => {
-            assertFalse(stage.components.delete({ id: new UUID(), entity: new UUID() }));
+            assertFalse(stage.components.delete({ id: UUID(), entityId: UUID() }));
         });
     });
+
+    describe('component value change', () => {
+        let handler, component;
+        beforeEach(() => {
+            handler = spy();
+            component = stage.components.getById(componentA);
+            component.watch(handler);
+        });
+
+        it('should call watch handler when value changes', async () => {
+            const oldValue = component.value;
+            component.value = 'change';
+            await time.runMicrotasks();
+            assertSpyCall(handler, 0, { args: [component, oldValue]});
+        });
+
+        it('should not call watch handler when value is the same', async () => {
+            component.value = 'a';
+            await time.runMicrotasks();
+            assertSpyCalls(handler, 0);
+        });
+    })
 
     describe('model.entity.components.add', () => {
         let componentG;
         beforeEach(() => {
-            componentG = { type: 'g', value: 'g' };
-            systemA.modelA.entity.components.add(componentG);
+            componentG = UUID();
+            systemA.modelA.entity.components.add({ id: componentG, type: 'g', value: 'g' });
         });
 
         it('should add the component to the stage', () => {
-            assert(stage.components.has(componentG));
+            assert(stage.components.getById(componentG));
         });
 
         it('should add the entity id to the component', () => {
-            assertEquals(componentG.entity, systemA.modelA.entity.id);
+            assertEquals(stage.components.getById(componentG).entityId, systemA.modelA.entity.id);
         });
     });
 
     describe('model.entity.components.delete', () => {
         beforeEach(() => {
-            systemA.modelA.entity.components.delete(componentA);
-            systemA.modelA.entity.components.delete(componentF);
+            systemA.modelA.entity.components.delete({ id: componentA });
+            systemA.modelA.entity.components.delete({ id: componentF });
         });
 
         it('should remove the component from the stage', () => {
-            assert(!stage.components.has(componentA));
+            assert(!stage.components.getById(componentA));
         });
 
         it('should not remove the component from the stage if it does not belong to the entity', () => {
-            assert(stage.components.has(componentF));
+            assert(stage.components.getById(componentF));
         });
     });
 
@@ -227,18 +260,18 @@ describe('Stage', () => {
         let handler, entityC, entityD;
 
         beforeEach(() => {
-            entityC = new UUID();
-            entityD = new UUID();
+            entityC = UUID();
+            entityD = UUID();
             handler = spy();
         });
 
         it('should fire ModelAddEvent when all the components for that model are registered', () => {
             systemA.addEventListener('modeladd', (e) => handler(e.model.constructor));
 
-            stage.components.add({ id: new UUID(), entity: entityC, type: 'a' });
+            stage.components.add({ id: UUID(), entityId: entityC, type: 'a' });
 
-            stage.components.add({ id: new UUID(), entity: entityD, type: 'a' });
-            stage.components.add({ id: new UUID(), entity: entityD, type: 'b' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'a' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'b' });
 
             assertSpyCall(handler, 0, { args: [ModelA]});
             assertSpyCall(handler, 1, { args: [ModelA]});
@@ -248,23 +281,23 @@ describe('Stage', () => {
         it('should call onModelAdd id defined when all the components for that model are registered', () => {
             systemA.onModelAdd = (model, key) => handler(model.constructor, key);
 
-            stage.components.add({ id: new UUID(), entity: entityC, type: 'a' });
+            stage.components.add({ id: UUID(), entityId: entityC, type: 'a' });
 
-            stage.components.add({ id: new UUID(), entity: entityD, type: 'a' });
-            stage.components.add({ id: new UUID(), entity: entityD, type: 'b' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'a' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'b' });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA']});
-            assertSpyCall(handler, 1, { args: [ModelA, 'modelA']});
-            assertSpyCall(handler, 2, { args: [ModelB, 'modelB']});
+            assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
+            assertSpyCall(handler, 1, { args: [ModelA, 'modelA'] });
+            assertSpyCall(handler, 2, { args: [ModelB, 'modelB'] });
         });
 
         it('should call onModelDelete when all the components for that model are deleted if defined', () => {
             systemA.onModelDelete = (model, key) => handler(model.constructor, key);
 
-            stage.components.delete(componentA);
+            stage.components.delete({ id: componentA });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA']});
-            assertSpyCall(handler, 1, { args: [ModelB, 'modelB']});
+            assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
+            assertSpyCall(handler, 1, { args: [ModelB, 'modelB'] });
         });
     });
 
@@ -295,7 +328,7 @@ describe('Stage', () => {
 
         it('should no longer add models to system', () => {
             const size = systemA.models.size;
-            stage.components.add({ id: new UUID(), entity: new UUID(), type: 'a', value: 'a' });
+            stage.components.add({ id: UUID(), entityId: UUID(), type: 'a', value: 'a' });
             assertEquals(systemA.models.size, size);
         });
     });
@@ -307,12 +340,12 @@ describe('Stage', () => {
         it('should create all the components specified sharing the same entity id', () => {
             stage.createEntity({ a: 'a', b: 'b', c: 'c' });
             assertEquals(stage.components.size, 3);
-            assertEquals([...stage.components][0].entity, [...stage.components][1].entity);
-            assertEquals([...stage.components][0].entity, [...stage.components][2].entity);
+            assertEquals([...stage.components][0].entityId, [...stage.components][1].entityId);
+            assertEquals([...stage.components][0].entityId, [...stage.components][2].entityId);
         });
 
         it('should generate and return a new entity id if not specified', () => {
-            assertInstanceOf(stage.createEntity({ a: 'a', b: 'b', c: 'c' }), UUID);
+            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 'b', c: 'c' })));
         });
     });
 
@@ -342,7 +375,7 @@ describe('Stage', () => {
 
             stage.systems.add(system);
 
-            entity = new UUID();
+            entity = UUID();
 
             componentAdd = spy(stage.components, 'add');
             
@@ -360,7 +393,7 @@ describe('Stage', () => {
         });
 
         it('should create new entity uuid if not specified', () => {
-            assertInstanceOf(modelB.entity.id, UUID);
+            assert(UUID.isUUID(modelB.entity.id));
             assertNotEquals(modelB.entity.id, entity);
         });
 

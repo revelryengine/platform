@@ -36,13 +36,13 @@ describe('GameNode', () => {
             updateB = spy(childB, 'update');
         });
 
-        it('should call dispatchDeferredEvents ', () => {
-            node.update();
+        it('should call dispatchDeferredEvents ', async () => {
+            await node.update();
             assertSpyCalls(dispatch, 1);
         });
 
-        it('should call update on all children', () => {
-            node.update();
+        it('should call update on all children', async () => {
+            await node.update();
             assertSpyCalls(updateA, 1);
             assertSpyCalls(updateB, 1);
         });

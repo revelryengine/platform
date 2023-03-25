@@ -1,6 +1,6 @@
 import { describe, it, beforeEach   } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
 import { assertEquals, assertExists } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCall         } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { spy, assertSpyCalls        } from 'https://deno.land/std@0.143.0/testing/mock.ts';
 
 import { Model } from '../../lib/model.js';
 import { UUID  } from '../../lib/utils/uuid.js';
@@ -26,14 +26,14 @@ describe('Model', () => {
     }
 
     beforeEach(() => {
-        componentA = { id: new UUID(), type: 'a', value: 'valueA' };
-        componentB = { id: new UUID(), type: 'b', value: 'valueB' };
+        componentA = { id: UUID(), type: 'a', value: 'valueA' };
+        componentB = { id: UUID(), type: 'b', value: 'valueB' };
 
-        entity    = { id: new UUID(), components: new Set([componentA, componentB]), models: new Set() };
+        entity    = { id: UUID(), components: new Set([componentA, componentB]), models: new Set() };
         stage     = { components: new Set() };
         
-        modelA     = new ModelA(new UUID(), entity);
-        modelB     = new ModelB(new UUID(), entity);
+        modelA     = new ModelA(UUID(), entity);
+        modelB     = new ModelB(UUID(), entity);
 
         entity.models.add(modelA).add(modelB);
     });
@@ -44,25 +44,36 @@ describe('Model', () => {
             assertEquals(modelA.b, componentB.value);
         });
 
-        it('should have update the component values when updating the model properties', () => {
+        it('should update the component values when updating the model properties', () => {
             modelA.a = 'updatedA';
             modelA.b = 'updatedB';
             assertEquals(componentA.value, 'updatedA');
             assertEquals(componentB.value, 'updatedB');
         });
+    });
 
-        it('should call onComponentChange when a component value changes', () => {
-            modelA.onComponentChange = spy();
-            modelA.a = 'updatedA';
-            modelA.b = 'updatedB';
-            assertSpyCall(modelA.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
-            assertSpyCall(modelA.onComponentChange, 1, { args: ['b', 'updatedB', 'valueB', componentB]});
+    describe('watch', () => {
+        let handler;
+        beforeEach(() => {
+            handler = spy();
+            componentA.watch   = spy();
+            componentA.unwatch = spy();
+            componentA.notify  = spy();
         });
 
-        it('should call onComponentChange when a component value change on a different model', () => {
-            modelA.onComponentChange = spy();
-            modelB.a = 'updatedA';
-            assertSpyCall(modelA.onComponentChange, 0, { args: ['a', 'updatedA', 'valueA', componentA]});
+        it('should call watch on the component', () => {
+            modelA.watch('a', handler);
+            assertSpyCalls(componentA.watch, 1);
+        });
+
+        it('should call unwatch on the component', () => {
+            modelA.unwatch('a', handler);
+            assertSpyCalls(componentA.unwatch, 1);
+        });
+
+        it('should call watch on the component', () => {
+            modelA.notify('a');
+            assertSpyCalls(componentA.notify, 1);
         });
     });
 

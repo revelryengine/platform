@@ -39,7 +39,7 @@ describe('IdSet', () => {
     it('should generate a uuid for a item if it is not provided', () => {
         const item = {};
         idSet.add(item);
-        assertInstanceOf(item.id, UUID);
+        assert(UUID.isUUID(item.id));
     });
 
     describe('setRegistrationHandlers', () => {
@@ -74,6 +74,4 @@ describe('IdSet', () => {
             assertSpyCalls(unregister, 0);
         });
     });
-
-    
 });
