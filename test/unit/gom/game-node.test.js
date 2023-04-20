@@ -1,6 +1,6 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals                        } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCalls                 } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
+import { assertEquals                        } from 'std/testing/asserts.ts';
+import { spy, assertSpyCalls                 } from 'std/testing/mock.ts';
 
 import { GameNode } from '../../../lib/gom/game-node.js';
 
@@ -9,7 +9,6 @@ describe('GameNode', () => {
 
     beforeEach(() => {
         node = new GameNode('node');
-        node.initialized = true;
 
         parentA = new GameNode('parentA');
         parentB = new GameNode('parentB');

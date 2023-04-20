@@ -1,6 +1,6 @@
-import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals             } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCalls      } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { assertEquals             } from 'std/testing/asserts.ts';
+import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
 
 import { WatchedProxy } from '../../../lib/utils/watched-proxy.js';
 

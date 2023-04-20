@@ -5,5 +5,5 @@
 ## Running tests
 
 ```sh
-deno test --coverage=cov_profile && deno coverage cov_profile
+rm -rf cov_profile && deno test --coverage=cov_profile --importmap test/importmap.json && deno coverage cov_profile
 ```

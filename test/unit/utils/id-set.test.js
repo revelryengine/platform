@@ -1,12 +1,14 @@
-import { describe, it, beforeEach                            } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assert, assertFalse, assertEquals, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCall, assertSpyCalls                  } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach           } from 'std/testing/bdd.ts';
+import { assert, assertFalse, assertEquals  } from 'std/testing/asserts.ts';
+import { spy, assertSpyCall, assertSpyCalls } from 'std/testing/mock.ts';
 
 import { IdSet } from '../../../lib/utils/id-set.js';
 import { UUID  } from '../../../lib/utils/uuid.js';
 
+/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+
 describe('IdSet', () => {
-    let itemA, itemB, idSet;
+    let /** @type {{id: String }} */itemA, /** @type {{id: String }} */itemB, /** @type {IdSet<Object, { id: String }>} */idSet;
 
     beforeEach(() => {
         itemA = { id: 'itemA' };
@@ -39,28 +41,27 @@ describe('IdSet', () => {
     it('should generate a uuid for a item if it is not provided', () => {
         const item = {};
         idSet.add(item);
-        assert(UUID.isUUID(item.id));
+        const lastItem = [...idSet].pop(); 
+        assertEquals(item, lastItem)
+        assert(lastItem && UUID.isUUID(lastItem.id));
     });
 
     describe('setRegistrationHandlers', () => {
-        let register, unregister, itemA, itemB;
+        let /** @type {Spy} */register, /** @type {Spy} */unregister;
         beforeEach(() => {
-            register   = spy();
+            register   = spy(item => item);
             unregister = spy();
             idSet.setRegistrationHandlers({ register, unregister });
 
-            itemA = {};
-            itemB = {};
-
             idSet.add(itemA);
-            idSet.add(itemB, false);
+            idSet.addSilent(itemB);
         });
 
         it('should call register handler when item is added', () => {
             assertSpyCall(register, 0, { args: [itemA]});
         });
     
-        it('should not call register handler when item is added if register = false', () => {
+        it('should not call register handler when item is added if addSilent is called', () => {
             assertSpyCalls(register, 1);
         });
     
@@ -69,8 +70,8 @@ describe('IdSet', () => {
             assertSpyCall(unregister, 0, { args: [itemA]});
         });
     
-        it('should not call register handler when item is deleted if unregister = false', () => {
-            idSet.delete(itemB, false);
+        it('should not call register handler when item is deleted if deleteSilent is called', () => {
+            idSet.deleteSilent(itemB);
             assertSpyCalls(unregister, 0);
         });
     });

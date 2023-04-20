@@ -1,12 +1,16 @@
-import { describe, it, beforeEach   } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertExists } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, assertSpyCalls        } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach                 } from 'std/testing/bdd.ts';
+import { assertEquals, assertExists, assertThrows } from 'std/testing/asserts.ts';
+import { spy, assertSpyCall, assertSpyCalls       } from 'std/testing/mock.ts';
 
-import { Model } from '../../lib/model.js';
-import { UUID  } from '../../lib/utils/uuid.js';
+
+import { Game   } from '../../lib/game.js';
+import { Stage  } from '../../lib/stage.js';
+import { System } from '../../lib/system.js';
+import { Model  } from '../../lib/model.js';
+import { UUID   } from '../../lib/utils/uuid.js';
 
 describe('Model', () => {
-    let componentA, componentB, entity, stage, modelA, modelB;
+    let componentAId, componentBId, componentA, componentB, entityId, game, stage, system, modelA;
 
     class ModelA extends Model {
         static get components() {
@@ -25,17 +29,35 @@ describe('Model', () => {
         }
     }
 
+    class SystemA extends System {
+        static get models() {
+            return {
+                modelA:  { model: ModelA },
+                modelBs: { model: ModelB },
+            }
+        }
+    }
+
     beforeEach(() => {
-        componentA = { id: UUID(), type: 'a', value: 'valueA' };
-        componentB = { id: UUID(), type: 'b', value: 'valueB' };
+        game   = new Game();
+        stage  = new Stage();
+        system = new SystemA();
 
-        entity    = { id: UUID(), components: new Set([componentA, componentB]), models: new Set() };
-        stage     = { components: new Set() };
+        game.stages.add(stage);
+
+        stage.systems.add(system);
+
+        entityId = UUID();
+        componentAId = UUID();
+        componentBId = UUID();
+
+        stage.components.add({ id: componentAId, entityId, type: 'a', value: 'valueA' });
+        stage.components.add({ id: componentBId, entityId, type: 'b', value: 'valueB' });
         
-        modelA     = new ModelA(UUID(), entity);
-        modelB     = new ModelB(UUID(), entity);
+        modelA = stage.getEntityById(entityId).models.getByClass(ModelA);
 
-        entity.models.add(modelA).add(modelB);
+        componentA = stage.components.getById(componentAId);
+        componentB = stage.components.getById(componentBId);
     });
 
     describe('components', () => {
@@ -52,43 +74,113 @@ describe('Model', () => {
         });
     });
 
-    describe('watch', () => {
-        let handler;
+    describe('watching', () => {
+        let handler, watcher;
         beforeEach(() => {
             handler = spy();
-            componentA.watch   = spy();
-            componentA.unwatch = spy();
-            componentA.notify  = spy();
+            watcher = modelA.watch(handler);
         });
 
-        it('should call watch on the component', () => {
-            modelA.watch('a', handler);
-            assertSpyCalls(componentA.watch, 1);
+        describe('watch', () => {
+            it('should watch all components for changes', async () => {
+                modelA.a = 'testA';
+                modelA.b = 'testB';
+                await null;
+                assertSpyCall(handler, 0, { args: [new Map([['a', 'valueA'], ['b', 'valueB']])] });
+            });
+
+            it('should return a watcher object containing the original handler and an unwatch method', async () => {
+                assertEquals(watcher.handler, handler);
+                watcher.unwatch();
+                modelA.a = 'testA';
+                modelA.b = 'testB';
+                await null;
+                assertSpyCalls(handler, 0);
+            });
         });
 
-        it('should call unwatch on the component', () => {
-            modelA.unwatch('a', handler);
-            assertSpyCalls(componentA.unwatch, 1);
+        describe('unwatch', () => {
+            it('should unwatch all components', async () => {
+                modelA.unwatch(handler);
+                modelA.a = 'testA';
+                modelA.b = 'testB';
+                await null;
+                assertSpyCalls(handler, 0);
+            });
+        });
+        describe('notify', () => {
+            it('should notify all components of changes', async () => {
+                modelA.notify();
+                await null;
+                assertSpyCall(handler, 0, { args: [new Map([['a', undefined], ['b', undefined]])] });
+            });
+    
+            it('should notify all components of changes with the specified oldValue', async () => {
+                modelA.notify({ a: 'oldValueA', b: 'oldValueB' });
+                await null;
+                assertSpyCall(handler, 0, { args: [new Map([['a', 'oldValueA'], ['b', 'oldValueB']])] });
+            });
         });
 
-        it('should call watch on the component', () => {
-            modelA.notify('a');
-            assertSpyCalls(componentA.notify, 1);
+        describe('immediate=true', () => {
+            let handler;
+            beforeEach(() => {
+                handler = spy();
+                modelA.watch({ handler, immediate: true });
+            });
+
+            it('should call the watcher immediately for all components that change', async () => {
+                modelA.a = 'testA';
+                modelA.b = 'testB';
+                assertSpyCall(handler, 0, { args: ['a', 'valueA'] });
+                assertSpyCall(handler, 1, { args: ['b', 'valueB'] });
+                assertSpyCalls(handler, 2);
+            });
+        });
+
+        describe('watchProp', () => {
+            let handler, watcher;
+            beforeEach(() => {
+                handler = spy();
+                watcher = modelA.watchProp('a', handler);
+            });
+
+            it('should return an object containing the original watch handler, an unwatch method and the component the watcher was attached to', async () => {
+                assertEquals(watcher.component, modelA.components.get('a'));
+                assertEquals(watcher.handler, handler);
+                assertExists(watcher.immediate);
+
+                watcher.unwatch();
+                modelA.a = 'testA';
+                await null;
+                assertSpyCalls(handler, 0);
+            });
+
+            it('should watch only component specified', async () => {
+                modelA.a = 'testA';
+                modelA.b = 'testB';
+                await null;
+                assertSpyCall(handler, 0, { args: [watcher.component, 'valueA'] });
+                assertSpyCalls(handler, 1);
+            });
+
+            it('should throw an error if prop does not exist on model', () => {
+                assertThrows(() => {
+                    modelA.watchProp('x', () => {});
+                }, Error, 'Component property missing')
+            });
         });
     });
 
-
     describe('stage', () => {
         it('should be a reference to the entity stage', () => {
-            modelA.entity = { stage: {} };
-            assertEquals(modelA.stage, modelA.entity.stage);
+            assertEquals(modelA.stage, stage);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the entity stage game', () => {
-            modelA.entity = { stage: { game: {} } };
-            assertEquals(modelA.game, modelA.entity.stage.game);
+            assertEquals(modelA.game, game);
         });
     });
 

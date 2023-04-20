@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "target": "ES2022",
+        "module": "ES2022",
+        "outDir": "types",
+
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "strictNullChecks": true,
+
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "baseUrl": "./",
+        "moduleResolution": "nodenext"
+    },
+    "include": ["lib/**/*.js"],
+    "typedocOptions": {
+        "entryPointStrategy": "expand",
+        "entryPoints": ["lib"],
+        "out": "docs",
+        "name": "revelryengine/ecs",
+    }
+}

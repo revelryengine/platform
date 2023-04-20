@@ -1,87 +1,76 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.180.0/testing/bdd.ts';
-import { assertEquals                        } from 'https://deno.land/std@0.180.0/testing/asserts.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.180.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.180.0/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
+import { assertEquals                        } from 'std/testing/asserts.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
+import { FakeTime                            } from 'std/testing/time.ts';
 
-import 'https://esm.sh/raf/polyfill';
-import { Game } from '../../lib/game.js';
+import { Game   } from '../../lib/game.js';
 import { Stage  } from '../../lib/stage.js';
 import { System } from '../../lib/system.js';
 
 describe('Game', () => {
-    let game, command, loop, update, render, time;    
+    let game, command, time;    
 
     beforeEach(() => {
-        time   = new FakeTime();
-        game   = new Game();
-        loop   = spy(game, 'loop');
-        update = spy(game, 'update');
-        render = spy(game, 'render');
+        time = new FakeTime();
+        game = new Game();
+
+        spy(game, 'loop');
+        spy(game, 'update');
+        spy(game, 'render');
     });
 
     afterEach(() => {
-        { //clear any leftover rafs
-            game.pause();
-            time.next();
-        }
-        
-        time.restore();
-    });
-
-    describe('stages', () => {
-        it('should be a reference to the game children', () => {
-            assertEquals(game.stages, game.children);
-        });
+        time.restore();      
     });
 
     describe('start', () => {
         beforeEach(() => {
             game.start();
-            time.next();
         });
 
         it('should loop repeatedly', async () => {
-            await time.nextAsync();
-            await time.nextAsync();
-            assertSpyCalls(loop, 3);
+            await time.tickAsync(game.targetFrameRate);
+            await time.tickAsync(game.targetFrameRate);
+            await time.tickAsync(game.targetFrameRate);
+            assertSpyCalls(game.loop, 3);
         });
     });
 
     describe('pause', () => {
         beforeEach(() => {
             game.start();
-            time.next();
         });
 
         it('should cancel requestAnimationFrame and loop should not be called', async () => {
-            await time.nextAsync();
-            await time.nextAsync();
+            await time.tickAsync(game.targetFrameRate);
+            await time.tickAsync(game.targetFrameRate);
+            assertSpyCalls(game.loop, 2);
             game.pause();
-            await time.nextAsync();
-            assertSpyCalls(loop, 3);
+            await time.tickAsync(game.targetFrameRate);
+            assertSpyCalls(game.loop, 2);
         });
     });
 
     describe('loop', () => {
         it('should call game.update with a fixed timeloop of config.targetFrameRate', async () => {
             await game.loop(game.targetFrameRate * 2);
-            assertSpyCalls(update, 2);
-            assertSpyCall(update, 0, { args: [game.targetFrameRate ]});
+            assertSpyCalls(game.update, 2);
+            assertSpyCall(game.update, 0, { args: [game.targetFrameRate ]});
         });
 
         it('should drop any frames after config.frameThreshold', async () => {
             await game.loop(game.frameThreshold * 2);
-            assertSpyCalls(update, Math.floor(game.frameThreshold / game.targetFrameRate));
+            assertSpyCalls(game.update, Math.floor(game.frameThreshold / game.targetFrameRate));
         });
 
         it('should call render exactly once', async () => {
             await game.loop(game.targetFrameRate * 2);
-            assertSpyCalls(render, 1);
+            assertSpyCalls(game.render, 1);
         });
 
         it('should not call render if an update has not occured', async () => {
             await game.loop(game.targetFrameRate / 2);
-            assertSpyCalls(render, 0);
+            assertSpyCalls(game.render, 0);
         });
     });
 
@@ -94,6 +83,12 @@ describe('Game', () => {
         it('should call the defined function with a game reference followed by supplied arguments', () => {
             game.command('test-command', 0, 1, 2, 'test');
             assertSpyCall(command, 0, { args: [game, 0, 1, 2, 'test'] });
+        });
+    });
+
+    describe('stages', () => {
+        it('should be a reference to the game children', () => {
+            assertEquals(game.stages, game.children);
         });
     });
 
@@ -115,4 +110,40 @@ describe('Game', () => {
             assertEquals(game.getContext('stageA:systemA'), systemA);
         });
     });
+
+    describe('requestAnimationFrame', () => {
+        it('should polyfill requestAnimationFrame with setTimeout', () => {
+            spy(globalThis, 'setTimeout');
+            game = new Game();
+            game.requestAnimationFrame();
+            assertSpyCalls(globalThis.setTimeout, 1);
+            globalThis.setTimeout.restore();
+        });
+
+        it('should use globalThis.requestAnimationFrame if defined', () => {
+            globalThis.requestAnimationFrame = spy();
+            game = new Game();
+            game.requestAnimationFrame();
+            assertSpyCalls(globalThis.requestAnimationFrame, 1);
+            delete globalThis.requestAnimationFrame;
+        })
+    });
+
+    describe('cancelAnimationFrame', () => {
+        it('should polyfill cancelAnimationFrame with clearTimeout', () => {
+            spy(globalThis, 'clearTimeout');
+            game = new Game();
+            game.cancelAnimationFrame();
+            assertSpyCalls(globalThis.clearTimeout, 1);
+            globalThis.clearTimeout.restore();
+        });
+
+        it('should use globalThis.cancelAnimationFrame if defined', () => {
+            globalThis.cancelAnimationFrame = spy();
+            game = new Game();
+            game.cancelAnimationFrame();
+            assertSpyCalls(globalThis.cancelAnimationFrame, 1);
+            delete globalThis.cancelAnimationFrame;
+        })
+    })
 });

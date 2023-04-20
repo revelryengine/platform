@@ -1,16 +1,18 @@
-import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { spy, assertSpyCalls      } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
 
 import { GameEvent       } from '../../../lib/events/game-event.js';
 import { GameEventTarget } from '../../../lib/events/game-event-target.js';
 
+/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+
 describe('GameEvent', () => {
-    let handler, target1, target2, event;
+    let /** @type {Spy} */handler, /** @type {GameEventTarget}*/target1, /** @type {GameEventTarget}*/target2, /** @type {GameEvent}*/event;
 
     beforeEach(() => {
         handler = spy();
-        target1 = new GameEventTarget('target1');
-        target2 = new GameEventTarget('target2');
+        target1 = new GameEventTarget();
+        target2 = new GameEventTarget();
     });
 
     describe('stopPropagation', () => {
@@ -40,6 +42,5 @@ describe('GameEvent', () => {
             target1.dispatchEvent(event);
             assertSpyCalls(handler, 1);
         });
-    })
-
+    });
 });

@@ -1,5 +1,5 @@
-import { describe, it, beforeEach                     } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertInstanceOf, assertExists } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { describe, it, beforeEach                     } from 'std/testing/bdd.ts';
+import { assertEquals, assertInstanceOf, assertExists } from 'std/testing/asserts.ts';
 
 import { System } from '../../lib/system.js';
 

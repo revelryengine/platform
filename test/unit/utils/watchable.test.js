@@ -1,57 +1,92 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { spy, assertSpyCalls                 } from 'https://deno.land/std@0.143.0/testing/mock.ts';
-import { FakeTime                            } from "https://deno.land/std@0.180.0/testing/time.ts";
-import { assertInstanceOf, assertExists      } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { describe, it, beforeEach                     } from 'std/testing/bdd.ts';
+import { spy, assertSpyCalls                          } from 'std/testing/mock.ts';
+import { assertInstanceOf, assertExists, assertEquals } from 'std/testing/asserts.ts';
 
 import { Watchable } from '../../../lib/utils/watchable.js';
 
 describe('Watchable', () => {
-    let handler, watchable, time;
+    let handler, watchable, result;
 
     beforeEach(() => {
-        time      = new FakeTime();
         handler   = spy();
         watchable = new Watchable();
-        watchable.watch(handler);
-    });
-
-    afterEach(() => {        
-        time.restore();
+        result    = watchable.watch(handler);
     });
 
     it('should call the handler in the next microtask execution when notify has been called.', async () => {
         watchable.notify();
-        await time.runMicrotasks();
+        await null;
         assertSpyCalls(handler, 1);
     });
 
     it('should not call the handler more than once in the same microtask execution.', async () => {
         watchable.notify();
         watchable.notify();
-        await time.runMicrotasks();
+        await null;
         assertSpyCalls(handler, 1);
     });
 
     it('should call the handler more than once if another microtask execution has occured.', async () => {
         watchable.notify();
-        await time.runMicrotasks();
+        await null;
         watchable.notify();
-        await time.runMicrotasks();
+        await null;
         assertSpyCalls(handler, 2);
     });
 
     it('should not call the handler if unwatch has been called.', async () => {
         watchable.unwatch(handler);
         watchable.notify();
-        await time.runMicrotasks();
+        await null;
         assertSpyCalls(handler, 0);
     });
 
     it('should not call the handler if unwatch has been called even if after notify has been called but before the next microtask execution.', async () => {
         watchable.notify();
         watchable.unwatch(handler);
-        await time.runMicrotasks();
+        await null;
         assertSpyCalls(handler, 0);
+    });
+
+    it('should return a result object containing original handler and an unwatch method.', async () => {
+        assertEquals(result.handler, handler);
+        result.unwatch();
+        watchable.notify();
+        await null;
+        assertSpyCalls(handler, 0);
+    });
+
+    describe('Watcher object', () => {
+        beforeEach(() => {
+            handler   = spy();
+            watchable = new Watchable();
+            watchable.watch({ handler });
+        });
+
+        it('should accept an object containing a handler method', async () => {
+            watchable.notify();
+            await null;
+            assertSpyCalls(handler, 1);
+        });
+
+        describe('immediate=true', () => {
+            beforeEach(() => {
+                handler   = spy();
+                watchable = new Watchable();
+                watchable.watch({ handler, immediate: true });
+            });
+
+            it('should call the handler immediately when notify has been called.', async () => {
+                watchable.notify();
+                assertSpyCalls(handler, 1);
+            });
+
+            it('should not call the handler if unwatch has been called.', async () => {
+                watchable.unwatch(handler);
+                watchable.notify();
+                assertSpyCalls(handler, 0);
+            });
+        })
     });
 
     describe('mixin', () => {
@@ -76,7 +111,15 @@ describe('Watchable', () => {
             float.watch(handler);
             float.notify();
 
-            await time.runMicrotasks();
+            await null;
+            assertSpyCalls(handler, 1);
+        });
+
+        it('should add the watch method and support immediate=true', async () => {
+            assertExists(float.watch);
+
+            float.watch({ handler, immediate: true });
+            float.notify();
             assertSpyCalls(handler, 1);
         });
 
@@ -86,7 +129,26 @@ describe('Watchable', () => {
             float.watch(handler);
             float.unwatch(handler);
             float.notify();
-            await time.runMicrotasks();
+            await null;
+            assertSpyCalls(handler, 0);
+        });
+
+        it('should add the unwatch method and support immediate=true', async () => {
+            assertExists(float.unwatch);
+
+            float.watch({ handler, immediate: true });
+            float.unwatch(handler);
+            float.notify();
+            assertSpyCalls(handler, 0);
+        });
+
+        it('should return an object containing original handler, an unwatch method, and immediate boolean.', async () => {
+            const result = float.watch(handler);
+            assertEquals(result.handler, handler);
+            assertExists(result.immediate);
+            result.unwatch();
+            float.notify();
+            await null;
             assertSpyCalls(handler, 0);
         });
     });

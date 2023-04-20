@@ -1,6 +1,6 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.143.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.180.0/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
+import { FakeTime                            } from 'std/testing/time.ts';
 import { 
     assert,
     assertEquals, 
@@ -168,6 +168,17 @@ describe('Stage', () => {
 
         it('should initialize the component value if an initializer is specified', () => {
             assertInstanceOf([...systemA.modelCs][0].c, Initializer);
+        });
+
+        it('should not initialize a component instance', () => {
+            const component = stage.components.getById(componentC);
+            stage.components.delete(component);
+
+            component.value = 'test';
+
+            stage.components.add(component);
+            assertEquals(stage.components.getById(componentC).value, 'test');
+
         });
     });
 
@@ -367,9 +378,11 @@ describe('Stage', () => {
             }
         }
 
-        let system, entity, modelA, modelB, arrayB = ['b', 'c'], componentAdd;
+        let system, entity, modelA, modelB, arrayB, componentAdd;
 
         beforeEach(() => {
+            arrayB = ['b', 'c'];
+
             stage  = new Stage();
             system = new SystemA();
 

@@ -1,18 +1,20 @@
-import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assertEquals, assertFalse, assertExists  } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
-import { spy, stub, assertSpyCall, assertSpyCalls } from 'https://deno.land/std@0.143.0/testing/mock.ts';
+import { describe, it, beforeEach                 } from 'std/testing/bdd.ts';
+import { assertEquals, assertFalse, assertExists  } from 'std/testing/asserts.ts';
+import { spy, stub, assertSpyCall, assertSpyCalls } from 'std/testing/mock.ts';
 
 import { GameEvent       } from '../../../lib/events/game-event.js';
 import { GameEventTarget } from '../../../lib/events/game-event-target.js';
 
+/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+
 describe('GameEventTarget', () => {
-    let handler, target1, target2, target3;
+    let /** @type {Spy} */handler, /** @type {GameEventTarget}*/target1, /** @type {GameEventTarget}*/target2, /** @type {GameEventTarget}*/target3;
 
     beforeEach(() => {
         handler = spy();
-        target1 = new GameEventTarget('target1');
-        target2 = new GameEventTarget('target2');
-        target3 = new GameEventTarget('target3');
+        target1 = new GameEventTarget();
+        target2 = new GameEventTarget();
+        target3 = new GameEventTarget();
     });
 
     describe('addEventListener', () => {
@@ -98,10 +100,10 @@ describe('GameEventTarget', () => {
             });
 
             describe('promise', () => {
-                let event, promise;
+                let /** @type {GameEvent} */event, /** @type {Promise<void>} */promise;
 
                 beforeEach(() => {
-                    event = new GameEvent('test');
+                    event   = new GameEvent('test');
                     promise = new Promise(resolve => setTimeout(resolve, 0));
                     target1.addEventListener('test', handler, { once: promise });
                 });
@@ -160,7 +162,7 @@ describe('GameEventTarget', () => {
         });
 
         describe('propagation', () => {
-            let event;
+            let /** @type {GameEvent} */event;
             beforeEach(() => {
                 event = new GameEvent('test');
                 event.path.push(target2, target3);
@@ -191,7 +193,28 @@ describe('GameEventTarget', () => {
                 assertEquals(handler.calls[1].args[0], target2);
                 assertEquals(handler.calls[2].args[0], target1);
             });
+
+            
         });
+
+        describe('bubble = false', () => {
+            let /** @type {GameEvent} */event;
+            beforeEach(() => {
+                event = new GameEvent('test', { bubbles: false });
+                event.path.push(target2, target3);
+            });
+
+            it('should not bubble up the event path', () => {
+                target1.addEventListener('test', e => handler(e.currentTarget));
+                target2.addEventListener('test', e => handler(e.currentTarget));
+                target3.addEventListener('test', e => handler(e.currentTarget));
+
+                target1.dispatchEvent(event);
+
+                assertSpyCalls(handler, 1);
+                assertEquals(handler.calls[0].args[0], target1);
+            }); 
+        })
     });
 
     describe('deferEvent', () => {

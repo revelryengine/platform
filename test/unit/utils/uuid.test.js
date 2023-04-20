@@ -1,5 +1,5 @@
-import { describe, it, beforeEach } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assert, assertEquals, assertInstanceOf } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { describe, it, beforeEach                             } from 'std/testing/bdd.ts';
+import { assert, assertEquals, assertInstanceOf, assertThrows } from 'std/testing/asserts.ts';
 
 import { UUID } from '../../../lib/utils/uuid.js';
 
@@ -33,6 +33,10 @@ describe('UUID', () => {
         it('should result in an equivlanent byte array', () => {
             assertEquals(bytes, UUID_BYTES);
         });
+
+        it('should throw if not a valid UUID v4 string', () => {
+            assertThrows(() => UUID.toBytes('foobar'));
+        });
     });
 
     describe('fromBytes', () => {
@@ -47,11 +51,6 @@ describe('UUID', () => {
     });
 
     describe('isUUID', () => {
-        let bytes;
-        beforeEach(() => {
-            bytes = UUID.fromBytes(UUID_BYTES);
-        });
-
         it('should return true if string is in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx hex format', () => {
             assert(UUID.isUUID(UUID_STRING));
         });

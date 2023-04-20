@@ -1,11 +1,10 @@
-import { describe, it, beforeEach          } from 'https://deno.land/std@0.143.0/testing/bdd.ts';
-import { assert, assertFalse, assertEquals } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { describe, it, beforeEach          } from 'std/testing/bdd.ts';
+import { assert, assertFalse, assertEquals } from 'std/testing/asserts.ts';
 
 import { ClassSet } from '../../../lib/utils/class-set.js';
 
 describe('ClassSet', () => {
-    let itemA, itemB, classSet;
-
+    
     class ClassA {
 
     }
@@ -13,6 +12,8 @@ describe('ClassSet', () => {
     class ClassB {
 
     }
+
+    let /** @type {ClassA} */itemA, /** @type {ClassB} */itemB, /** @type {ClassSet<ClassA|ClassB>} */classSet;
 
     beforeEach(() => {
         itemA    = new ClassA();
