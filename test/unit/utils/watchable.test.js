@@ -1,6 +1,6 @@
 import { describe, it, beforeEach                     } from 'std/testing/bdd.ts';
 import { spy, assertSpyCalls                          } from 'std/testing/mock.ts';
-import { assertInstanceOf, assertExists, assertEquals } from 'std/testing/asserts.ts';
+import { assertInstanceOf, assertExists, assertEquals, assert } from 'std/testing/asserts.ts';
 
 import { Watchable } from '../../../lib/utils/watchable.js';
 
@@ -152,4 +152,30 @@ describe('Watchable', () => {
             assertSpyCalls(handler, 0);
         });
     });
+
+    describe('isWatchable', () => {
+        let watchable, extended, mixin, nonWatchable;
+        beforeEach(() => {
+            watchable    = new Watchable();
+            extended     = new (class extends Watchable {});
+            mixin        = new (class extends Watchable.mixin(Float32Array) {});
+            nonWatchable = new Float32Array();
+        });
+
+        it('should return true for watchable instance', () => {
+            assert(Watchable.isWatchable(watchable));
+        });
+
+        it('should return true for extended watchable intance', () => {
+            assert(Watchable.isWatchable(extended));
+        });
+
+        it('should return true for extended mixin watchable intance', () => {
+            assert(Watchable.isWatchable(mixin));
+        });
+
+        it('should return false non watchable', () => {
+            assert(!Watchable.isWatchable(nonWatchable));
+        });
+    })
 });

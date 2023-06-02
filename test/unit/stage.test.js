@@ -11,15 +11,16 @@ import {
     assertFalse,
 } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 
-import { Stage    } from '../../lib/stage.js';
-import { System   } from '../../lib/system.js';
-import { Model    } from '../../lib/model.js';
-import { UUID     } from '../../lib/utils/uuid.js';
+import { Stage     } from '../../lib/stage.js';
+import { System    } from '../../lib/system.js';
+import { Model     } from '../../lib/model.js';
+import { UUID      } from '../../lib/utils/uuid.js';
+import { Watchable } from '../../lib/utils/watchable.js';
 
 describe('Stage', () => {
     let time;
     let stage, systemA, systemB, entityA, entityB;
-    let componentA, componentB, componentC, componentD, componentE, componentF;
+    let componentA, componentB, componentC, componentD, componentE, componentF, componentW;
 
     class Initializer {
 
@@ -43,7 +44,7 @@ describe('Stage', () => {
     class ModelC extends Model {
         static get components() {
             return { 
-                c: { type: 'c', initializer: Initializer },
+                c: { type: 'c' },
             };
         }
     }
@@ -71,6 +72,8 @@ describe('Stage', () => {
     beforeEach(() => {
         time = new FakeTime();
         stage = new Stage();
+
+        stage.initializers.set('c', Initializer);
 
         entityA = UUID();
         entityB = UUID();
@@ -234,7 +237,61 @@ describe('Stage', () => {
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
-    })
+    });
+
+    describe('component watchable value change', () => {
+        let handler, componentW, component, watchableA, watchableB;
+        beforeEach(() => {
+            componentW = UUID();
+            watchableA = new Watchable();
+            watchableB = new Watchable();
+
+            stage.components.add({ id: componentW, entityId: entityB, type: 'w', value: watchableA });
+
+            handler = spy();
+            component = stage.components.getById(componentW);
+            component.watch(handler);
+        });
+
+        it('should call watch handler when watchable notifies change', async () => {
+            watchableA.notify('oldValue');
+            await time.runMicrotasks();
+            assertSpyCall(handler, 0, { args: [component, 'oldValue']});
+        });
+
+        it('should call watch handler when watchable value changes', async () => {
+            component.value = watchableB;
+            await time.runMicrotasks();
+            assertSpyCall(handler, 0, { args: [component, watchableA]});
+        });
+
+        it('should call watch handler when new watchable value notifies', async () => {
+            component.value = watchableB;
+            await time.runMicrotasks();
+            assertSpyCall(handler, 0, { args: [component, watchableA]});
+
+            watchableB.notify('oldValue');
+            await time.runMicrotasks();
+            assertSpyCall(handler, 1, { args: [component, 'oldValue']});
+        });
+
+        it('should not call watch handler when original watchable value has been removed', async () => {
+            component.value = watchableB;
+            await time.runMicrotasks();
+            assertSpyCall(handler, 0, { args: [component, watchableA]});
+
+            watchableA.notify('oldValue');
+            await time.runMicrotasks();
+            assertSpyCalls(handler, 1);
+        });
+
+        it('should not call watch handler after component has been removed', async () => {
+            stage.components.delete(component);
+            watchableA.notify('oldValue');
+            await time.runMicrotasks();
+            assertSpyCalls(handler, 0);
+        });
+    });
 
     describe('model.entity.components.add', () => {
         let componentG;
