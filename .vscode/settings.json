@@ -1,0 +1,18 @@
+{
+    "svg.preview.background": "transparent",
+    "deno.enable": true,
+    "deno.unstable": false,
+    "deno.config": "./deno.jsonc",
+    "deno.lint": true,
+    "deno.suggest.imports.hosts": {
+
+        "https://deno.land": true,
+        "https://x.nest.land": true,
+        "https://crux.land": true
+    },
+    "deno.enablePaths": [
+        "./packages/ecs",
+        "./editor/vscode-extension"
+    ],
+    "github.gitProtocol": "https"
+}

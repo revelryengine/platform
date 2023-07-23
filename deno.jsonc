@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+    },
+    "lock": false,
+    "lint": {
+        "files": {
+            "include": ["packages/ecs", "editor"],
+            "exclude": ["edtior/vscode-extension/editor.bundle.js"]
+        },
+        "rules": {
+            "exclude": ["require-await", "no-explicit-any"]
+        }
+    },
+    "imports": {
+        "revelryengine/ecs" : "./packages/ecs/lib/ecs.js",
+        "revelryengine/"    : "./packages/",
+        "std/testing/"      : "https://deno.land/std@0.180.0/testing/",
+        "lit"               : "https://cdn.skypack.dev/lit@2.4.0",
+        "lit/"              : "https://cdn.skypack.dev/lit@2.4.0/",
+        "stats"             : "https://cdn.jsdelivr.net/gh/mrdoob/stats.js/build/stats.module.js",
+        "vscode"            : "https://cdn.jsdelivr.net/npm/@types/vscode/index.d.ts"
+    }
+}
