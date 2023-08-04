@@ -20,52 +20,49 @@ import { Watchable } from '../../lib/utils/watchable.js';
 describe('Stage', () => {
     let time;
     let stage, systemA, systemB, entityA, entityB;
-    let componentA, componentB, componentC, componentD, componentE, componentF, componentW;
+    let componentA, componentB, componentC, componentD, componentE, componentF;
+    let cleanupSpy;
 
     class Initializer {
 
     }
 
     class ModelA extends Model {
-        static get components() {
-            return { a: { type: 'a', } };
+        static components = {
+            a: { type: 'a' },
         }
     }
 
     class ModelB extends Model {
-        static get components() {
-            return { 
-                a: { type: 'a' },
-                b: { type: 'b' } 
-            };
+        static components = {
+            a: { type: 'a' },
+            b: { type: 'b' },
+        }
+
+        cleanup() {
+            cleanupSpy(this.entity.id);
         }
     }
 
     class ModelC extends Model {
-        static get components() {
-            return { 
-                c: { type: 'c' },
-            };
+        static components = {
+            c: { type: 'c' },
         }
     }
 
     class SystemA extends System {
-        static get models() {
-            return {
-                modelA:  { model: ModelA },
-                modelB:  { model: ModelB },
-                modelCs: { model: ModelC, isSet: true },
-            }
+        static models = {
+            modelA:  { model: ModelA },
+            modelB:  { model: ModelB },
+            modelCs: { model: ModelC, isSet: true },
         }
     }
 
     class SystemB extends System {
-        static get models() {
-            return {
-                modelA:  { model: ModelA },
-                modelB:  { model: ModelB },
-                modelCs: { model: ModelC, isSet: true },
-            }
+        static models = {
+            modelA:  { model: ModelA },
+            modelB:  { model: ModelB },
+            modelCs: { model: ModelC, isSet: true },
         }
     }
 
@@ -187,6 +184,7 @@ describe('Stage', () => {
 
     describe('components.delete', () => {
         beforeEach(() => {
+            cleanupSpy = spy();
             stage.components.delete({ id: componentB });
             stage.components.delete({ id: componentD });
             stage.components.delete({ id: componentE });
@@ -202,6 +200,11 @@ describe('Stage', () => {
         it('should delete system property when model no longer matches', () => {
             assertEquals(systemA.modelB, undefined);
             assertEquals(systemB.modelB, undefined);
+        });
+
+        it('should call model.cleanup on model when model no longer matches', () => {
+            assertSpyCall(cleanupSpy, 0, { args: [entityA] });
+            assertSpyCall(cleanupSpy, 1, { args: [entityB] });
         });
 
         it('should remove entities from system property Set when model is removed', () => {
@@ -222,14 +225,14 @@ describe('Stage', () => {
         beforeEach(() => {
             handler = spy();
             component = stage.components.getById(componentA);
-            component.watch(handler);
+            component.watch({ type: 'value', handler });
         });
 
         it('should call watch handler when value changes', async () => {
             const oldValue = component.value;
             component.value = 'change';
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [component, oldValue]});
+            assertSpyCall(handler, 0, { args: [oldValue]});
         });
 
         it('should not call watch handler when value is the same', async () => {
@@ -250,37 +253,37 @@ describe('Stage', () => {
 
             handler = spy();
             component = stage.components.getById(componentW);
-            component.watch(handler);
+            component.watch({ type: 'value', handler });
         });
 
         it('should call watch handler when watchable notifies change', async () => {
-            watchableA.notify('oldValue');
+            watchableA.notify('test', 'oldValue');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [component, 'oldValue']});
+            assertSpyCall(handler, 0, { args: [new Map([['test', ['oldValue']]])]});
         });
 
         it('should call watch handler when watchable value changes', async () => {
             component.value = watchableB;
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [component, watchableA]});
+            assertSpyCall(handler, 0, { args: [watchableA]});
         });
 
-        it('should call watch handler when new watchable value notifies', async () => {
+        it('should call watch handler when new watchable notifies', async () => {
             component.value = watchableB;
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [component, watchableA]});
+            assertSpyCall(handler, 0, { args: [watchableA]});
 
-            watchableB.notify('oldValue');
+            watchableB.notify('test', 'oldValue');
             await time.runMicrotasks();
-            assertSpyCall(handler, 1, { args: [component, 'oldValue']});
+            assertSpyCall(handler, 1, { args: [new Map([['test', ['oldValue']]])]});
         });
 
         it('should not call watch handler when original watchable value has been removed', async () => {
             component.value = watchableB;
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [component, watchableA]});
+            assertSpyCall(handler, 0, { args: [watchableA]});
 
-            watchableA.notify('oldValue');
+            watchableA.notify('test', 'oldValue');
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
         });
@@ -290,6 +293,13 @@ describe('Stage', () => {
             watchableA.notify('oldValue');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
+        });
+    });
+
+    describe('component.stage', () => {
+        it('should have a reference to the stage', () => {
+            const component = stage.components.getById(componentA);
+            assertEquals(component.stage, stage);
         });
     });
 
