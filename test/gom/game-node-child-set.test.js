@@ -2,23 +2,41 @@ import { describe, it, beforeEach          } from 'std/testing/bdd.ts';
 import { assert, assertEquals, assertFalse } from 'std/testing/asserts.ts';
 import { spy, assertSpyCalls               } from 'std/testing/mock.ts';
 
-import { GameNodeChildSet } from '../../../lib/gom/game-node-child-set.js';
-import { GameNode         } from '../../../lib/gom/game-node.js';
-import { Game             } from '../../../lib/game.js';
-import { Stage            } from '../../../lib/stage.js';
-import { System           } from '../../../lib/system.js';
+import { GameNodeChildSet } from '../../lib/gom/game-node-child-set.js';
+import { GameNode         } from '../../lib/gom/game-node.js';
+import { Game             } from '../../lib/game.js';
+import { Stage            } from '../../lib/stage.js';
+import { System           } from '../../lib/system.js';
 
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
 
 describe('GameNodeChildSet', () => {
-    let /** @type {Game} */game, /** @type {Stage} */stageA, /** @type {Stage} */stageB, /** @type {System} */systemA, /** @type {System} */systemB, /** @type {GameNodeChildSet<any>} */childSet;
+
+    class SystemA extends System {}
+    class SystemB extends System {}
+
+    /** @type {Game} */
+    let game;
+    /** @type {Stage} */
+    let stageA;
+    /** @type {Stage} */
+    let stageB;
+    /** @type {SystemA} */
+    let systemA;
+    /** @type {SystemB} */
+    let systemB;
+    /** @type {GameNodeChildSet<any>} */
+    let childSet;
+
+    /** @type {Spy} */
+    let handler;
 
     beforeEach(() => {
         game     = new Game();
         stageA   = new Stage('stageA');
         stageB   = new Stage('stageB');
-        systemA  = new System('systemA');
-        systemB  = new System('systemB');
+        systemA  = new SystemA('systemA');
+        systemB  = new SystemB('systemB');
         childSet = new GameNodeChildSet(new GameNode('parent'), [new GameNode('child')]);
     });
 
@@ -29,9 +47,12 @@ describe('GameNodeChildSet', () => {
     });
 
     describe('add', () => {
-        let /** @type {Spy} */connected;
+        /** @type {Spy} */
+        let connected;
         beforeEach(() => {
             connected = spy(stageA, 'connectedCallback');
+            handler = spy();
+            game.watch({ type: 'node:add', immediate: true, handler });
             game.children.add(stageA);
         });
 
@@ -47,10 +68,15 @@ describe('GameNodeChildSet', () => {
             assertSpyCalls(connected, 1);
         });
 
+        it('should notify node:add', () => {
+            assertSpyCalls(handler, 1);
+        });
     });
 
     describe('delete', () => {
         beforeEach(() => {
+            handler = spy();
+            game.watch({ type: 'node:delete', immediate: true, handler });
             game.children.add(stageA);
             game.children.delete(stageA);
         });
@@ -66,6 +92,10 @@ describe('GameNodeChildSet', () => {
         it('should return false if child was not part of game', () => {
             assertFalse(childSet.delete(new GameNode()));
         });
+
+        it('should notify node:delete', () => {
+            assertSpyCalls(handler, 1);
+        });
     });
 
     describe('getById', () => {
@@ -80,8 +110,14 @@ describe('GameNodeChildSet', () => {
     });
 
     describe('connectedCallback', () => {
-        let /** @type {Spy} */connectedStageA, /** @type {Spy} */connectedStageB;
-        let /** @type {Spy} */connectedSystemA, /** @type {Spy} */connectedSystemB;
+        /** @type {Spy} */
+        let connectedStageA;
+         /** @type {Spy} */
+        let connectedStageB;
+        /** @type {Spy} */
+        let connectedSystemA;
+        /** @type {Spy} */
+        let connectedSystemB;
 
         beforeEach(() => {
             connectedStageA  = spy(stageA,  'connectedCallback');
@@ -110,8 +146,15 @@ describe('GameNodeChildSet', () => {
     });
 
     describe('disconnectedCallback', () => {
-        let /** @type {Spy} */disconnectedStageA, /** @type {Spy} */disconnectedStageB;
-        let /** @type {Spy} */disconnectedSystemA, /** @type {Spy} */disconnectedSystemB;
+        /** @type {Spy} */
+        let disconnectedStageA;
+        /** @type {Spy} */
+        let disconnectedStageB;
+        /** @type {Spy} */
+        let disconnectedSystemA;
+        /** @type {Spy} */
+        let disconnectedSystemB;
+        
         beforeEach(() => {
             disconnectedStageA  = spy(stageA,  'disconnectedCallback');
             disconnectedStageB  = spy(stageB,  'disconnectedCallback');

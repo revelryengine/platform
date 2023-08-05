@@ -1,7 +1,7 @@
 import { describe, it, beforeEach                             } from 'std/testing/bdd.ts';
 import { assert, assertEquals, assertInstanceOf, assertThrows } from 'std/testing/asserts.ts';
 
-import { UUID } from '../../../lib/utils/uuid.js';
+import { UUID } from '../../lib/utils/uuid.js';
 
 const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
 
@@ -10,7 +10,11 @@ const UUID_STRING = 'b47b93ce-4c65-4aba-bf15-287a8934656f';
 const UUID_BYTES  = new Uint8Array([180, 123, 147, 206, 76, 101, 74, 186, 191, 21, 40, 122, 137, 52, 101, 111]);
 
 describe('UUID', () => {
+    /** @type {string} */
     let id;
+    /** @type {Uint8Array} */
+    let bytes;
+
     beforeEach(() => {
         id = UUID();
     });
@@ -20,7 +24,6 @@ describe('UUID', () => {
     });
 
     describe('toBytes', () => {
-        let bytes;
         beforeEach(() => {
             bytes = UUID.toBytes(UUID_STRING);
         });
@@ -40,13 +43,12 @@ describe('UUID', () => {
     });
 
     describe('fromBytes', () => {
-        let bytes;
         beforeEach(() => {
-            bytes = UUID.fromBytes(UUID_BYTES);
+            id = UUID.fromBytes(UUID_BYTES);
         });
 
         it('should result in an equivalent string ', () => {
-            assertEquals(bytes, UUID_STRING);
+            assertEquals(id, UUID_STRING);
         });
     });
 

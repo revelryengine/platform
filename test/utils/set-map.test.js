@@ -1,9 +1,10 @@
 import { describe, it, beforeEach                            } from 'std/testing/bdd.ts';
 import { assert, assertInstanceOf, assertEquals, assertFalse } from 'std/testing/asserts.ts';
 
-import { SetMap } from '../../../lib/utils/set-map.js';
+import { SetMap } from '../../lib/utils/set-map.js';
 
 describe('SetMap', () => {
+    /** @type {SetMap<any, any>} */
     let setMap;
 
     beforeEach(() => {
@@ -22,12 +23,12 @@ describe('SetMap', () => {
     });
 
     it('should add item to set', () => {
-        assert(setMap.get('foo').has('foobat'));
-        assert(setMap.get('foo').has('foobaz'));
+        assert(setMap.get('foo')?.has('foobat'));
+        assert(setMap.get('foo')?.has('foobaz'));
     });
 
     it('should remove item from set', () => {
-        assertFalse(setMap.get('foo').has('foobar'));
+        assertFalse(setMap.get('foo')?.has('foobar'));
     });
 
     it('should remove empty Sets', () => {

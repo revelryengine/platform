@@ -1,27 +1,33 @@
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
-/** @typedef {import('../../lib/stage.js').Component} Component */
-/** @typedef {import('../../lib/utils/watchable.js').WatchHandler} WatchHandler */
-/** @typedef {import('../../lib/utils/watchable.js').WatchOptions} WatchOptions */
-
 import { describe, it, beforeEach           } from 'std/testing/bdd.ts';
 import { assertEquals                       } from 'std/testing/asserts.ts';
 import { spy, assertSpyCall, assertSpyCalls } from 'std/testing/mock.ts';
 
+import { Game   } from '../lib/game.js';
+import { Stage  } from '../lib/stage.js';
+import { System } from '../lib/system.js';
+import { Model  } from '../lib/model.js';
+import { UUID   } from '../lib/utils/uuid.js';
 
-import { Game   } from '../../lib/game.js';
-import { Stage  } from '../../lib/stage.js';
-import { System } from '../../lib/system.js';
-import { Model  } from '../../lib/model.js';
-import { UUID   } from '../../lib/utils/uuid.js';
+/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+/** @typedef {import('../lib/stage.js').Component} Component */
+/** @typedef {import('../lib/utils/watchable.js').WatchHandler} WatchHandler */
+/** @typedef {import('../lib/utils/watchable.js').WatchOptions} WatchOptions */
+
 
 describe('Model', () => {
+    /**
+     * @extends {Model<{ a: string, b: string }>} 
+     */
     class ModelA extends Model {
         static components = {
             a: { type: 'a' }, 
-            b: { type: 'b' }, 
+            b: { type: 'b' },
         }
     }
 
+    /**
+     * @extends {Model<{ a: string }>} 
+     */
     class ModelB extends Model {
         static components = {
             a: { type: 'a' },
@@ -35,9 +41,25 @@ describe('Model', () => {
             modelC:  { model: Model  },
         }
     }
+    /** @type {string} */
+    let componentAId;
+    /** @type {string} */
+    let componentBId; 
+    /** @type {Component} */
+    let componentA;
+    /** @type {Component} */
+    let componentB;
+    /** @type {string} */
+    let entityId;
 
-    let /** @type {string} */componentAId, /** @type {string} */componentBId, /** @type {Component} */componentA, /** @type {Component} */componentB, /** @type {string} */entityId;
-    let /** @type {Game} */game, /** @type {Stage} */stage, /** @type {System} */system, /** @type {ModelA} */modelA;
+    /** @type {Game} */
+    let game;
+    /** @type {Stage} */
+    let stage;
+    /** @type {System} */
+    let system;
+    /** @type {ModelA} */
+    let modelA;
 
     beforeEach(() => {
         game   = new Game();
@@ -150,10 +172,4 @@ describe('Model', () => {
             assertEquals(modelA.game, game);
         });
     });
-
-    // describe('default components', () => {
-    //     it('should not error when not defining a subclass', () => {
-    //         assertEquals(true, false);
-    //     });
-    // });
 });

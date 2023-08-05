@@ -1,19 +1,25 @@
 import { describe, it, beforeEach                     } from 'std/testing/bdd.ts';
 import { assertEquals, assertInstanceOf, assertExists } from 'std/testing/asserts.ts';
 
-import { System } from '../../lib/system.js';
+import { System } from '../lib/system.js';
+import { Model  } from '../lib/model.js';
+
+/** @typedef {import('../lib/game.js').Game} Game */
+/** @typedef {import('../lib/stage.js').Stage} Stage */
 
 describe('System', () => {
-    let system;
-
+    /**
+     * @extends {System<{ modelA: Model<{ a: string }>, modelBs: Set<Model<{ a: string }>> }>} 
+     */
     class SystemA extends System {
-        static get models() {
-            return {
-                modelA:  { },
-                modelBs: { isSet: true },
-            }
+        static models = {
+            modelA:  { model: Model, },
+            modelBs: { model: Model, isSet: true },
         }
     }
+
+    /** @type {SystemA} */
+    let system;
 
     beforeEach(() => {
         system = new SystemA('system');
@@ -29,15 +35,16 @@ describe('System', () => {
 
     describe('stage', () => {
         it('should be a reference to the parent stage', () => {
-            system.parent = {};
+            system.parent = /** @type {Stage} */({});
             assertEquals(system.stage, system.parent);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the stage parent game', () => {
-            system.parent = { parent: {} };
-            assertEquals(system.game, system.stage.parent);
+            system.parent =  /** @type {Stage} */({ parent:  /** @type {Game} */({}) });
+            assertExists(system.stage?.parent);
+            assertEquals(system.game, system.stage?.parent);
         });
     });
 

@@ -2,13 +2,18 @@ import { describe, it, beforeEach           } from 'std/testing/bdd.ts';
 import { assert, assertFalse, assertEquals  } from 'std/testing/asserts.ts';
 import { spy, assertSpyCall, assertSpyCalls } from 'std/testing/mock.ts';
 
-import { IdSet } from '../../../lib/utils/id-set.js';
-import { UUID  } from '../../../lib/utils/uuid.js';
+import { IdSet } from '../../lib/utils/id-set.js';
+import { UUID  } from '../../lib/utils/uuid.js';
 
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
 
 describe('IdSet', () => {
-    let /** @type {{id: String }} */itemA, /** @type {{id: String }} */itemB, /** @type {IdSet<Object, { id: String }>} */idSet;
+    /** @type {{id: String }} */
+    let itemA;
+    /** @type {{id: String }} */
+    let itemB;
+    /** @type {IdSet<Object, { id: String }>} */
+    let idSet;
 
     beforeEach(() => {
         itemA = { id: 'itemA' };
@@ -47,7 +52,11 @@ describe('IdSet', () => {
     });
 
     describe('setRegistrationHandlers', () => {
-        let /** @type {Spy} */register, /** @type {Spy} */unregister;
+        /** @type {Spy} */
+        let register;
+        /** @type {Spy} */
+        let unregister;
+        
         beforeEach(() => {
             register   = spy(item => item);
             unregister = spy();

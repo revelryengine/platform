@@ -1,7 +1,7 @@
 import { describe, it } from 'std/testing/bdd.ts';
 import { assertExists } from 'std/testing/asserts.ts';
 
-import * as ECS from '../../lib/ecs.js';
+import * as ECS from '../lib/ecs.js';
 
 describe('ECS', () => {
     it('should load module', () => {

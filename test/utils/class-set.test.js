@@ -1,7 +1,7 @@
 import { describe, it, beforeEach          } from 'std/testing/bdd.ts';
 import { assert, assertFalse, assertEquals } from 'std/testing/asserts.ts';
 
-import { ClassSet } from '../../../lib/utils/class-set.js';
+import { ClassSet } from '../../lib/utils/class-set.js';
 
 describe('ClassSet', () => {
     
@@ -12,8 +12,12 @@ describe('ClassSet', () => {
     class ClassB {
 
     }
-
-    let /** @type {ClassA} */itemA, /** @type {ClassB} */itemB, /** @type {ClassSet<ClassA|ClassB>} */classSet;
+    /** @type {ClassA} */
+    let itemA;
+    /** @type {ClassB} */
+    let itemB;
+    /** @type {ClassSet<ClassA|ClassB>} */
+    let classSet;
 
     beforeEach(() => {
         itemA    = new ClassA();

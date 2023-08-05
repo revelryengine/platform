@@ -1,19 +1,23 @@
 import { describe, it, beforeEach } from 'std/testing/bdd.ts';
 import { assertEquals             } from 'std/testing/asserts.ts';
 
-
-import { Game       } from '../../lib/game.js';
-import { extensions } from '../../lib/extensions.js';
+import { Game       } from '../lib/game.js';
+import { extensions } from '../lib/extensions.js';
 
 describe('extensions', () => {
-    let GameSubClassA, GameSubClassB, GameSubClassC;
-    let gameA, gameB, gameC;
+
+    class GameSubClassA extends Game { }
+    class GameSubClassB extends Game { }
+    class GameSubClassC extends GameSubClassB { }
+
+    /** @type {GameSubClassA} */
+    let gameA;
+    /** @type {GameSubClassB} */
+    let gameB; 
+    /** @type {GameSubClassC} */
+    let gameC;
 
     beforeEach(() => {
-        GameSubClassA = class extends Game { };
-        GameSubClassB = class extends Game { };
-        GameSubClassC = class extends GameSubClassB { };
-
         gameA = new GameSubClassA();
         gameB = new GameSubClassB();
         gameC = new GameSubClassC();

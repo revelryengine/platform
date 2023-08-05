@@ -1,54 +1,70 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { assertEquals                        } from 'std/testing/asserts.ts';
-import { spy, assertSpyCalls                 } from 'std/testing/mock.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { assertEquals             } from 'std/testing/asserts.ts';
+import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
 
-import { GameNode } from '../../../lib/gom/game-node.js';
+import { GameNode } from '../../lib/gom/game-node.js';
+
+/** @typedef {import('std/testing/mock.ts').Spy} Spy */
 
 describe('GameNode', () => {
-    let node, childA, childB, parentA, parentB, event;
+    /** @type {GameNode<any, any>} */
+    let node;
+    /**
+    * @type {GameNode<any, any>}
+    */
+    let childA;
+    /**
+    * @type {GameNode<any, any>}
+    */
+    let childB;
+    /**
+    * @type {GameNode<any, any>}
+    */
+    let parentA;
+    /**
+    * @type {GameNode<any, any>}
+    */
+    let parentB;
 
     beforeEach(() => {
         node = new GameNode('node');
 
         parentA = new GameNode('parentA');
         parentB = new GameNode('parentB');
-        childA = new GameNode('childA');
-        childB = new GameNode('childB');
+        childA  = new GameNode('childA');
+        childB  = new GameNode('childB');
 
         node.parent = parentA;
         parentA.parent = parentB;
 
         node.children.add(childA);
         node.children.add(childB);
-
-        event = { eventPhase: 0, bubbles: true, path: [] };
-
-
     });
 
     describe('update', () => {
-        let dispatch, updateA, updateB;
+        /** @type {Spy} */
+        let updateA;
+        /** @type {Spy} */
+        let updateB;
 
         beforeEach(() => {
-            dispatch  = spy(node, 'dispatchDeferredEvents');
             updateA = spy(childA, 'update');
             updateB = spy(childB, 'update');
         });
 
-        it('should call dispatchDeferredEvents ', async () => {
-            await node.update();
-            assertSpyCalls(dispatch, 1);
-        });
 
         it('should call update on all children', async () => {
-            await node.update();
+            await node.update(1);
             assertSpyCalls(updateA, 1);
             assertSpyCalls(updateB, 1);
         });
     });
 
     describe('render', () => {
-        let renderA, renderB;
+        /** @type {Spy} */
+        let renderA;
+        /** @type {Spy} */
+        let renderB;
         beforeEach(() => {
             renderA = spy(childA, 'render');
             renderB = spy(childB, 'render');
@@ -62,7 +78,10 @@ describe('GameNode', () => {
     });
 
     describe('preload', () => {
-        let preloadA, preloadB;
+        /** @type {Spy} */
+        let preloadA;
+        /** @type {Spy} */
+        let preloadB;
         beforeEach(() => {
             preloadA = spy(childA, 'preload');
             preloadB = spy(childB, 'preload');
@@ -75,26 +94,14 @@ describe('GameNode', () => {
         });
     });
 
-    describe('dispatchEvent', () => {
-        let dispatch;
-        beforeEach(() => {
-            dispatch = spy(Object.getPrototypeOf(GameNode).prototype, 'dispatchEvent');
-        });
-
-        afterEach(() => {
-            dispatch.restore();
-        });
-
-        it('Add parents to GameEvent.path and call super dispatchEvent', () => {
-            node.dispatchEvent(event);
-            assertEquals(event.path[0], parentA);
-            assertEquals(event.path[1], parentB);
-            assertSpyCalls(dispatch, 1);
-        });
-    });
 
     describe('get root', () => {
-        let root, childA, childB;
+        /** @type {GameNode<any, any>} */
+        let root;
+        /** @type {GameNode<any, any>} */
+        let childA;
+        /** @type {GameNode<any, any>} */
+        let childB;
 
         beforeEach(() => {
             root   = new GameNode('root');
