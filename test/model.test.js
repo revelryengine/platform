@@ -112,7 +112,7 @@ describe('Model', () => {
                     modelA.a = 'testA';
                     modelA.b = 'testB';
                     await null;
-                    assertSpyCall(handler, 0, { args: [new Map([['a', ['valueA']], ['b', ['valueB']]])] });
+                    assertSpyCall(handler, 0, { args: [new Map([['a:change', ['valueA']], ['b:change', ['valueB']]])] });
                 });
             });
     
@@ -137,8 +137,8 @@ describe('Model', () => {
             it('should call the watcher immediately for all components that change', async () => {
                 modelA.a = 'testA';
                 modelA.b = 'testB';
-                assertSpyCall(handler, 0, { args: ['a', 'valueA'] });
-                assertSpyCall(handler, 1, { args: ['b', 'valueB'] });
+                assertSpyCall(handler, 0, { args: ['a:change', 'valueA'] });
+                assertSpyCall(handler, 1, { args: ['b:change', 'valueB'] });
                 assertSpyCalls(handler, 2);
             });
         });
@@ -146,7 +146,7 @@ describe('Model', () => {
         describe('watch individual property', () => {
             beforeEach(() => {
                 handler = spy();
-                options = { handler, type: 'a' };
+                options = { handler, type: 'a:change' };
                 modelA.watch(options);
             });
 
