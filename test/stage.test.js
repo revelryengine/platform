@@ -279,7 +279,7 @@ describe('Stage', () => {
         beforeEach(() => {
             handler = spy();
             component = /** @type {Component} */(stage.components.getById(componentA));
-            component.watch({ type: 'value', handler });
+            component.watch({ type: 'value:change', handler });
         });
 
         it('should call watch handler when value changes', async () => {
@@ -315,7 +315,7 @@ describe('Stage', () => {
 
             handler = spy();
             component = /** @type {Component} */(stage.components.getById(componentW));
-            component.watch({ type: 'value', handler });
+            component.watch({ type: 'value:change', handler });
         });
 
         it('should call watch handler when watchable notifies change', async () => {
