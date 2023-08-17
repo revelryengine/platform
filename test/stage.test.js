@@ -7,7 +7,8 @@ import {
     assertInstanceOf, 
     assertExists,
     assertFalse,
-} from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+    assertThrows,
+} from 'std/testing/asserts.ts';
 
 import { Stage     } from '../lib/stage.js';
 import { System    } from '../lib/system.js';
@@ -17,79 +18,84 @@ import { Watchable } from '../lib/utils/watchable.js';
 
 /**
  * @typedef {import('std/testing/mock.ts').Spy} Spy
- * @typedef {import('../lib/game.js').Game} Game
- * @typedef {import('../lib/stage.js').Component} Component
- * @typedef {import('../lib/stage.js').ComponentReference} ComponentReference
+ */
+
+
+/**
+ * @template V,[C=any]
+ * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
+ */
+
+/**
+ * @typedef {{  
+ *  a: ComponentValue<string>,
+ *  b: ComponentValue<number>,
+ *  c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
+ *  d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+ * }} ComponentTypes
+ */
+
+
+/**
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').Component<ComponentTypes,K>} Component
+ */
+
+/**
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').ComponentData<ComponentTypes,K>} ComponentData
+ */
+
+/**
+ * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
  */
 
 describe('Stage', () => {
-    
-    class Initializer {
-        set() {
 
-        }
-        clone() {
-            
-        }
-    }
+    class ModelA extends Model.define({
+        a: { type: 'a' },
+    }, /** @type {ComponentTypes} */({})) { }
+        
 
-    /**
-     * @extends {Model<{ a: string }>} 
-     */
-    class ModelA extends Model {
-        static components = {
-            a: { type: 'a' },
-        }
-    }
-
-    /**
-     * @extends {Model<{ a: string, b: string }>} 
-     */
-    class ModelB extends Model {
-        static components = {
-            a: { type: 'a' },
-            b: { type: 'b' },
-        }
-
+    class ModelB extends Model.define({
+        a: { type: 'a' },
+        b: { type: 'b' },
+    },/** @type {ComponentTypes} */({})) {
         cleanup() {
             cleanupSpy(this.entity.id);
         }
     }
 
-    /**
-     * @extends {Model<{ c: string }>} 
-     */
-    class ModelC extends Model {
-        static components = {
-            c: { type: 'c' },
-        }
-    }
+    class ModelC extends Model.define({
+        c: { type: 'c' },
+        d: { type: 'd' },
+    }, /** @type {ComponentTypes} */({})) { }
 
-    /**
-     * @extends {System<{ modelA: ModelA, modelB: ModelB, modelCs: Set<ModelC> }>} 
-     */
-    class SystemA extends System {
-        static models = {
-            modelA:  { model: ModelA },
-            modelB:  { model: ModelB },
-            modelCs: { model: ModelC, isSet: true },
-        }
-    }
 
-    /**
-     * @extends {System<{ modelA: ModelA, modelB: ModelB, modelCs: Set<ModelC> }>} 
-     */
-    class SystemB extends System {
-        static models = {
-            modelA:  { model: ModelA },
-            modelB:  { model: ModelB },
-            modelCs: { model: ModelC, isSet: true },
+    class SystemA extends System.define({
+        modelA:  { model: ModelA },
+        modelB:  { model: ModelB },
+        modelCs: { model: ModelC, isSet: true },
+    }, /** @type {ComponentTypes} */({})) { }
+
+    class SystemB extends System.define({
+        modelA:  { model: ModelA },
+        modelB:  { model: ModelB },
+        modelCs: { model: ModelC, isSet: true },
+    }, /** @type {ComponentTypes} */({})) { }
+
+    class Initializer {
+        set() {
+    
+        }
+        toJSON() {
+            return {};
         }
     }
 
     /** @type {FakeTime} */
     let time;
-    /** @type {Stage} */
+    /** @type {Stage<ComponentTypes>} */
     let stage;
     /** @type {SystemA} */
     let systemA;
@@ -111,6 +117,10 @@ describe('Stage', () => {
     let componentE;
     /** @type {string} */
     let componentF;
+    /** @type {string} */
+    let componentG;
+    /** @type {string} */
+    let componentH;
     /** @type {Spy} */
     let handler;
     /** @type {Spy} */
@@ -120,7 +130,7 @@ describe('Stage', () => {
         time = new FakeTime();
         stage = new Stage();
 
-        stage.initializers.set('c', Initializer);
+        stage.initializers['d'] =  () => new Initializer();
 
         entityA = UUID();
         entityB = UUID();
@@ -131,6 +141,8 @@ describe('Stage', () => {
         componentD = UUID();
         componentE = UUID();
         componentF = UUID();
+        componentG = UUID();
+        componentH = UUID();
 
         systemA  = new SystemA('systemA');
         systemB  = new SystemB('systemB');
@@ -139,12 +151,15 @@ describe('Stage', () => {
         stage.systems.add(systemB);
 
         stage.components.add({ id: componentA, entityId: entityA, type: 'a', value: 'a' });
-        stage.components.add({ id: componentB, entityId: entityA, type: 'b', value: 'b' });
-        stage.components.add({ id: componentC, entityId: entityA, type: 'c', value: 'c' });
+        stage.components.add({ id: componentB, entityId: entityA, type: 'b', value: 123 });
+        stage.components.add({ id: componentC, entityId: entityA, type: 'c', value: new Watchable() });
 
         stage.components.add({ id: componentD, entityId: entityB, type: 'a', value: 'a' });
-        stage.components.add({ id: componentE, entityId: entityB, type: 'b', value: 'b' });
-        stage.components.add({ id: componentF, entityId: entityB, type: 'c', value: 'c' });
+        stage.components.add({ id: componentE, entityId: entityB, type: 'b', value: 123 });
+        stage.components.add({ id: componentF, entityId: entityB, type: 'c', value: new Watchable() });
+
+        stage.components.add({ id: componentG, entityId: entityA, type: 'd', value: { foo: 'bar' } });
+        stage.components.add({ id: componentH, entityId: entityB, type: 'd', value: { foo: 'bar' } });
     });
 
     afterEach(() => {
@@ -207,7 +222,7 @@ describe('Stage', () => {
         });
 
         it('should generate a uuid for a component if it is not provided', () => {
-            const component = { entityId: UUID(), type: 'a', value: 'valueA', id: undefined };
+            const component = /** @type {ComponentData<'a'>} */({ entityId: UUID(), type: 'a', value: 'valueA' });
             stage.components.add(component);
             assert(component.id);
             assert(UUID.isUUID(component.id));
@@ -218,11 +233,11 @@ describe('Stage', () => {
         });
 
         it('should initialize the component value if an initializer is specified', () => {
-            assertInstanceOf([...systemA.modelCs][0].c, Initializer);
+            assertInstanceOf([...systemA.modelCs][0].d, Initializer);
         });
 
         it('should not initialize a component instance', () => {
-            const component = stage.components.getById(componentC);
+            const component = /** @type {ComponentData<'a'>} */(stage.components.getById(componentC));
             assertExists(component);
 
             stage.components.delete(component);
@@ -242,6 +257,7 @@ describe('Stage', () => {
             stage.components.delete({ id: componentD });
             stage.components.delete({ id: componentE });
             stage.components.delete({ id: componentF });
+            stage.components.delete({ id: componentH });
         });
 
         describe('getEntityById', () => {
@@ -273,13 +289,31 @@ describe('Stage', () => {
         });
     });
 
+    describe('component.toJSON', () => {
+         /** @type {Component<'a'>} */
+        let component;
+        /** @type {ComponentData<'a'>} */
+        let json;
+        beforeEach(() => {
+            component = /** @type {Component<'a'>} */(stage.components.getById(componentA));
+            json = component.toJSON();
+        });
+
+        it('should return an object containing id, entityId, type, and value', () => {
+            assertEquals(component.id,       json.id);
+            assertEquals(component.entityId, json.entityId);
+            assertEquals(component.type,     json.type);
+            assertEquals(component.value,    json.value);
+        });
+    });
+
     describe('component value change', () => {
         /** @type {Component} */
         let component;
         beforeEach(() => {
             handler = spy();
             component = /** @type {Component} */(stage.components.getById(componentA));
-            component.watch({ type: 'value:change', handler });
+            component.watch('value:change', handler);
         });
 
         it('should call watch handler when value changes', async () => {
@@ -296,10 +330,10 @@ describe('Stage', () => {
         });
     });
 
-    describe('component watchable value change', () => {
+    describe('component watchable value event', () => {
         /** @type {string} */
         let componentW;
-        /** @type {Component} */
+        /** @type {Component<'c'>} */
         let component;
         /** @type {Watchable} */
         let watchableA; 
@@ -311,48 +345,36 @@ describe('Stage', () => {
             watchableA = new Watchable();
             watchableB = new Watchable();
 
-            stage.components.add({ id: componentW, entityId: entityB, type: 'w', value: watchableA });
+            stage.components.add({ id: componentW, entityId: entityB, type: 'c', value: watchableA });
 
             handler = spy();
-            component = /** @type {Component} */(stage.components.getById(componentW));
-            component.watch({ type: 'value:change', handler });
+            component = /** @type {Component<'c'>} */(stage.components.getById(componentW));
+            component.watch('value:notify',  handler);
         });
 
-        it('should call watch handler when watchable notifies change', async () => {
-            watchableA.notify('test', 'oldValue');
+        it('should call watch handler when watchable notifies event', async () => {
+            watchableA.notify('a', 'a');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [new Map([['test', ['oldValue']]])]});
-        });
-
-        it('should call watch handler when watchable value changes', async () => {
-            component.value = watchableB;
-            await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [watchableA]});
+            assertSpyCall(handler, 0, { args: [new Map([['a', 'a']])]});
         });
 
         it('should call watch handler when new watchable notifies', async () => {
             component.value = watchableB;
+            watchableB.notify('b', 'b');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [watchableA]});
-
-            watchableB.notify('test', 'oldValue');
-            await time.runMicrotasks();
-            assertSpyCall(handler, 1, { args: [new Map([['test', ['oldValue']]])]});
+            assertSpyCall(handler, 0, { args: [new Map([['b', 'b']])]});
         });
 
         it('should not call watch handler when original watchable value has been removed', async () => {
             component.value = watchableB;
+            watchableA.notify('a', 'a');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [watchableA]});
-
-            watchableA.notify('test', 'oldValue');
-            await time.runMicrotasks();
-            assertSpyCalls(handler, 1);
+            assertSpyCalls(handler, 0);
         });
 
         it('should not call watch handler after component has been removed', async () => {
             stage.components.delete(component);
-            watchableA.notify('oldValue');
+            watchableA.notify('a');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
@@ -368,25 +390,35 @@ describe('Stage', () => {
 
     describe('model.entity.components.add', () => {
         /** @type {string} */
-        let componentG;
+        let componentX;
         beforeEach(() => {
-            componentG = UUID();
-            systemA.modelA.entity.components.add({ id: componentG, type: 'g', value: 'g' });
+            componentX = UUID();
+            systemA.modelA.entity.components.add({ id: componentX, type: 'a', value: 'a' });
         });
 
         it('should add the component to the stage', () => {
-            assert(stage.components.getById(componentG));
+            assert(stage.components.getById(componentX));
         });
 
         it('should add the entity id to the component', () => {
-            assertEquals(stage.components.getById(componentG)?.entityId, systemA.modelA.entity.id);
+            assertEquals(stage.components.getById(componentX)?.entityId, systemA.modelA.entity.id);
+        });
+
+        it('should not throw an error if trying to add a Component that belongs to the same entity', () => {
+            const component = /** @type {Component<'c'>} */(stage.components.getById(componentA));  
+            systemA.modelA.entity.components.add(component);
+        });
+
+        it('should throw an error if trying to add a Component that belongs to another entity', () => {
+            const component = /** @type {Component<'c'>} */(stage.components.getById(componentD));
+            assertThrows(() => systemA.modelA.entity.components.add(component), 'Component registered to another entity');
         });
     });
 
     describe('model.entity.components.delete', () => {
         beforeEach(() => {
-            systemA.modelA.entity.components.delete({ id: componentA });
             systemA.modelA.entity.components.delete({ id: componentF });
+            systemA.modelA.entity.components.delete({ id: componentA });
         });
 
         it('should remove the component from the stage', () => {
@@ -412,20 +444,16 @@ describe('Stage', () => {
 
         describe('system:add', () => {
 
-            class SystemC extends System {
-                static get models() {
-                    return {
-                        modelA: { model: ModelA }
-                    }
-                }
-            }
+            class SystemC extends System.define({
+                modelA: { model: ModelA }
+            }, /** @type {ComponentTypes} */({})) {}
 
             /** @type {SystemC} */
             let systemC;
 
             beforeEach(() => {
                 systemC = new SystemC();
-                stage.watch({ type: 'system:add', immediate: true, handler });
+                stage.watch('system:add', { immediate: true, handler });
                 stage.systems.add(systemC);
             });
 
@@ -436,7 +464,7 @@ describe('Stage', () => {
 
         describe('system:delete', () => {
             beforeEach(() => {
-                stage.watch({ type: 'system:delete', immediate: true, handler });
+                stage.watch('system:delete', { immediate: true, handler });
                 stage.systems.delete(systemA);
             });
 
@@ -447,8 +475,8 @@ describe('Stage', () => {
 
         describe('component:add', () => {
             beforeEach(() => {
-                stage.watch({ type: 'component:add', immediate: true, handler });
-                stage.components.add({ id: UUID(), entityId: UUID(), type: 'c', value: 'c' });
+                stage.watch('component:add', { immediate: true, handler });
+                stage.components.add({ id: UUID(), entityId: UUID(), type: 'c', value: new Watchable() });
             });
 
             it('should notify component:add when a new component is added', () => {
@@ -460,8 +488,8 @@ describe('Stage', () => {
             let entityId;
             beforeEach(() => {
                 entityId = UUID();
-                stage.watch({ type: `component:add:${entityId}:c`, immediate: true, handler });
-                stage.components.add({ id: UUID(), entityId, type: 'c', value: 'c' });
+                stage.watch(`component:add:${entityId}:c`, { immediate: true, handler });
+                stage.components.add({ id: UUID(), entityId, type: 'c', value: new Watchable() });
             });
 
             it('should notify component:add:${entityId}:${type} when a new component is added', () => {
@@ -471,7 +499,7 @@ describe('Stage', () => {
 
         describe('component:delete', () => {
             beforeEach(() => {
-                stage.watch({ type: 'component:delete', immediate: true, handler });
+                stage.watch('component:delete', { immediate: true, handler });
                 stage.components.delete({ id: componentA });
             });
 
@@ -482,7 +510,7 @@ describe('Stage', () => {
 
         describe('component:delete:${entityId}:${type}', () => {
             beforeEach(() => {
-                stage.watch({ type: `component:delete:${entityA}:a`, immediate: true, handler });
+                stage.watch(`component:delete:${entityA}:a`, { immediate: true, handler });
                 stage.components.delete({ id: componentA });
             });
 
@@ -493,8 +521,8 @@ describe('Stage', () => {
 
         describe('entity:add', () => {
             beforeEach(() => {
-                stage.watch({ type: 'entity:add', immediate: true, handler });
-                stage.components.add({ id: UUID(), entityId: UUID(), type: 'c', value: 'c' });
+                stage.watch('entity:add', { immediate: true, handler });
+                stage.components.add({ id: UUID(), entityId: UUID(), type: 'c', value: new Watchable() });
             });
 
             it('should notify entity:add when a new entity is added', () => {
@@ -507,8 +535,8 @@ describe('Stage', () => {
             beforeEach(() => {
                 entityId = UUID();
 
-                stage.watch({ type: `entity:add:${entityId}`, immediate: true, handler });
-                stage.components.add({ id: UUID(), entityId, type: 'c', value: 'c' });
+                stage.watch(`entity:add:${entityId}`, { immediate: true, handler });
+                stage.components.add({ id: UUID(), entityId, type: 'c', value: new Watchable() });
             });
 
             it('should notify entity:add:${id} when a new entity is added', () => {
@@ -518,10 +546,11 @@ describe('Stage', () => {
 
         describe('entity:delete', () => {
             beforeEach(() => {
-                stage.watch({ type: 'entity:delete', immediate: true, handler });
+                stage.watch('entity:delete', { immediate: true, handler });
                 stage.components.delete({ id: componentA });
                 stage.components.delete({ id: componentB });
                 stage.components.delete({ id: componentC });
+                stage.components.delete({ id: componentG });
             });
 
             it('should notify entity:delete when an entity is deleted', () => {
@@ -531,10 +560,11 @@ describe('Stage', () => {
 
         describe('entity:delete:${id}', () => {
             beforeEach(() => {
-                stage.watch({ type: `entity:delete:${entityA}`, immediate: true, handler });
+                stage.watch(`entity:delete:${entityA}`, { immediate: true, handler });
                 stage.components.delete({ id: componentA });
                 stage.components.delete({ id: componentB });
                 stage.components.delete({ id: componentC });
+                stage.components.delete({ id: componentG });
             });
 
             it('should notify entity:delete:${entityId} when an entity is deleted', () => {
@@ -544,11 +574,11 @@ describe('Stage', () => {
 
 
         it('should notify model:add when all the components for that model are registered', () => {
-            systemA.watch({ type: 'model:add', immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
+            systemA.watch('model:add', { immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
 
             stage.components.add({ id: UUID(), entityId: entityC, type: 'a', value: 'a' });
             stage.components.add({ id: UUID(), entityId: entityD, type: 'a', value: 'a' });
-            stage.components.add({ id: UUID(), entityId: entityD, type: 'b', value: 'b' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'b', value: 123 });
 
             assertSpyCall(handler, 0, { args: [ModelA, 'modelA']});
             assertSpyCall(handler, 1, { args: [ModelA, 'modelA']});
@@ -560,7 +590,7 @@ describe('Stage', () => {
 
             stage.components.add({ id: UUID(), entityId: entityC, type: 'a', value: 'a' });
             stage.components.add({ id: UUID(), entityId: entityD, type: 'a', value: 'a' });
-            stage.components.add({ id: UUID(), entityId: entityD, type: 'b', value: 'b' });
+            stage.components.add({ id: UUID(), entityId: entityD, type: 'b', value: 123 });
 
             assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
             assertSpyCall(handler, 1, { args: [ModelA, 'modelA'] });
@@ -568,7 +598,7 @@ describe('Stage', () => {
         });
 
         it('should notify model:delete when all the components for that model are unregistered', () => {
-            systemA.watch({ type: 'model:delete', immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
+            systemA.watch('model:delete', { immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
 
             stage.components.delete({ id: componentA });
 
@@ -587,12 +617,9 @@ describe('Stage', () => {
     });
 
     describe('new system', () => {
-
-        class SystemC extends System {
-            static models =  {
-                modelA: { model: ModelA }
-            }
-        }
+        class SystemC extends System.define({
+            modelA: { model: ModelA }
+        }, /** @type {ComponentTypes} */({})) { }
 
         /** @type {SystemC} */
         let systemC;
@@ -624,14 +651,15 @@ describe('Stage', () => {
             stage = new Stage();
         })
         it('should create all the components specified sharing the same entity id', () => {
-            stage.createEntity({ a: 'a', b: 'b', c: 'c' });
-            assertEquals(stage.components.size, 3);
+            stage.createEntity({ a: 'a', b: 123, c: new Watchable(), d: { foo: 'bar' } });
+            assertEquals(stage.components.size, 4);
             assertEquals([...stage.components][0].entityId, [...stage.components][1].entityId);
             assertEquals([...stage.components][0].entityId, [...stage.components][2].entityId);
+            assertEquals([...stage.components][0].entityId, [...stage.components][3].entityId);
         });
 
         it('should generate and return a new entity id if not specified', () => {
-            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 'b', c: 'c' })));
+            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 123, c: new Watchable() })));
         });
     });
 
@@ -662,21 +690,21 @@ describe('Stage', () => {
         it('should resolve to a non existing component async', async () => {
             const promise = refB.waitFor('resolve');
             const id = UUID();
-            stage.components.add({ id, entityId: entityC, type: 'c', value: 'c' });
+            stage.components.add({ id, entityId: entityC, type: 'c', value: new Watchable() });
             await time.runMicrotasks();
-            const [component] = await promise;
+            const component = await promise;
             assertEquals(component?.id, id);
         });
 
         it('should notify destroy if component removed', async () => {
-            refA.watch({ type: 'destroy', handler });
+            refA.watch('destroy', handler);
             stage.components.delete({ id: componentA });
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
         });
 
         it('should notify release if released', async () => {
-            refA.watch({ type: 'release', handler });
+            refA.watch('release', handler);
             refA.release();
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
@@ -714,7 +742,7 @@ describe('Stage', () => {
     
             it('should return "resolved" if component has been resolved', async () => {
                 assertEquals(refA.status, 'resolved');
-                stage.components.add({ id: UUID(), entityId: entityC, type: 'c', value: 'c' });
+                stage.components.add({ id: UUID(), entityId: entityC, type: 'c', value: new Watchable() });
                 await time.runMicrotasks();
                 assertEquals(refB.status, 'resolved');
             });
@@ -774,7 +802,7 @@ describe('Stage', () => {
 
     describe('game', () => {
         it('should be a reference to the parent game', () => {
-            stage.parent = /** @type {Game} */({});
+            stage.parent = /** @type {import('../lib/game.js').Game} */({});
             assertEquals(stage.game, stage.parent);
         });
     });

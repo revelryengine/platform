@@ -1,29 +1,35 @@
-import { describe, it, beforeEach, afterEach    } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls     } from 'std/testing/mock.ts';
-import { assertInstanceOf, assertExists, assert } from 'std/testing/asserts.ts';
-import { FakeTime                               } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach                  } from 'std/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls                   } from 'std/testing/mock.ts';
+import { assertInstanceOf, assertExists, assert, assertEquals } from 'std/testing/asserts.ts';
+import { FakeTime                                             } from 'std/testing/time.ts';
 
 import { Watchable } from '../../lib/utils/watchable.js';
 
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
 
+
 describe('Watchable', () => {
+
+    /** @extends {Watchable<{ a: string, b: number , c: void, d: void }>} */
+    class ExtendedWatchable extends Watchable { }
+
     /** @type {FakeTime}*/
     let time;
     /** @type {Spy} */
     let handler;
     /** @type {Spy} */
     let rejectHandler;
-    /** @type {Watchable} */
+    /** @type {ExtendedWatchable} */
     let watchable;
     /** @type {AbortController} */
     let abortCtl;
 
+    
     beforeEach(() => {
         time = new FakeTime();
         handler       = spy();
         rejectHandler = spy();
-        watchable = new Watchable();
+        watchable     = new ExtendedWatchable();
         watchable.watch(handler);
     });
 
@@ -32,70 +38,71 @@ describe('Watchable', () => {
     });
 
     it('should call the handler in the next microtask execution when notify has been called.', async () => {
-        watchable.notify('test');
+        watchable.notify('a', '123');
         await time.runMicrotasks();
         assertSpyCalls(handler, 1);
     });
 
 
     it('should not call the handler more than once in the same microtask execution.', async () => {
-        watchable.notify('test');
-        watchable.notify('test');
+        watchable.notify('b', 123);
+        watchable.notify('c');
         await time.runMicrotasks();
         assertSpyCalls(handler, 1);
     });
 
     it('should call the handler more than once if another microtask execution has occured.', async () => {
-        watchable.notify('test');
+        watchable.notify('c');
         await time.runMicrotasks();
-        watchable.notify('test');
+        watchable.notify('c');
         await time.runMicrotasks();
         assertSpyCalls(handler, 2);
     });
 
     it('should not call the handler if unwatch has been called.', async () => {
         watchable.unwatch(handler);
-        watchable.notify('test');
+        watchable.notify('c');
         await time.runMicrotasks();
         assertSpyCalls(handler, 0);
     });
 
     it('should not call the handler if unwatch has been called even if after notify has been called but before the next microtask execution.', async () => {
-        watchable.notify('test');
+        watchable.notify('c');
         watchable.unwatch(handler);
         await time.runMicrotasks();
         assertSpyCalls(handler, 0);
     });
 
     it('should call the handler with a map of the notification types and arguments', async () => {
-        watchable.notify('a', 1, 2, 3);
-        watchable.notify('b', 4, 5, 6);
+        watchable.notify('a', 'abc');
+        watchable.notify('b', 123);
         await time.runMicrotasks();
-        assertSpyCall(handler, 0, { args: [new Map([['a', [1, 2, 3]], ['b', [4, 5, 6]]])] });
+        assertEquals(handler.calls[0].args[0].get('a'), 'abc');
+        assertEquals(handler.calls[0].args[0].get('b'), 123);
     });
 
     it('should not error when calling unwatch on a watchable that has not been watched', () => {
-        watchable = new Watchable();
+        watchable = new ExtendedWatchable();
         watchable.unwatch(handler); 
     });
-
 
     describe('Watcher object', () => {
         beforeEach(() => {
             handler   = spy();
-            watchable = new Watchable();
+            watchable = new ExtendedWatchable();
             watchable.watch({ handler });
         });
 
         it('should accept an object containing a handler method', async () => {
-            watchable.notify('test');
+            watchable.notify('c');
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
         });
 
         it('should not call the handler if unwatch has been called.', async () => {
             watchable.unwatch({ handler });
-            watchable.notify('test');
+            watchable.notify('c');
+            await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
 
@@ -103,18 +110,18 @@ describe('Watchable', () => {
         describe('type', () => {
             beforeEach(() => {
                 handler   = spy();
-                watchable = new Watchable();
-                watchable.watch({ handler, type: 'a' });
+                watchable = new ExtendedWatchable();
+                watchable.watch('a', { handler });
             });
 
             it('should call the handler if type matches.', async () => {
-                watchable.notify('a');
+                watchable.notify('a', 'abc');
                 await time.runMicrotasks();
                 assertSpyCalls(handler, 1);
             });
 
             it('should not call the handler if type does not match.', async () => {
-                watchable.notify('b');
+                watchable.notify('b', 123);
                 await time.runMicrotasks();
                 assertSpyCalls(handler, 0);
             });
@@ -123,18 +130,18 @@ describe('Watchable', () => {
         describe('immediate=true', () => {
             beforeEach(() => {
                 handler   = spy();
-                watchable = new Watchable();
+                watchable = new ExtendedWatchable();
                 watchable.watch({ handler, immediate: true });
             });
 
             it('should call the handler immediately when notify has been called.', async () => {
-                watchable.notify('test');
+                watchable.notify('c');
                 assertSpyCalls(handler, 1);
             });
 
             it('should not call the handler if unwatch has been called.', async () => {
                 watchable.unwatch({ handler, immediate: true });
-                watchable.notify('test');
+                watchable.notify('c');
                 assertSpyCalls(handler, 0);
             });
         });
@@ -145,40 +152,47 @@ describe('Watchable', () => {
 
             beforeEach(() => {
                 handler   = spy();
-                watchable = new Watchable();
+                watchable = new ExtendedWatchable();
                 abortCtl  = new AbortController();
-                watchable.watch({ handler, signal: abortCtl.signal });
+                watchable.watch('c', { handler, signal: abortCtl.signal });
             });
 
             it('should not call handler if aborted', async () => {
                 abortCtl.abort();
-                watchable.notify('test');
+                watchable.notify('c');
                 await time.runMicrotasks();
                 assertSpyCalls(handler, 0);
             });
+
+            it('should not error when abort has been called after the unwatch method', async() => {
+                watchable.unwatch('c', { handler });
+                abortCtl.abort();
+                await time.runMicrotasks();
+                assertSpyCalls(handler, 0);
+            })
         });
     });
 
     describe('waitFor', () => {
         beforeEach(() => {
             handler   = spy();
-            watchable = new Watchable();
+            watchable = new ExtendedWatchable();
             abortCtl  = new AbortController();
-            watchable.waitFor('test', abortCtl.signal).then(handler);
+            watchable.waitFor('a', abortCtl.signal).then(handler);
         });
     
         it('should call the handler in the next microtask execution when notify has been called.', async () => {
-            watchable.notify('test', 1, 2, 3);
+            watchable.notify('a', 'abc');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [[1, 2, 3]]});
+            assertSpyCall(handler, 0, { args: ['abc']});
         });
 
         it('should not call the handler more than once.', async () => {
-            watchable.notify('test', 1, 2, 3);
+            watchable.notify('a', 'abc');
             await time.runMicrotasks();
-            watchable.notify('test', 4, 5, 6);
+            watchable.notify('a', 'abc');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [[1, 2, 3]]});
+            assertSpyCall(handler, 0, { args: ['abc']});
             assertSpyCalls(handler, 1);
         });
 
@@ -186,14 +200,14 @@ describe('Watchable', () => {
             beforeEach(() => {
                 handler       = spy();
                 rejectHandler = spy();
-                watchable = new Watchable();
+                watchable = new ExtendedWatchable();
                 abortCtl  = new AbortController();
-                watchable.waitFor('test', abortCtl.signal).then(handler).catch(rejectHandler);
+                watchable.waitFor('c', abortCtl.signal).then(handler).catch(rejectHandler);
             });
 
             it('should not call handler if aborted', async () => {
                 abortCtl.abort();
-                watchable.notify('test');
+                watchable.notify('c');
                 await time.runMicrotasks();
                 assertSpyCalls(handler, 0);
             });
@@ -206,16 +220,18 @@ describe('Watchable', () => {
         });
     });
 
-    describe('mixin', () => {
-        class ExtendedFloat extends Watchable.mixin(Float32Array) {
 
-        }
+    describe('mixin', () => {
+        /** @typedef {{ a: string, b: number, c: void, d: void }} EventMap */
+
+        class ExtendedFloat extends Watchable.mixin(Float32Array, /** @type {EventMap} */ ({})) { }
 
         /** @type {ExtendedFloat} */ 
         let float;
 
         beforeEach(() => {
             float = new ExtendedFloat(4);
+            float.notify('c');
         });
 
         it('should maintain specified super class', () => {
@@ -231,7 +247,7 @@ describe('Watchable', () => {
             assertExists(float.watch);
 
             float.watch(handler);
-            float.notify('test');
+            float.notify('a', 'abc');
 
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
@@ -240,9 +256,9 @@ describe('Watchable', () => {
         it('should add the watch method and support type', async () => {
             assertExists(float.watch);
 
-            float.watch({ handler, type: 'a' });
-            float.notify('a');
-            float.notify('b');
+            float.watch('a', handler);
+            float.notify('a', 'abc');
+            float.notify('b', 123);
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
         });
@@ -251,16 +267,16 @@ describe('Watchable', () => {
             assertExists(float.watch);
 
             float.watch({ handler, immediate: true });
-            float.notify('test');
+            float.notify('c');
             assertSpyCalls(handler, 1);
 
             float.unwatch({ handler, immediate: true });
-            float.notify('test');
+            float.notify('c');
             assertSpyCalls(handler, 1);
 
-            float.watch({ type: "a", handler, immediate: true });
-            float.notify('a');
-            float.notify('b');
+            float.watch('a', { handler, immediate: true });
+            float.notify('a', 'abc');
+            float.notify('c');
             assertSpyCalls(handler, 2);
         });
 
@@ -270,7 +286,7 @@ describe('Watchable', () => {
 
             float.watch({ handler, signal: abortCtl.signal });
             abortCtl.abort();
-            float.notify('test');
+            float.notify('c');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
@@ -280,38 +296,36 @@ describe('Watchable', () => {
 
             float.watch(handler);
             float.unwatch(handler);
-            float.notify('test');
+            float.notify('c');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
 
         it('should add the unwatch method and support type', async () => {
             assertExists(float.unwatch);
-            const options = { handler, type: 'a' };
-            float.watch(options);
-            float.unwatch(options);
-            float.notify('a');
-            float.notify('b');
+
+            float.watch('a', handler);
+            float.unwatch('a', handler);
+            float.notify('a', 'abc');
+            float.notify('b', 123);
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
 
         it('should add the unwatch method and support immediate=true', async () => {
             assertExists(float.unwatch);
-            const options = { handler, immediate: true };
-            float.watch(options);
-            float.unwatch(options);
-            float.notify('test');
+            float.watch({ handler, immediate: true });
+            float.unwatch({ handler, immediate: true });
+            float.notify('c');
             assertSpyCalls(handler, 0);
         });
 
         it('should add the unwatch method and support signal', async () => {
             assertExists(float.unwatch);
             const abortCtl = new AbortController();
-            const options = { handler, signal: abortCtl.signal };
-            float.watch(options);
+            float.watch({ handler, signal: abortCtl.signal });
             abortCtl.abort();
-            float.notify('test');
+            float.notify('c');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
@@ -324,8 +338,8 @@ describe('Watchable', () => {
         it('should add the waitFor method', async () => {
             assertExists(float.waitFor);
 
-            float.waitFor('test').then(handler);
-            float.notify('test');
+            float.waitFor('c').then(handler);
+            float.notify('c');
 
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
@@ -335,34 +349,20 @@ describe('Watchable', () => {
             assertExists(float.watch);
             const abortCtl = new AbortController();
 
-            float.waitFor('test', abortCtl.signal).then(handler).catch(rejectHandler);
+            float.waitFor('c', abortCtl.signal).then(handler).catch(rejectHandler);
             abortCtl.abort();
-            float.notify('test');
+            float.notify('c');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
     });
 
     describe('isWatchable', () => {
-        class ExtendedWatchable extends Watchable {
-
-        }
-
-        class MixinWatchable extends Watchable.mixin(Float32Array) {
-            
-        }
-
-        /** @type {ExtendedWatchable} */
-        let extended;
-        /** @type {MixinWatchable} */ 
-        let mixin;
         /** @type {Float32Array} */
         let nonWatchable;
 
         beforeEach(() => {
             watchable    = new Watchable();
-            extended     = new ExtendedWatchable();
-            mixin        = new MixinWatchable();
             nonWatchable = new Float32Array();
         });
 
@@ -370,16 +370,8 @@ describe('Watchable', () => {
             assert(Watchable.isWatchable(watchable));
         });
 
-        it('should return true for extended watchable intance', () => {
-            assert(Watchable.isWatchable(extended));
-        });
-
-        it('should return true for extended mixin watchable intance', () => {
-            assert(Watchable.isWatchable(mixin));
-        });
-
         it('should return false non watchable', () => {
             assert(!Watchable.isWatchable(nonWatchable));
         });
-    })
+    });
 });

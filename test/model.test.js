@@ -1,67 +1,85 @@
-import { describe, it, beforeEach           } from 'std/testing/bdd.ts';
-import { assertEquals                       } from 'std/testing/asserts.ts';
-import { spy, assertSpyCall, assertSpyCalls } from 'std/testing/mock.ts';
+import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
+import { assertEquals                        } from 'std/testing/asserts.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
+import { FakeTime                            } from 'std/testing/time.ts';
 
-import { Game   } from '../lib/game.js';
-import { Stage  } from '../lib/stage.js';
-import { System } from '../lib/system.js';
-import { Model  } from '../lib/model.js';
-import { UUID   } from '../lib/utils/uuid.js';
+import { Game      } from '../lib/game.js';
+import { Stage     } from '../lib/stage.js';
+import { System    } from '../lib/system.js';
+import { Model     } from '../lib/model.js';
+import { UUID      } from '../lib/utils/uuid.js';
+import { Watchable } from '../lib/utils/watchable.js';
 
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
-/** @typedef {import('../lib/stage.js').Component} Component */
-/** @typedef {import('../lib/utils/watchable.js').WatchHandler} WatchHandler */
-/** @typedef {import('../lib/utils/watchable.js').WatchOptions} WatchOptions */
 
+/**
+ * @template V,[C=V]
+ * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
+ */
+/**
+ * @typedef {{  
+ *   a: ComponentValue<string>,
+ *   b: ComponentValue<number>,
+ *   c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
+ *   d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+ * }} ComponentTypes
+ */
+/**
+* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+* @typedef {import('../lib/stage.js').Component<ComponentTypes,K>} Component
+*/
+/**
+* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+* @typedef {import('../lib/stage.js').ComponentData<ComponentTypes,K>} ComponentData
+*/
+/**
+* @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
+*/
+
+const types = /** @type {ComponentTypes} */({});
 
 describe('Model', () => {
-    /**
-     * @extends {Model<{ a: string, b: string }>} 
-     */
-    class ModelA extends Model {
-        static components = {
-            a: { type: 'a' }, 
-            b: { type: 'b' },
-        }
-    }
+    
+    class ModelA extends Model.define({ 
+        a: { type: 'a' }, 
+        b: { type: 'b' },
+        c: { type: 'c' },
+    }, types) { }
 
-    /**
-     * @extends {Model<{ a: string }>} 
-     */
-    class ModelB extends Model {
-        static components = {
-            a: { type: 'a' },
-        }
-    }
+    class SystemA extends System.define({
+        modelA:  { model: ModelA },
+    }, types) { }
 
-    class SystemA extends System {
-        static models = {
-            modelA:  { model: ModelA },
-            modelBs: { model: ModelB },
-            modelC:  { model: Model  },
-        }
-    }
+    /** @type {FakeTime} */
+    let time;
+
     /** @type {string} */
     let componentAId;
     /** @type {string} */
     let componentBId; 
-    /** @type {Component} */
+    /** @type {string} */
+    let componentCId; 
+
+    /** @type {ComponentData<'a'>} */
     let componentA;
-    /** @type {Component} */
+    /** @type {ComponentData<'b'>} */
     let componentB;
+    /** @type {ComponentData<'c'>} */
+    let componentC;
     /** @type {string} */
     let entityId;
 
     /** @type {Game} */
     let game;
-    /** @type {Stage} */
+    /** @type {Stage<ComponentTypes>} */
     let stage;
-    /** @type {System} */
+    /** @type {SystemA} */
     let system;
     /** @type {ModelA} */
     let modelA;
 
     beforeEach(() => {
+        time   = new FakeTime();
         game   = new Game();
         stage  = new Stage();
         system = new SystemA();
@@ -73,14 +91,21 @@ describe('Model', () => {
         entityId = UUID();
         componentAId = UUID();
         componentBId = UUID();
+        componentCId = UUID();
 
-        stage.components.add({ id: componentAId, entityId, type: 'a', value: 'valueA' });
-        stage.components.add({ id: componentBId, entityId, type: 'b', value: 'valueB' });
+        stage.components.add({ id: componentAId, entityId, type: 'a', value: 'abc' });
+        stage.components.add({ id: componentBId, entityId, type: 'b', value: 123 });
+        stage.components.add({ id: componentCId, entityId, type: 'c', value: new Watchable() });
 
         modelA = /** @type {ModelA} */(stage.getEntityById(entityId)?.models.getByClass(ModelA));
 
-        componentA = /** @type {Component} */(stage.components.getById(componentAId));
-        componentB = /** @type {Component} */(stage.components.getById(componentBId));
+        componentA = /** @type {ComponentData<'a'>} */(stage.components.getById(componentAId));
+        componentB = /** @type {ComponentData<'b'>} */(stage.components.getById(componentBId));
+        componentC = /** @type {ComponentData<'c'>} */(stage.components.getById(componentCId));
+    });
+
+    afterEach(() => {
+        time.restore();
     });
 
     describe('components', () => {
@@ -90,38 +115,39 @@ describe('Model', () => {
         });
 
         it('should update the component values when updating the model properties', () => {
-            modelA.a = 'updatedA';
-            modelA.b = 'updatedB';
-            assertEquals(componentA.value, 'updatedA');
-            assertEquals(componentB.value, 'updatedB');
+            modelA.a = 'def';
+            modelA.b = 456;
+            assertEquals(componentA.value, 'def');
+            assertEquals(componentB.value, 456);
         });
     });
 
     describe('watching', () => {
-        let /** @type {Spy} */handler, /** @type {WatchOptions} */options;
+        let /** @type {Spy} */handler;
 
         describe('all components', () => {
             beforeEach(() => {
                 handler = spy();
-                options = { handler };
-                modelA.watch(options);
+                modelA.watch(handler);
             });
     
             describe('watch', () => {
                 it('should watch all components for changes', async () => {
-                    modelA.a = 'testA';
-                    modelA.b = 'testB';
-                    await null;
-                    assertSpyCall(handler, 0, { args: [new Map([['a:change', ['valueA']], ['b:change', ['valueB']]])] });
+                    modelA.a = 'def';
+                    modelA.b = 456;
+                    await time.runMicrotasks();
+                    assertSpyCalls(handler, 1);
+                    assertEquals(handler.calls[0].args[0].get('a:change'), 'abc');
+                    assertEquals(handler.calls[0].args[0].get('b:change'), 123);
                 });
             });
     
             describe('unwatch', () => {
                 it('should unwatch all components', async () => {
-                    modelA.unwatch(options);
-                    modelA.a = 'testA';
-                    modelA.b = 'testB';
-                    await null;
+                    modelA.unwatch(handler);
+                    modelA.a = 'def';
+                    modelA.b = 456;
+                    await time.runMicrotasks();
                     assertSpyCalls(handler, 0);
                 });
             });    
@@ -130,15 +156,14 @@ describe('Model', () => {
         describe('immediate=true', () => {
             beforeEach(() => {
                 handler = spy();
-                options = { handler, immediate: true };
-                modelA.watch(options);
+                modelA.watch({ handler, immediate: true });
             });
 
             it('should call the watcher immediately for all components that change', async () => {
-                modelA.a = 'testA';
-                modelA.b = 'testB';
-                assertSpyCall(handler, 0, { args: ['a:change', 'valueA'] });
-                assertSpyCall(handler, 1, { args: ['b:change', 'valueB'] });
+                modelA.a = 'def';
+                modelA.b = 456;
+                assertSpyCall(handler, 0, { args: ['a:change', 'abc'] });
+                assertSpyCall(handler, 1, { args: ['b:change', 123] });
                 assertSpyCalls(handler, 2);
             });
         });
@@ -146,19 +171,33 @@ describe('Model', () => {
         describe('watch individual property', () => {
             beforeEach(() => {
                 handler = spy();
-                options = { handler, type: 'a:change' };
-                modelA.watch(options);
+                modelA.watch('a:change', handler);
             });
 
 
             it('should watch only component specified', async () => {
-                modelA.a = 'testA';
-                modelA.b = 'testB';
-                await null;
-                assertSpyCall(handler, 0, { args: ['valueA'] });
+                modelA.a = 'def';
+                modelA.b = 456;
+                await time.runMicrotasks();
+                assertSpyCall(handler, 0, { args: ['abc'] });
                 assertSpyCalls(handler, 1);
             });
         });
+
+        describe('watchable component value', () => {
+            beforeEach(() => {
+                handler = spy();
+                modelA.watch('c:notify', handler);
+            });
+
+            it('should capture component value notify events', async () => {
+                componentC.value.notify('c', 'test1');
+                componentC.value.notify('d', 'test2');
+                await time.runMicrotasks();
+                assertSpyCall(handler, 0, { args: [new Map([['c', 'test1'], ['d', 'test2']])] });
+                assertSpyCalls(handler, 1);
+            });
+        })
     });
 
     describe('stage', () => {
@@ -170,6 +209,13 @@ describe('Model', () => {
     describe('game', () => {
         it('should be a reference to the entity stage game', () => {
             assertEquals(modelA.game, game);
+        });
+    });
+
+    describe('default components', () => {
+        it('should not error when using the base Model class', () => {
+            stage.systems.add(/** @type {System} */(new (System.define({ modelA: { model: Model } }))));
+            stage.components.add({ id: UUID(), entityId: UUID(), type: 'a', value: 'a' });
         });
     });
 });

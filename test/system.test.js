@@ -4,19 +4,46 @@ import { assertEquals, assertInstanceOf, assertExists } from 'std/testing/assert
 import { System } from '../lib/system.js';
 import { Model  } from '../lib/model.js';
 
-/** @typedef {import('../lib/game.js').Game} Game */
-/** @typedef {import('../lib/stage.js').Stage} Stage */
+/**
+ * @template V,[C=any]
+ * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
+ */
+/**
+ * @typedef {{  
+*   a: ComponentValue<string>,
+*   b: ComponentValue<number>,
+*   c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
+*   d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+* }} ComponentTypes
+*/
+/**
+* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+* @typedef {import('../lib/stage.js').Component<ComponentTypes,K>} Component
+*/
+/**
+* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+* @typedef {import('../lib/stage.js').ComponentData<ComponentTypes,K>} ComponentData
+*/
+/**
+* @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
+*/
+
+const types = /** @type {ComponentTypes} */({});
 
 describe('System', () => {
-    /**
-     * @extends {System<{ modelA: Model<{ a: string }>, modelBs: Set<Model<{ a: string }>> }>} 
-     */
-    class SystemA extends System {
-        static models = {
-            modelA:  { model: Model, },
-            modelBs: { model: Model, isSet: true },
-        }
-    }
+
+    class ModelA extends Model.define({ 
+        b: { type: 'b' },
+    }, types) { }
+
+    class ModelB extends Model.define({ 
+        a: { type: 'a' }, 
+    }, types) { }
+
+    class SystemA extends System.define({
+        modelA:  { model: ModelA, },
+        modelBs: { model: ModelB, isSet: true },
+    }, types) { }
 
     /** @type {SystemA} */
     let system;
@@ -35,14 +62,14 @@ describe('System', () => {
 
     describe('stage', () => {
         it('should be a reference to the parent stage', () => {
-            system.parent = /** @type {Stage} */({});
+            system.parent = /** @type {import('../lib/stage.js').Stage} */({});
             assertEquals(system.stage, system.parent);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the stage parent game', () => {
-            system.parent =  /** @type {Stage} */({ parent:  /** @type {Game} */({}) });
+            system.parent =  /** @type {import('../lib/stage.js').Stage} */({ parent:  /** @type {import('../lib/game.js').Game} */({}) });
             assertExists(system.stage?.parent);
             assertEquals(system.game, system.stage?.parent);
         });
