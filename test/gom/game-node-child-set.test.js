@@ -1,10 +1,13 @@
-import { describe, it, beforeEach          } from 'std/testing/bdd.ts';
-import { assert, assertEquals, assertFalse } from 'std/testing/asserts.ts';
-import { spy, assertSpyCalls               } from 'std/testing/mock.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
+
+import { assert       } from 'std/assert/assert.ts';
+import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertFalse  } from 'std/assert/assert_false.ts';
 
 import { GameNodeChildSet } from '../../lib/gom/game-node-child-set.js';
 import { GameNode         } from '../../lib/gom/game-node.js';
-import { Game             } from '../../lib/game.js';
+import { Game             } from '../../lib/game.js';   
 import { Stage            } from '../../lib/stage.js';
 import { System           } from '../../lib/system.js';
 

@@ -1,5 +1,6 @@
 import { describe, it, beforeEach } from 'std/testing/bdd.ts';
-import { assertEquals             } from 'std/testing/asserts.ts';
+
+import { assertEquals } from 'std/assert/assert_equals.ts';
 
 import { Game       } from '../lib/game.js';
 import { extensions } from '../lib/extensions.js';

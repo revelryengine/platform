@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "esModuleInterop": true,
+        "inlineSourceMap": true,
+        "isolatedModules": true,
+        "lib": ["dom", "esnext"],
+        "module": "esnext",
+        "moduleDetection": "force",
+        "strict": true,
+        "target": "esnext",
+        "useDefineForClassFields": true,
+
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "types",
+        "checkJs": true,
+        "allowImportingTsExtensions":true,
+        "paths": {
+            "std/assert/*": ["./vendor/deno.land/std@0.196.0/assert/*"],
+            "std/testing/*": ["./vendor/deno.land/std@0.196.0/testing/*"]
+        }
+    }
+}

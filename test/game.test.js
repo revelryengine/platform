@@ -1,7 +1,8 @@
 import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { assertEquals                        } from 'std/testing/asserts.ts';
 import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
 import { FakeTime                            } from 'std/testing/time.ts';
+
+import { assertEquals } from 'std/assert/assert_equals.ts';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';

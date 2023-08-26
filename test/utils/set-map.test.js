@@ -1,5 +1,9 @@
-import { describe, it, beforeEach                            } from 'std/testing/bdd.ts';
-import { assert, assertInstanceOf, assertEquals, assertFalse } from 'std/testing/asserts.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+
+import { assert           } from 'std/assert/assert.ts';
+import { assertEquals     } from 'std/assert/assert_equals.ts';
+import { assertFalse      } from 'std/assert/assert_false.ts';
+import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
 
 import { SetMap } from '../../lib/utils/set-map.js';
 

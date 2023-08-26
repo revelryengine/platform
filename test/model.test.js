@@ -1,7 +1,8 @@
 import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { assertEquals                        } from 'std/testing/asserts.ts';
 import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
 import { FakeTime                            } from 'std/testing/time.ts';
+
+import { assertEquals } from 'std/assert/assert_equals.ts';
 
 import { Game      } from '../lib/game.js';
 import { Stage     } from '../lib/stage.js';
@@ -13,28 +14,28 @@ import { Watchable } from '../lib/utils/watchable.js';
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
 
 /**
- * @template V,[C=V]
- * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
- */
-/**
  * @typedef {{  
- *   a: ComponentValue<string>,
- *   b: ComponentValue<number>,
- *   c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
- *   d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+ *   a: { value: string },
+ *   b: { value: number },
+ *   c: { value: import('../lib/utils/watchable.js').Watchable },
+ *   d: { value: { foo: string }, complex: import('../lib/stage.js').ComplexComponentValue },
  * }} ComponentTypes
  */
+
 /**
-* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
-* @typedef {import('../lib/stage.js').Component<ComponentTypes,K>} Component
-*/
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').Component<ComponentTypes, K>} Component
+ */
+
 /**
-* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
-* @typedef {import('../lib/stage.js').ComponentData<ComponentTypes,K>} ComponentData
-*/
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').ComponentData<ComponentTypes, K>} ComponentData
+ */
+
 /**
-* @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
-*/
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes, K>} ComponentReference
+ */
 
 const types = /** @type {ComponentTypes} */({});
 
@@ -214,7 +215,7 @@ describe('Model', () => {
 
     describe('default components', () => {
         it('should not error when using the base Model class', () => {
-            stage.systems.add(/** @type {System} */(new (System.define({ modelA: { model: Model } }))));
+            stage.systems.add(new (System.define({ modelA: { model: Model } }, types)));
             stage.components.add({ id: UUID(), entityId: UUID(), type: 'a', value: 'a' });
         });
     });

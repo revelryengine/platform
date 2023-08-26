@@ -1,14 +1,13 @@
 import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
 import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
 import { FakeTime                            } from 'std/testing/time.ts';
-import { 
-    assert,
-    assertEquals,  
-    assertInstanceOf, 
-    assertExists,
-    assertFalse,
-    assertThrows,
-} from 'std/testing/asserts.ts';
+
+import { assert           } from 'std/assert/assert.ts';
+import { assertEquals     } from 'std/assert/assert_equals.ts';
+import { assertExists     } from 'std/assert/assert_exists.ts';
+import { assertFalse      } from 'std/assert/assert_false.ts';
+import { assertThrows     } from 'std/assert/assert_throws.ts';
+import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
 
 import { Stage     } from '../lib/stage.js';
 import { System    } from '../lib/system.js';
@@ -20,21 +19,14 @@ import { Watchable } from '../lib/utils/watchable.js';
  * @typedef {import('std/testing/mock.ts').Spy} Spy
  */
 
-
-/**
- * @template V,[C=any]
- * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
- */
-
 /**
  * @typedef {{  
- *  a: ComponentValue<string>,
- *  b: ComponentValue<number>,
- *  c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
- *  d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+ *   a: { value: string },
+ *   b: { value: number },
+ *   c: { value: import('../lib/utils/watchable.js').Watchable },
+ *   d: { value: { foo: string }, complex: import('../lib/stage.js').ComplexComponentValue },
  * }} ComponentTypes
  */
-
 
 /**
  * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
@@ -47,7 +39,8 @@ import { Watchable } from '../lib/utils/watchable.js';
  */
 
 /**
- * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
+ * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
+ * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes, K>} ComponentReference
  */
 
 describe('Stage', () => {
@@ -85,11 +78,24 @@ describe('Stage', () => {
     }, /** @type {ComponentTypes} */({})) { }
 
     class Initializer {
-        set() {
-    
+        #value;
+
+        /**
+         * @param {ComponentTypes['d']['value'] | ComponentTypes['d']['complex']} value
+         */
+        constructor(value) {
+            this.#value = value;
         }
+
+        /**
+         * @param {ComponentTypes['d']['value']} value
+         */
+        set(value) {
+            this.#value = value;
+        }
+
         toJSON() {
-            return {};
+            return this.#value;
         }
     }
 
@@ -130,7 +136,7 @@ describe('Stage', () => {
         time = new FakeTime();
         stage = new Stage();
 
-        stage.initializers['d'] =  () => new Initializer();
+        stage.initializers['d'] = (c) => new Initializer(c.value);
 
         entityA = UUID();
         entityB = UUID();
@@ -198,7 +204,7 @@ describe('Stage', () => {
     
     
         it('should share component between models matching the same entity', () => {
-            assertEquals(systemA.modelA.components.get('a'), systemA.modelB.components.get('a'));
+            assertEquals(systemA.modelA.components['a'], systemA.modelB.components['a']);
         });
         
         
@@ -307,12 +313,27 @@ describe('Stage', () => {
         });
     });
 
+    describe('component.getJSONValue', () => {
+        /** @type {Component<'d'>} */
+        let component;
+        /** @type {ComponentTypes['d']['value']} */
+        let json;
+        beforeEach(() => {
+            component = /** @type {Component<'d'>} */(stage.components.getById(componentG));
+            json = component.getJSONValue();
+        });
+
+        it('should return the value of toJSON of a complex object', () => {
+            assertEquals(json, { foo: 'bar' });
+        });
+    });
+
     describe('component value change', () => {
-        /** @type {Component} */
+        /** @type {Component<'a'>} */
         let component;
         beforeEach(() => {
             handler = spy();
-            component = /** @type {Component} */(stage.components.getById(componentA));
+            component = /** @type {Component<'a'>} */(stage.components.getById(componentA));
             component.watch('value:change', handler);
         });
 
@@ -374,7 +395,7 @@ describe('Stage', () => {
 
         it('should not call watch handler after component has been removed', async () => {
             stage.components.delete(component);
-            watchableA.notify('a');
+            watchableA.notify('a', 'a');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
@@ -586,7 +607,7 @@ describe('Stage', () => {
         });
 
         it('should call onModelAdd id defined when all the components for that model are registered', () => {
-            systemA.onModelAdd = (/** @type {{ constructor: any; }} */ model, /** @type {any} */ key) => handler(model.constructor, key);
+            systemA.onModelAdd = (model, key) => handler(model.constructor, key);
 
             stage.components.add({ id: UUID(), entityId: entityC, type: 'a', value: 'a' });
             stage.components.add({ id: UUID(), entityId: entityD, type: 'a', value: 'a' });
@@ -607,7 +628,7 @@ describe('Stage', () => {
         });
 
         it('should call onModelDelete when all the components for that model are deleted if defined', () => {
-            systemA.onModelDelete = (/** @type {{ constructor: any; }} */ model, /** @type {any} */ key) => handler(model.constructor, key);
+            systemA.onModelDelete = (model, key) => handler(model.constructor, key);
 
             stage.components.delete({ id: componentA });
 
@@ -665,9 +686,9 @@ describe('Stage', () => {
 
 
     describe('component references', () => {
-        /** @type {ComponentReference} */ 
+        /** @type {ComponentReference<'a'>} */ 
         let refA;
-        /** @type {ComponentReference} */ 
+        /** @type {ComponentReference<'c'>} */ 
         let refB;
         /** @type {string} */ 
         let entityC;

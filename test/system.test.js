@@ -1,19 +1,19 @@
-import { describe, it, beforeEach                     } from 'std/testing/bdd.ts';
-import { assertEquals, assertInstanceOf, assertExists } from 'std/testing/asserts.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+
+import { assertEquals     } from 'std/assert/assert_equals.ts';
+import { assertExists     } from 'std/assert/assert_exists.ts';
+import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
 
 import { System } from '../lib/system.js';
 import { Model  } from '../lib/model.js';
 
-/**
- * @template V,[C=any]
- * @typedef {import('../lib/stage.js').ComponentValue<V,C>} ComponentValue
- */
+
 /**
  * @typedef {{  
-*   a: ComponentValue<string>,
-*   b: ComponentValue<number>,
-*   c: ComponentValue<import('../lib/utils/watchable.js').Watchable>
-*   d: ComponentValue<{ foo: string }, import('../lib/stage.js').ComplexComponentValue>
+*   a: { value: string },
+*   b: { value: number },
+*   c: { value: import('../lib/utils/watchable.js').Watchable },
+*   d: { value: { foo: string }, complex: import('../lib/stage.js').ComplexComponentValue },
 * }} ComponentTypes
 */
 /**
@@ -62,14 +62,14 @@ describe('System', () => {
 
     describe('stage', () => {
         it('should be a reference to the parent stage', () => {
-            system.parent = /** @type {import('../lib/stage.js').Stage} */({});
+            system.parent = /** @type {import('../lib/stage.js').Stage<ComponentTypes>} */({});
             assertEquals(system.stage, system.parent);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the stage parent game', () => {
-            system.parent =  /** @type {import('../lib/stage.js').Stage} */({ parent:  /** @type {import('../lib/game.js').Game} */({}) });
+            system.parent =  /** @type {import('../lib/stage.js').Stage<ComponentTypes>} */({ parent:  /** @type {import('../lib/game.js').Game} */({}) });
             assertExists(system.stage?.parent);
             assertEquals(system.game, system.stage?.parent);
         });

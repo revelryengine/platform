@@ -1,5 +1,9 @@
-import { describe, it, beforeEach           } from 'std/testing/bdd.ts';
-import { assert, assertFalse, assertEquals  } from 'std/testing/asserts.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+
+import { assert       } from 'std/assert/assert.ts';
+import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertFalse  } from 'std/assert/assert_false.ts';
+import { assertThrows } from 'std/assert/assert_throws.ts';
 
 import { IdSet } from '../../lib/utils/id-set.js';
 import { UUID  } from '../../lib/utils/uuid.js';
@@ -40,6 +44,11 @@ describe('IdSet', () => {
     it('should not be able to find item by id of removed item', () => {
         idSet.delete(itemA);
         assertEquals(idSet.getById('itemA'), undefined);
+    });
+
+    it('should throw if getById is called with assert = true and the item does not exist', () => {
+        idSet.delete(itemA);
+        assertThrows(() => idSet.getById('itemA', true));
     });
 
     it('should generate a uuid for a item if it is not provided', () => {

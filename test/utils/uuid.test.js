@@ -1,5 +1,10 @@
-import { describe, it, beforeEach                             } from 'std/testing/bdd.ts';
-import { assert, assertEquals, assertInstanceOf, assertThrows } from 'std/testing/asserts.ts';
+import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+
+import { assert           } from 'std/assert/assert.ts';
+import { assertEquals     } from 'std/assert/assert_equals.ts';
+import { assertThrows     } from 'std/assert/assert_throws.ts';
+import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
+
 
 import { UUID } from '../../lib/utils/uuid.js';
 

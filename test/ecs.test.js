@@ -1,5 +1,6 @@
 import { describe, it } from 'std/testing/bdd.ts';
-import { assertExists } from 'std/testing/asserts.ts';
+
+import { assertExists } from 'std/assert/assert_exists.ts';
 
 import * as ECS from '../lib/ecs.js';
 

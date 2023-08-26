@@ -1,6 +1,7 @@
 import { describe, it, beforeEach } from 'std/testing/bdd.ts';
-import { assertEquals             } from 'std/testing/asserts.ts';
 import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
+
+import { assertEquals } from 'std/assert/assert_equals.ts';
 
 import { GameNode } from '../../lib/gom/game-node.js';
 

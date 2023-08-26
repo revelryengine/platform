@@ -1,12 +1,15 @@
-import { describe, it, beforeEach, afterEach                  } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls                   } from 'std/testing/mock.ts';
-import { assertInstanceOf, assertExists, assert, assertEquals } from 'std/testing/asserts.ts';
-import { FakeTime                                             } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
+import { FakeTime                            } from 'std/testing/time.ts';
+
+import { assert           } from 'std/assert/assert.ts';
+import { assertEquals     } from 'std/assert/assert_equals.ts';
+import { assertExists     } from 'std/assert/assert_exists.ts';
+import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
 
 import { Watchable } from '../../lib/utils/watchable.js';
 
 /** @typedef {import('std/testing/mock.ts').Spy} Spy */
-
 
 describe('Watchable', () => {
 
