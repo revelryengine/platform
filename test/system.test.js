@@ -28,22 +28,30 @@ import { Model  } from '../lib/model.js';
 * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
 */
 
-const types = /** @type {ComponentTypes} */({});
-
 describe('System', () => {
+    const types = /** @type {ComponentTypes} */({});
+    const TypedModel  = Model.Typed(types);
+    const TypedSystem = System.Typed(types);
 
-    class ModelA extends Model.define({ 
-        b: { type: 'b' },
-    }, types) { }
+    class ModelA extends TypedModel({ 
+        components: {
+            b: { type: 'b' },
+        }
+        
+    }) { }
 
-    class ModelB extends Model.define({ 
-        a: { type: 'a' }, 
-    }, types) { }
+    class ModelB extends TypedModel({ 
+        components: {
+            a: { type: 'a' }, 
+        }
+    }) { }
 
-    class SystemA extends System.define({
-        modelA:  { model: ModelA, },
-        modelBs: { model: ModelB, isSet: true },
-    }, types) { }
+    class SystemA extends TypedSystem({
+        models: {
+            modelA:  { model: ModelA, },
+            modelBs: { model: ModelB, isSet: true },
+        }
+    }) { }
 
     /** @type {SystemA} */
     let system;

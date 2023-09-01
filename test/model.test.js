@@ -37,19 +37,24 @@ import { Watchable } from '../lib/utils/watchable.js';
  * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes, K>} ComponentReference
  */
 
-const types = /** @type {ComponentTypes} */({});
-
 describe('Model', () => {
-    
-    class ModelA extends Model.define({ 
-        a: { type: 'a' }, 
-        b: { type: 'b' },
-        c: { type: 'c' },
-    }, types) { }
+    const types = /** @type {ComponentTypes} */({});
+    const TypedModel  = Model.Typed(types);
+    const TypedSystem = System.Typed(types);
 
-    class SystemA extends System.define({
-        modelA:  { model: ModelA },
-    }, types) { }
+    class ModelA extends TypedModel({
+        components: {
+            a: { type: 'a' }, 
+            b: { type: 'b' },
+            c: { type: 'c' },
+        }
+    }) { }
+
+    class SystemA extends TypedSystem({
+        models: {
+            modelA: { model: ModelA },
+        },
+    }) { }
 
     /** @type {FakeTime} */
     let time;
@@ -215,7 +220,7 @@ describe('Model', () => {
 
     describe('default components', () => {
         it('should not error when using the base Model class', () => {
-            stage.systems.add(new (System.define({ modelA: { model: Model } }, types)));
+            stage.systems.add(new (TypedSystem({ models: { modelA: { model: Model } } })));
             stage.components.add({ id: UUID(), entityId: UUID(), type: 'a', value: 'a' });
         });
     });

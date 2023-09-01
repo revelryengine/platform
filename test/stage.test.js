@@ -44,38 +44,53 @@ import { Watchable } from '../lib/utils/watchable.js';
  */
 
 describe('Stage', () => {
+    const types = /** @type {ComponentTypes} */({});
+    const TypedModel  = Model.Typed(types);
+    const TypedSystem = System.Typed(types);
 
-    class ModelA extends Model.define({
-        a: { type: 'a' },
-    }, /** @type {ComponentTypes} */({})) { }
+
+    class ModelA extends TypedModel({
+        components: {
+            a: { type: 'a' },
+        },
+    }) { }
         
 
-    class ModelB extends Model.define({
-        a: { type: 'a' },
-        b: { type: 'b' },
-    },/** @type {ComponentTypes} */({})) {
+    class ModelB extends TypedModel({
+        components: {
+            a: { type: 'a' },
+            b: { type: 'b' },
+        }
+    }) {
         cleanup() {
             cleanupSpy(this.entity.id);
         }
     }
 
-    class ModelC extends Model.define({
-        c: { type: 'c' },
-        d: { type: 'd' },
-    }, /** @type {ComponentTypes} */({})) { }
+    class ModelC extends TypedModel({
+        components: {
+            c: { type: 'c' },
+            d: { type: 'd' },
+        }
+    }) { }
 
 
-    class SystemA extends System.define({
-        modelA:  { model: ModelA },
-        modelB:  { model: ModelB },
-        modelCs: { model: ModelC, isSet: true },
-    }, /** @type {ComponentTypes} */({})) { }
+    class SystemA extends TypedSystem({
+        models: {
+            modelA:  { model: ModelA },
+            modelB:  { model: ModelB },
+            modelCs: { model: ModelC, isSet: true },
+        }
+        
+    }) { }
 
-    class SystemB extends System.define({
-        modelA:  { model: ModelA },
-        modelB:  { model: ModelB },
-        modelCs: { model: ModelC, isSet: true },
-    }, /** @type {ComponentTypes} */({})) { }
+    class SystemB extends TypedSystem({
+        models: {
+            modelA:  { model: ModelA },
+            modelB:  { model: ModelB },
+            modelCs: { model: ModelC, isSet: true },
+        }
+    }) { }
 
     class Initializer {
         #value;
@@ -465,9 +480,11 @@ describe('Stage', () => {
 
         describe('system:add', () => {
 
-            class SystemC extends System.define({
-                modelA: { model: ModelA }
-            }, /** @type {ComponentTypes} */({})) {}
+            class SystemC extends TypedSystem({
+                models: {
+                    modelA: { model: ModelA }
+                }
+            }) { }
 
             /** @type {SystemC} */
             let systemC;
@@ -638,9 +655,11 @@ describe('Stage', () => {
     });
 
     describe('new system', () => {
-        class SystemC extends System.define({
-            modelA: { model: ModelA }
-        }, /** @type {ComponentTypes} */({})) { }
+        class SystemC extends TypedSystem({
+            models: {
+                modelA: { model: ModelA }
+            }
+        }) { }
 
         /** @type {SystemC} */
         let systemC;
