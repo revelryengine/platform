@@ -1,7 +1,6 @@
 import { Stage, ComponentTypesDefinition } from './stage.js';
 import { Game     } from './game.js';
 import { GameNode } from './gom/game-node.js';
-import { IdSet    } from './utils/id-set.js';
 import { EventMap } from './utils/watchable.js';
 
 type SystemModelsDefinition<T extends ComponentTypesDefinition = any> = Record<string, { model: import('./model.js').ModelConstructor<T>, isSet?: boolean }>;
@@ -21,8 +20,6 @@ type Events<T extends ComponentTypesDefinition, D extends SystemModelsDefinition
 
 export declare class System<T extends ComponentTypesDefinition = any, D extends SystemModelsDefinition<T> = any, E extends EventMap = any> extends GameNode<Stage<T>, any, E & Events<T, D> > {
     constructor(id?: string);
-
-    readonly models: IdSet<Model<T, D>>;
 
     /** The id of the model */
     readonly id: string;

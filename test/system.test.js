@@ -7,25 +7,13 @@ import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
 import { System } from '../lib/system.js';
 import { Model  } from '../lib/model.js';
 
-
 /**
  * @typedef {{  
 *   a: { value: string },
 *   b: { value: number },
 *   c: { value: import('../lib/utils/watchable.js').Watchable },
-*   d: { value: { foo: string }, complex: import('../lib/stage.js').ComplexComponentValue },
+*   d: { value: { foo: string }, complex: import('../lib/component.js').ComplexComponentValue },
 * }} ComponentTypes
-*/
-/**
-* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
-* @typedef {import('../lib/stage.js').Component<ComponentTypes,K>} Component
-*/
-/**
-* @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
-* @typedef {import('../lib/stage.js').ComponentData<ComponentTypes,K>} ComponentData
-*/
-/**
-* @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes>} ComponentReference
 */
 
 describe('System', () => {

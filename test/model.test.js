@@ -18,23 +18,23 @@ import { Watchable } from '../lib/utils/watchable.js';
  *   a: { value: string },
  *   b: { value: number },
  *   c: { value: import('../lib/utils/watchable.js').Watchable },
- *   d: { value: { foo: string }, complex: import('../lib/stage.js').ComplexComponentValue },
+ *   d: { value: import('../lib/component.js').ComplexComponentValue, json: { foo: string } },
  * }} ComponentTypes
  */
 
 /**
  * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/stage.js').Component<ComponentTypes, K>} Component
+ * @typedef {import('../lib/component.js').Component<ComponentTypes, K>} Component
  */
 
 /**
  * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/stage.js').ComponentData<ComponentTypes, K>} ComponentData
+ * @typedef {import('../lib/component.js').ComponentData<ComponentTypes, K>} ComponentData
  */
 
 /**
  * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/stage.js').ComponentReference<ComponentTypes, K>} ComponentReference
+ * @typedef {import('../lib/component.js').ComponentReference<ComponentTypes, K>} ComponentReference
  */
 
 describe('Model', () => {
@@ -59,13 +59,6 @@ describe('Model', () => {
     /** @type {FakeTime} */
     let time;
 
-    /** @type {string} */
-    let componentAId;
-    /** @type {string} */
-    let componentBId; 
-    /** @type {string} */
-    let componentCId; 
-
     /** @type {ComponentData<'a'>} */
     let componentA;
     /** @type {ComponentData<'b'>} */
@@ -73,7 +66,7 @@ describe('Model', () => {
     /** @type {ComponentData<'c'>} */
     let componentC;
     /** @type {string} */
-    let entityId;
+    let entity;
 
     /** @type {Game} */
     let game;
@@ -94,20 +87,17 @@ describe('Model', () => {
 
         stage.systems.add(system);
 
-        entityId = UUID();
-        componentAId = UUID();
-        componentBId = UUID();
-        componentCId = UUID();
+        entity = UUID();
 
-        stage.components.add({ id: componentAId, entityId, type: 'a', value: 'abc' });
-        stage.components.add({ id: componentBId, entityId, type: 'b', value: 123 });
-        stage.components.add({ id: componentCId, entityId, type: 'c', value: new Watchable() });
+        stage.components.add({ entity, type: 'a', value: 'abc' });
+        stage.components.add({ entity, type: 'b', value: 123 });
+        stage.components.add({ entity, type: 'c', value: new Watchable() });
 
-        modelA = /** @type {ModelA} */(stage.getEntityById(entityId)?.models.getByClass(ModelA));
+        modelA = system.modelA;
 
-        componentA = /** @type {ComponentData<'a'>} */(stage.components.getById(componentAId));
-        componentB = /** @type {ComponentData<'b'>} */(stage.components.getById(componentBId));
-        componentC = /** @type {ComponentData<'c'>} */(stage.components.getById(componentCId));
+        componentA = /** @type {ComponentData<'a'>} */(stage.components.find({ entity, type: 'a' }));
+        componentB = /** @type {ComponentData<'b'>} */(stage.components.find({ entity, type: 'b' }));
+        componentC = /** @type {ComponentData<'c'>} */(stage.components.find({ entity, type: 'c' }));
     });
 
     afterEach(() => {
@@ -207,13 +197,13 @@ describe('Model', () => {
     });
 
     describe('stage', () => {
-        it('should be a reference to the entity stage', () => {
+        it('should be a reference to the stage', () => {
             assertEquals(modelA.stage, stage);
         });
     });
 
     describe('game', () => {
-        it('should be a reference to the entity stage game', () => {
+        it('should be a reference to the stage game', () => {
             assertEquals(modelA.game, game);
         });
     });
@@ -221,7 +211,7 @@ describe('Model', () => {
     describe('default components', () => {
         it('should not error when using the base Model class', () => {
             stage.systems.add(new (TypedSystem({ models: { modelA: { model: Model } } })));
-            stage.components.add({ id: UUID(), entityId: UUID(), type: 'a', value: 'a' });
+            stage.components.add({ entity: UUID(), type: 'a', value: 'a' });
         });
     });
 });

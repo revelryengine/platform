@@ -41,6 +41,10 @@ describe('IdSet', () => {
         assertFalse(idSet.has(itemA));
     });
 
+    it('should return false if item not in set', () => {
+        assertFalse(idSet.delete({ id: 'x' }));
+    });
+
     it('should not be able to find item by id of removed item', () => {
         idSet.delete(itemA);
         assertEquals(idSet.getById('itemA'), undefined);

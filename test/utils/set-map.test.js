@@ -42,4 +42,15 @@ describe('SetMap', () => {
     it('should return false if deleted but key does not exist', () => {
         assertFalse(setMap.delete('x'));
     });
+
+    describe('count', () => {
+        it('should return the number of items in a given set', () => {
+            assertEquals(setMap.count('foo'), 2);
+            assertEquals(setMap.count('removed'), 0);
+        });
+
+        it('should return 0 for a non existent set', () => {
+            assertEquals(setMap.count('z'), 0);
+        });
+    });
 });
