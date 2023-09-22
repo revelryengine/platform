@@ -19,6 +19,8 @@
         "paths": {
             "revelryengine/*": ["../../packages/*"],
             "gl-matrix": ["./vendor/cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/index.js"],
+            "std/assert/*": ["./vendor/deno.land/std@0.196.0/assert/*"],
+            "std/testing/*": ["./vendor/deno.land/std@0.196.0/testing/*"]
         },
         "types": ["./types/import-meta.d.ts"]
     }

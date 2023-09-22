@@ -5,5 +5,6 @@
 #### Install vendor types
 
 ```sh
-find lib/**/*.js | xargs deno vendor --force
+find lib/*.js | xargs deno vendor --force
+find test/*.js | xargs deno vendor --force
 ```
