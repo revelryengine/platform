@@ -8,15 +8,8 @@
 rm -rf cov_profile && deno test --coverage=cov_profile --reporter=dot && deno coverage cov_profile
 ```
 
-### Experimental Types
-
-
-```sh
-tsc -d  -p .
-```
-
 #### Install testing types
 
 ```sh
-find test/**/*.test.js | xargs deno vendor --force
+find test/*.test.js | xargs deno vendor --force
 ```

@@ -55,7 +55,7 @@ describe('GameNodeChildSet', () => {
         beforeEach(() => {
             connected = spy(stageA, 'connectedCallback');
             handler = spy();
-            game.watch('node:add', { immediate: true, handler });
+            game.watch('node:add', handler);
             game.children.add(stageA);
         });
 
@@ -79,7 +79,7 @@ describe('GameNodeChildSet', () => {
     describe('delete', () => {
         beforeEach(() => {
             handler = spy();
-            game.watch('node:delete', { immediate: true, handler });
+            game.watch('node:delete', handler);
             game.children.add(stageA);
             game.children.delete(stageA);
         });

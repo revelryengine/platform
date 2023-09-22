@@ -237,7 +237,7 @@ describe('Stage', () => {
 
             beforeEach(() => {
                 systemC = new SystemC();
-                stage.watch('system:add', { immediate: true, handler });
+                stage.watch('system:add', handler);
                 stage.systems.add(systemC);
             });
 
@@ -248,7 +248,7 @@ describe('Stage', () => {
 
         describe('system:delete', () => {
             beforeEach(() => {
-                stage.watch('system:delete', { immediate: true, handler });
+                stage.watch('system:delete', handler);
                 stage.systems.delete(systemA);
             });
 
@@ -258,7 +258,7 @@ describe('Stage', () => {
         });
 
         it('should notify model:add when all the components for that model are registered', () => {
-            systemA.watch('model:add', { immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
+            systemA.watch('model:add', { handler: ({ model, key}) => handler(model.constructor, key) });
 
             stage.components.add({ entity: entityC, type: 'a', value: 'a' });
             stage.components.add({ entity: entityD, type: 'a', value: 'a' });
@@ -282,7 +282,7 @@ describe('Stage', () => {
         });
 
         it('should notify model:delete when all the components for that model are unregistered', () => {
-            systemA.watch('model:delete', { immediate: true, handler: ({ model, key}) => handler(model.constructor, key) });
+            systemA.watch('model:delete', { handler: ({ model, key}) => handler(model.constructor, key) });
 
             stage.components.delete({ entity: entityA, type: 'a' });
 

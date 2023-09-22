@@ -126,44 +126,31 @@ describe('Model', () => {
                 handler = spy();
                 modelA.watch(handler);
             });
-    
-            describe('watch', () => {
-                it('should watch all components for changes', async () => {
-                    modelA.a = 'def';
-                    modelA.b = 456;
-                    await time.runMicrotasks();
-                    assertSpyCalls(handler, 1);
-                    assertEquals(handler.calls[0].args[0].get('a:change'), 'abc');
-                    assertEquals(handler.calls[0].args[0].get('b:change'), 123);
-                });
-            });
-    
-            describe('unwatch', () => {
-                it('should unwatch all components', async () => {
-                    modelA.unwatch(handler);
-                    modelA.a = 'def';
-                    modelA.b = 456;
-                    await time.runMicrotasks();
-                    assertSpyCalls(handler, 0);
-                });
-            });    
-        })
-        
-        describe('immediate=true', () => {
-            beforeEach(() => {
-                handler = spy();
-                modelA.watch({ handler, immediate: true });
-            });
 
-            it('should call the watcher immediately for all components that change', async () => {
+            it('should call the handler for all components that change', () => {
                 modelA.a = 'def';
                 modelA.b = 456;
                 assertSpyCall(handler, 0, { args: ['a:change', 'abc'] });
                 assertSpyCall(handler, 1, { args: ['b:change', 123] });
                 assertSpyCalls(handler, 2);
-            });
+            });    
         });
+        describe('all components deferred', () => {
+            beforeEach(() => {
+                handler = spy();
+                modelA.watch({ handler, deferred: true });
+            });
 
+            it('should watch all components for changes', async () => {
+                modelA.a = 'def';
+                modelA.b = 456;
+                await time.runMicrotasks();
+                assertSpyCalls(handler, 1);
+                assertEquals(handler.calls[0].args[0].get('a:change'), 'abc');
+                assertEquals(handler.calls[0].args[0].get('b:change'), 123);
+            });
+        })
+        
         describe('watch individual property', () => {
             beforeEach(() => {
                 handler = spy();
@@ -171,10 +158,9 @@ describe('Model', () => {
             });
 
 
-            it('should watch only component specified', async () => {
+            it('should watch only component specified', () => {
                 modelA.a = 'def';
                 modelA.b = 456;
-                await time.runMicrotasks();
                 assertSpyCall(handler, 0, { args: ['abc'] });
                 assertSpyCalls(handler, 1);
             });

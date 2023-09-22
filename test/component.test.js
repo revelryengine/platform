@@ -64,16 +64,14 @@ describe('Component', () => {
             component.watch('value:change', handler);
         });
 
-        it('should call watch handler when value changes', async () => {
+        it('should call watch handler when value changes', () => {
             const oldValue = component.value;
             component.value = 'change';
-            await time.runMicrotasks();
             assertSpyCall(handler, 0, { args: [oldValue]});
         });
 
-        it('should not call watch handler when value is the same', async () => {
+        it('should not call watch handler when value is the same', () => {
             component.value = 'a';
-            await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
     });
@@ -97,28 +95,28 @@ describe('Component', () => {
         
 
         it('should call watch handler when watchable notifies event', async () => {
-            watchableA.notify('a', 'a');
+            watchableA.notify('a', 'abc');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [new Map([['a', 'a']])]});
+            assertSpyCall(handler, 0, { args: [new Map([['a', 'abc']])]});
         });
 
         it('should call watch handler when new watchable notifies', async () => {
             component.value = watchableB;
-            watchableB.notify('b', 'b');
+            watchableB.notify('b', 'def');
             await time.runMicrotasks();
-            assertSpyCall(handler, 0, { args: [new Map([['b', 'b']])]});
+            assertSpyCall(handler, 0, { args: [new Map([['b', 'def']])]});
         });
 
         it('should not call watch handler when original watchable value has been removed', async () => {
             component.value = watchableB;
-            watchableA.notify('a', 'a');
+            watchableA.notify('a', 'abc');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
 
         it('should not call watch handler after component.cleanup has been called', async () => {
             component.cleanup();
-            watchableA.notify('a', 'a');
+            watchableA.notify('a', 'abc');
             await time.runMicrotasks();
             assertSpyCalls(handler, 0);
         });
@@ -386,55 +384,55 @@ describe('ComponentSet', () => {
         });
 
         it('should notify component:add when a new component is added', () => {
-            components.watch('component:add', { immediate: true, handler });
+            components.watch('component:add', handler);
             components.add({ entity: entityC, type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify component:add:${entity} when a new component is added', () => {
-            components.watch(`component:add:${entityC}`, { immediate: true, handler });
+            components.watch(`component:add:${entityC}`, handler);
             components.add({ entity: entityC, type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify component:add:${entity}:${type} when a new component is added', () => {
-            components.watch(`component:add:${entityC}:c`, { immediate: true, handler });
+            components.watch(`component:add:${entityC}:c`, handler);
             components.add({ entity: entityC, type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
         
         it('should notify component:delete when a component is deleted', () => {
-            components.watch('component:delete', { immediate: true, handler });
+            components.watch('component:delete', handler);
             components.delete({ entity: entityA, type: 'a' });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify component:delete:${entity} when a component is deleted', () => {
-            components.watch(`component:delete:${entityA}`, { immediate: true, handler });
+            components.watch(`component:delete:${entityA}`, handler);
             components.delete({ entity: entityA, type: 'a' });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify component:delete:${entity}:${type} when a component is deleted', () => {
-            components.watch(`component:delete:${entityA}:a`, { immediate: true, handler });
+            components.watch(`component:delete:${entityA}:a`, handler);
             components.delete({ entity: entityA, type: 'a' });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify entity:add when a new entity is added', () => {
-            components.watch('entity:add', { immediate: true, handler });
+            components.watch('entity:add', handler);
             components.add({ entity: UUID(), type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify entity:add:${entity} when a new entity is added', () => {
-            components.watch(`entity:add:${entityC}`, { immediate: true, handler });
+            components.watch(`entity:add:${entityC}`, handler);
             components.add({ entity: entityC, type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
 
         it('should notify entity:delete when an entity is deleted', () => {
-            components.watch('entity:delete', { immediate: true, handler });
+            components.watch('entity:delete', handler);
             components.delete({ entity: entityA, type: 'a' });
             components.delete({ entity: entityA, type: 'b' });
             components.delete({ entity: entityA, type: 'c' });
@@ -443,7 +441,7 @@ describe('ComponentSet', () => {
         });
 
         it('should notify entity:delete:${entity} when an entity is deleted', () => {
-            components.watch(`entity:delete:${entityA}`, { immediate: true, handler });
+            components.watch(`entity:delete:${entityA}`, { handler });
             components.delete({ entity: entityA, type: 'a' });
             components.delete({ entity: entityA, type: 'b' });
             components.delete({ entity: entityA, type: 'c' });
@@ -714,40 +712,40 @@ describe('ComponentSet', () => {
             });
 
             it('should notify reference:add when a new reference is added', () => {
-                components.references.watch('reference:add', { immediate: true, handler });
+                components.references.watch('reference:add', handler);
                 components.references.add(referer, { entity: entityC, type: 'c' });
                 assertSpyCall(handler, 0, { args: [{ referer, count: 10 }]});
             });
 
             it('should notify reference:add:${entity} when a new reference is added', () => {
-                components.references.watch(`reference:add:${entityC}`, { immediate: true, handler });
+                components.references.watch(`reference:add:${entityC}`, handler);
                 components.references.add(referer, { entity: entityC, type: 'c' });
                 assertSpyCall(handler, 0, { args: [{ referer, count: 1 }]});
             });
 
             it('should notify reference:add:${entity}:${type} when a new reference is added', () => {
-                components.references.watch(`reference:add:${entityC}:c`, { immediate: true, handler });
+                components.references.watch(`reference:add:${entityC}:c`, handler);
                 components.references.add(referer, { entity: entityC, type: 'c' });
                 assertSpyCall(handler, 0, { args: [{ referer, count: 1 }]});
             });
 
 
             it('should notify reference:release when reference is released', async () => {
-                components.references.watch('reference:release', { immediate: true, handler });
+                components.references.watch('reference:release', handler);
                 refA.release();
                 await time.runMicrotasks();
                 assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 8 }]});
             });
 
             it('should notify reference:release:${entity} when reference is released', async () => {
-                components.references.watch(`reference:release:${entityA}`, { immediate: true, handler });
+                components.references.watch(`reference:release:${entityA}`, handler);
                 refA.release();
                 await time.runMicrotasks();
                 assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 4 }]});
             });
 
             it('should notify reference:release:${entity}:${type} when reference is released', async () => {
-                components.references.watch(`reference:release:${entityA}:a`, { immediate: true, handler });
+                components.references.watch(`reference:release:${entityA}:a`, handler);
                 refA.release();
                 await time.runMicrotasks();
                 assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 0 }]});
