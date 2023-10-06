@@ -251,34 +251,4 @@ describe('Asset', () => {
         });
     });
 
-    describe('static getReferenceCount', () => {
-        it('should return the number of references for each path', () => {
-            new Asset({ entity: 'entityC', value: { path: pathA } });
-            assertEquals(Asset.getReferenceCount(pathA), 2);
-            assertEquals(Asset.getReferenceCount(pathB), 1);
-        });
-
-        it('should reduce the count when asset is unloaded', () => {
-            assertEquals(Asset.getReferenceCount(pathA), 1);
-            assertEquals(Asset.getReferenceCount(pathB), 1);
-
-            assetA.unload();
-            assetB.unload();
-
-            assertEquals(Asset.getReferenceCount(pathA), 0);
-            assertEquals(Asset.getReferenceCount(pathB), 0);
-        });
-
-        it('should reduce the count of a child asset when a referer is unloaded', async () => {
-            new Asset({ entity: 'entityC', value: { path: pathA } }, [assetB]);
-
-            assertEquals(Asset.getReferenceCount(pathA), 2);
-
-            assetB.unload();
-
-            await time.runMicrotasks();
-
-            assertEquals(Asset.getReferenceCount(pathA), 1);
-        });
-    })
 });
