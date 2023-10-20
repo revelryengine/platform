@@ -2,9 +2,8 @@
 
 !> Project Status - This project is in a very alpha state and is not fully implemented yet.
 
-#### Install vendor types
+#### Install vendor dependencies
 
 ```sh
-find lib/*.js | xargs deno vendor --force
-find test/*.js | xargs deno vendor --force
+find {lib,test}/*.js | xargs deno vendor --force
 ```

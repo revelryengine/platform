@@ -1,7 +1,18 @@
 {
   "imports": {
     "revelryengine/": "../",
-    "std/": "https://deno.land/std@0.196.0/"
+
+    "std/": "https://deno.land/std@0.196.0/",
+
+    "gl-matrix":  "https://cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/index.js",
+    "box2d-wasm": "https://cdn.jsdelivr.net/npm/box2d-wasm@7.0.0/dist/es/Box2D.js",
+    "emscripten": "https://cdn.jsdelivr.net/npm/@types/emscripten@1.39.8/index.d.ts",
+  },
+  "compilerOptions": {
+    "types": [
+      "https://cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/types.d.ts",
+      "https://cdn.jsdelivr.net/npm/box2d-wasm@7.0.0/dist/Box2D.d.ts"
+    ]
   },
   "tasks": {
     "test": "rm -rf cov_profile && deno test --allow-read --coverage=cov_profile && deno coverage cov_profile"

@@ -17,11 +17,12 @@
         "checkJs": true,
         "allowImportingTsExtensions":true,
         "paths": {
-            "revelryengine/*": ["../../packages/*"],
-            "gl-matrix": ["./vendor/cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/index.js"],
-            "std/assert/*": ["./vendor/deno.land/std@0.196.0/assert/*"],
-            "std/testing/*": ["./vendor/deno.land/std@0.196.0/testing/*"]
+            "revelryengine/*":  ["../../packages/*"],
+            "gl-matrix":        ["./vendor/cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/index.js"],
+            "box2d-wasm":       ["./vendor/cdn.jsdelivr.net/npm/box2d-wasm@7.0.0/dist/Box2DModule.d.ts"],
+            "std/assert/*":     ["./vendor/deno.land/std@0.196.0/assert/*"],
+            "std/testing/*":    ["./vendor/deno.land/std@0.196.0/testing/*"]
         },
-        "types": ["./types/import-meta.d.ts"]
+        "types": ["./types/import-meta.d.ts", "./vendor/cdn.jsdelivr.net/gh/toji/gl-matrix@v3.4.1/src/types.d.ts"]
     }
 }
