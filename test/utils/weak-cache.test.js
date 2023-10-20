@@ -33,13 +33,13 @@ describe('WeakCache', () => {
 
         cache = new WeakCache();
 
-        fooA = cache.create(keyA);
-        fooB = cache.create(keyB);
-        fooC = cache.create(keyA, keyB);
-        fooD = cache.create(keyB, keyA);
+        fooA = cache.ensure(keyA);
+        fooB = cache.ensure(keyB);
+        fooC = cache.ensure(keyA, keyB);
+        fooD = cache.ensure(keyB, keyA);
     });
 
-    describe('create', () => {
+    describe('ensure', () => {
         it('should return an object for the given key', () => {
             assertInstanceOf(fooA, Object);
             assertInstanceOf(fooB, Object);
@@ -51,13 +51,13 @@ describe('WeakCache', () => {
         });
 
         it('should return the same object for the given key each time', () => {
-            assertStrictEquals(fooA, cache.create(keyA));
-            assertStrictEquals(fooB, cache.create(keyB));
+            assertStrictEquals(fooA, cache.ensure(keyA));
+            assertStrictEquals(fooB, cache.ensure(keyB));
         });
 
         it('should return the same object for the given key sequence each time', () => {
-            assertStrictEquals(fooC, cache.create(keyA, keyB));
-            assertStrictEquals(fooD, cache.create(keyB, keyA));
+            assertStrictEquals(fooC, cache.ensure(keyA, keyB));
+            assertStrictEquals(fooD, cache.ensure(keyB, keyA));
         });
     });
 
