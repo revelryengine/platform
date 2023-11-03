@@ -2,6 +2,7 @@ import { Stage, ComponentTypesDefinition } from './stage.js';
 import { Game     } from './game.js';
 import { GameNode } from './gom/game-node.js';
 import { EventMap } from './utils/watchable.js';
+import { ComponentInitializers } from './component.js';
 
 type SystemModelsDefinition<T extends ComponentTypesDefinition = any> = Record<string, { model: import('./model.js').ModelConstructor<T>, isSet?: boolean }>;
 
@@ -40,3 +41,5 @@ export declare class System<T extends ComponentTypesDefinition = any, D extends 
 
     static models: SystemModelsDefinition;
 }
+
+type Bundle<T extends ComponentTypesDefinition> = { systems?: SystemConstructorTyped<T, any, any>[], initializers?: ComponentInitializers<T>}

@@ -5,9 +5,11 @@ import { assertFalse           } from 'std/assert/assert_false.ts';
 import { assertEquals          } from 'std/assert/assert_equals.ts';
 import { assertStrictEquals    } from 'std/assert/assert_strict_equals.ts';
 import { assertNotStrictEquals } from 'std/assert/assert_not_strict_equals.ts';
-import { assertInstanceOf      } from 'std/assert/assert_instance_of.ts';
+import { assertSpyCalls, spy   } from 'std/testing/mock.ts';
 
 import { WeakCache } from '../../lib/utils/weak-cache.js';
+
+/** @typedef {import('std/testing/mock.ts').Spy}  Spy */
 
 describe('WeakCache', () => {
     /** @type {WeakCache<{ foo: string }>} */
@@ -27,37 +29,70 @@ describe('WeakCache', () => {
     /** @type {{ foo?: string }} */
     let fooD;
 
+    /** @type {Spy} */
+    let spyA;
+    /** @type {Spy} */
+    let spyB;
+    /** @type {Spy} */
+    let spyC;
+    /** @type {Spy} */
+    let spyD;
+
     beforeEach(() => {
         keyA = {};
         keyB = {};
 
         cache = new WeakCache();
 
-        fooA = cache.ensure(keyA);
-        fooB = cache.ensure(keyB);
-        fooC = cache.ensure(keyA, keyB);
-        fooD = cache.ensure(keyB, keyA);
+        spyA = spy(() => ({ foo: 'a' }));
+        spyB = spy(() => ({ foo: 'b' }));
+        spyC = spy(() => ({ foo: 'ab' }));
+        spyD = spy(() => ({ foo: 'ba' }));
+
+        fooA = cache.ensure(keyA, spyA);
+        fooB = cache.ensure(keyB, spyB);
+        fooC = cache.ensure(keyA, keyB, spyC);
+        fooD = cache.ensure(keyB, keyA, spyD);
     });
 
     describe('ensure', () => {
-        it('should return an object for the given key', () => {
-            assertInstanceOf(fooA, Object);
-            assertInstanceOf(fooB, Object);
+        it('should call the callback when the key is not in the cache', () => {
+            assertSpyCalls(spyA, 1);
+            assertSpyCalls(spyB, 1);
+            assertSpyCalls(spyC, 1);
+            assertSpyCalls(spyD, 1);
         });
-    
+
+        it('should return the object for the given key', () => {
+            assertEquals(fooA, { foo: 'a' });
+            assertEquals(fooB, { foo: 'b' });
+        });
+
         it('should return an object for the given key sequence', () => {
-            assertInstanceOf(fooC, Object);
-            assertInstanceOf(fooD, Object);
+            assertEquals(fooC, { foo: 'ab' });
+            assertEquals(fooD, { foo: 'ba' });
+        });
+
+        it('should not call the callback when the key is already in the cache', () => {
+            cache.ensure(keyA, spyA);
+            cache.ensure(keyB, spyB);
+            cache.ensure(keyA, keyB, spyC);
+            cache.ensure(keyB, keyA, spyD);
+
+            assertSpyCalls(spyA, 1);
+            assertSpyCalls(spyB, 1);
+            assertSpyCalls(spyC, 1);
+            assertSpyCalls(spyD, 1);
         });
 
         it('should return the same object for the given key each time', () => {
-            assertStrictEquals(fooA, cache.ensure(keyA));
-            assertStrictEquals(fooB, cache.ensure(keyB));
+            assertStrictEquals(fooA, cache.ensure(keyA, spyA));
+            assertStrictEquals(fooB, cache.ensure(keyB, spyB));
         });
 
         it('should return the same object for the given key sequence each time', () => {
-            assertStrictEquals(fooC, cache.ensure(keyA, keyB));
-            assertStrictEquals(fooD, cache.ensure(keyB, keyA));
+            assertStrictEquals(fooC, cache.ensure(keyA, keyB, spyC));
+            assertStrictEquals(fooD, cache.ensure(keyB, keyA, spyD));
         });
     });
 
@@ -100,7 +135,7 @@ describe('WeakCache', () => {
             assertNotStrictEquals(fooA, cache.get(keyA));
             assertNotStrictEquals(fooB, cache.get(keyB));
         });
-    
+
         it('should delete the object for the given key sequence', () => {
             cache.delete(keyA, keyB);
             cache.delete(keyB, keyA);
@@ -120,12 +155,12 @@ describe('WeakCache', () => {
         /** @type {WeakKey} */
         let keyC;
 
-        /** @type {object} */
+        /** @type {{ foo: string }} */
         let fooC;
-        
+
         beforeEach(() => {
             keyC = {};
-            fooC = {};
+            fooC = { foo: 'c' };
         });
         it('should set the cache object for the given key', () => {
             cache.set(keyA, fooC);
@@ -137,7 +172,7 @@ describe('WeakCache', () => {
             assertStrictEquals(cache.get(keyA, keyB), fooC);
             assertStrictEquals(cache.get(keyB, keyA), fooC);
         });
-    
+
         it('should create a new cache object if it does not exist', () => {
             cache.set(keyC, fooC);
             cache.set(keyA, keyC, fooC);
