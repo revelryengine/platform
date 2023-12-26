@@ -96,6 +96,8 @@ declare namespace Revelry {
                 Texture                      : Texture,
             }
 
+            type ExtendablePropertyNames = Extract<keyof Revelry.GLTF.Extensions.ExtendableProperties, string>;
+
             //KHR_animation_pointer
             interface khrAnimationPointerTarget {}
             interface KHRAnimationPointerTarget {}
@@ -103,10 +105,10 @@ declare namespace Revelry {
                 KHRAnimationPointerTarget: KHRAnimationPointerTarget
             }
             interface animationChannelTarget {
-                KHR_animation_pointer: import('./extensions/KHR_animation_pointer.js').khrAnimationPointerTarget
+                KHR_animation_pointer?: import('./extensions/KHR_animation_pointer.js').khrAnimationPointerTarget
             }
             interface AnimationChannelTarget {
-                KHR_animation_pointer: import('./extensions/KHR_animation_pointer.js').KHRAnimationPointerTarget
+                KHR_animation_pointer?: import('./extensions/KHR_animation_pointer.js').KHRAnimationPointerTarget
             }
 
             //KHR_audio
@@ -134,22 +136,22 @@ declare namespace Revelry {
                 KHRAudioEmitter    : KHRAudioEmitter,
             }
             interface glTF {
-                KHR_audio: import('./extensions/KHR_audio.js').khrAudio
+                KHR_audio?: import('./extensions/KHR_audio.js').khrAudio
             }
             interface GLTF {
-                KHR_audio: import('./extensions/KHR_audio.js').KHRAudio
+                KHR_audio?: import('./extensions/KHR_audio.js').KHRAudio
             }
             interface node {
-                KHR_audio: import('./extensions/KHR_audio.js').khrAudioNode
+                KHR_audio?: import('./extensions/KHR_audio.js').khrAudioNode
             }
             interface Node {
-                KHR_audio: import('./extensions/KHR_audio.js').KHRAudioNode
+                KHR_audio?: import('./extensions/KHR_audio.js').KHRAudioNode
             }
             interface scene {
-                KHR_audio: import('./extensions/KHR_audio.js').khrAudioScene
+                KHR_audio?: import('./extensions/KHR_audio.js').khrAudioScene
             }
             interface Scene {
-                KHR_audio: import('./extensions/KHR_audio.js').KHRAudioScene
+                KHR_audio?: import('./extensions/KHR_audio.js').KHRAudioScene
             }
 
             //KHR_draco_mesh_compression
@@ -159,10 +161,10 @@ declare namespace Revelry {
                 KHRDracoMeshCompressionPrimitive : KHRDracoMeshCompressionPrimitive,
             }
             interface meshPrimitive {
-                KHR_draco_mesh_compression : import('./extensions/KHR_draco_mesh_compression.js').khrDracoMeshCompressionPrimitive
+                KHR_draco_mesh_compression?: import('./extensions/KHR_draco_mesh_compression.js').khrDracoMeshCompressionPrimitive
             }
             interface MeshPrimitive {
-                KHR_draco_mesh_compression : import('./extensions/KHR_draco_mesh_compression.js').KHRDracoMeshCompressionPrimitive
+                KHR_draco_mesh_compression?: import('./extensions/KHR_draco_mesh_compression.js').KHRDracoMeshCompressionPrimitive
             }
 
             //KHR_environment_map
@@ -181,16 +183,16 @@ declare namespace Revelry {
                 KHREnvironmentMapScene   : KHREnvironmentMapScene,
             }
             interface glTF  {
-                KHR_environment_map: import('./extensions/KHR_environment_map.js').khrEnvironmentMapGLTF
+                KHR_environment_map?: import('./extensions/KHR_environment_map.js').khrEnvironmentMapGLTF
             }
             interface GLTF  {
-                KHR_environment_map: import('./extensions/KHR_environment_map.js').KHREnvironmentMapGLTF
+                KHR_environment_map?: import('./extensions/KHR_environment_map.js').KHREnvironmentMapGLTF
             }
             interface scene {
-                KHR_environment_map: import('./extensions/KHR_environment_map.js').khrEnvironmentMapScene
+                KHR_environment_map?: import('./extensions/KHR_environment_map.js').khrEnvironmentMapScene
             }
             interface Scene {
-                KHR_environment_map: import('./extensions/KHR_environment_map.js').KHREnvironmentMapScene
+                KHR_environment_map?: import('./extensions/KHR_environment_map.js').KHREnvironmentMapScene
             }
 
             //KHR_lights_punctual
@@ -209,16 +211,16 @@ declare namespace Revelry {
                 KHRLightsPunctualNode  : KHRLightsPunctualNode,
             }
             interface glTF {
-                KHR_lights_punctual: import('./extensions/KHR_lights_punctual.js').khrLightsPunctualGLTF
+                KHR_lights_punctual?: import('./extensions/KHR_lights_punctual.js').khrLightsPunctualGLTF
             }
             interface GLTF {
-                KHR_lights_punctual: import('./extensions/KHR_lights_punctual.js').KHRLightsPunctualGLTF
+                KHR_lights_punctual?: import('./extensions/KHR_lights_punctual.js').KHRLightsPunctualGLTF
             }
             interface node {
-                KHR_lights_punctual: import('./extensions/KHR_lights_punctual.js').khrLightsPunctualNode
+                KHR_lights_punctual?: import('./extensions/KHR_lights_punctual.js').khrLightsPunctualNode
             }
             interface Node {
-                KHR_lights_punctual: import('./extensions/KHR_lights_punctual.js').KHRLightsPunctualNode
+                KHR_lights_punctual?: import('./extensions/KHR_lights_punctual.js').KHRLightsPunctualNode
             }
 
             //KHR_materials_clearcoat
@@ -229,10 +231,10 @@ declare namespace Revelry {
             }
 
             interface material {
-                KHR_materials_clearcoat: import('./extensions/KHR_materials_clearcoat.js').khrMaterialsClearcoatMaterial
+                KHR_materials_clearcoat?: import('./extensions/KHR_materials_clearcoat.js').khrMaterialsClearcoatMaterial
             }
             interface Material {
-                KHR_materials_clearcoat: import('./extensions/KHR_materials_clearcoat.js').KHRMaterialsClearcoatMaterial
+                KHR_materials_clearcoat?: import('./extensions/KHR_materials_clearcoat.js').KHRMaterialsClearcoatMaterial
             }
 
             //KHR_materials_emissive_strength
@@ -242,10 +244,10 @@ declare namespace Revelry {
                 KHRMaterialsEmissiveStrengthMaterial : KHRMaterialsEmissiveStrengthMaterial,
             }
             interface material {
-                KHR_materials_emissive_strength: import('./extensions/KHR_materials_emissive_strength.js').khrMaterialsEmissiveStrengthMaterial
+                KHR_materials_emissive_strength?: import('./extensions/KHR_materials_emissive_strength.js').khrMaterialsEmissiveStrengthMaterial
             }
             interface Material {
-                KHR_materials_emissive_strength: import('./extensions/KHR_materials_emissive_strength.js').KHRMaterialsEmissiveStrengthMaterial
+                KHR_materials_emissive_strength?: import('./extensions/KHR_materials_emissive_strength.js').KHRMaterialsEmissiveStrengthMaterial
             }
 
             //KHR_materials_ior
@@ -255,10 +257,10 @@ declare namespace Revelry {
                 KHRMaterialsIORMaterial : KHRMaterialsIORMaterial,
             }
             interface material {
-                KHR_materials_ior: import('./extensions/KHR_materials_ior.js').khrMaterialsIORMaterial
+                KHR_materials_ior?: import('./extensions/KHR_materials_ior.js').khrMaterialsIORMaterial
             }
             interface Material {
-                KHR_materials_ior: import('./extensions/KHR_materials_ior.js').KHRMaterialsIORMaterial
+                KHR_materials_ior?: import('./extensions/KHR_materials_ior.js').KHRMaterialsIORMaterial
             }
 
             //KHR_materials_iridescence
@@ -268,10 +270,10 @@ declare namespace Revelry {
                 KHRMaterialsIridescenceMaterial : KHRMaterialsIridescenceMaterial,
             }
             interface material {
-                KHR_materials_iridescence: import('./extensions/KHR_materials_iridescence.js').khrMaterialsIridescenceMaterial
+                KHR_materials_iridescence?: import('./extensions/KHR_materials_iridescence.js').khrMaterialsIridescenceMaterial
             }
             interface Material {
-                KHR_materials_iridescence: import('./extensions/KHR_materials_iridescence.js').KHRMaterialsIridescenceMaterial
+                KHR_materials_iridescence?: import('./extensions/KHR_materials_iridescence.js').KHRMaterialsIridescenceMaterial
             }
 
             //KHR_materials_sheen
@@ -281,10 +283,10 @@ declare namespace Revelry {
                 KHRMaterialsSheenMaterial : KHRMaterialsSheenMaterial,
             }
             interface material {
-                KHR_materials_sheen: import('./extensions/KHR_materials_sheen.js').khrMaterialsSheenMaterial
+                KHR_materials_sheen?: import('./extensions/KHR_materials_sheen.js').khrMaterialsSheenMaterial
             }
             interface Material {
-                KHR_materials_sheen: import('./extensions/KHR_materials_sheen.js').KHRMaterialsSheenMaterial
+                KHR_materials_sheen?: import('./extensions/KHR_materials_sheen.js').KHRMaterialsSheenMaterial
             }
 
             //KHR_materials_specular
@@ -294,10 +296,10 @@ declare namespace Revelry {
                 KHRMaterialsSpecularMaterial : KHRMaterialsSpecularMaterial,
             }
             interface material {
-                KHR_materials_specular: import('./extensions/KHR_materials_specular.js').khrMaterialsSpecularMaterial
+                KHR_materials_specular?: import('./extensions/KHR_materials_specular.js').khrMaterialsSpecularMaterial
             }
             interface Material {
-                KHR_materials_specular: import('./extensions/KHR_materials_specular.js').KHRMaterialsSpecularMaterial
+                KHR_materials_specular?: import('./extensions/KHR_materials_specular.js').KHRMaterialsSpecularMaterial
             }
 
             //KHR_materials_transmission
@@ -307,10 +309,10 @@ declare namespace Revelry {
                 KHRMaterialsTransmissionMaterial : KHRMaterialsTransmissionMaterial,
             }
             interface material {
-                KHR_materials_transmission: import('./extensions/KHR_materials_transmission.js').khrMaterialsTransmissionMaterial
+                KHR_materials_transmission?: import('./extensions/KHR_materials_transmission.js').khrMaterialsTransmissionMaterial
             }
             interface Material {
-                KHR_materials_transmission: import('./extensions/KHR_materials_transmission.js').KHRMaterialsTransmissionMaterial
+                KHR_materials_transmission?: import('./extensions/KHR_materials_transmission.js').KHRMaterialsTransmissionMaterial
             }
 
             //KHR_materials_unlit
@@ -320,10 +322,10 @@ declare namespace Revelry {
                 KHRMaterialsUnlitMaterial : KHRMaterialsUnlitMaterial,
             }
             interface material {
-                KHR_materials_unlit: import('./extensions/KHR_materials_unlit.js').khrMaterialsUnlitMaterial
+                KHR_materials_unlit?: import('./extensions/KHR_materials_unlit.js').khrMaterialsUnlitMaterial
             }
             interface Material {
-                KHR_materials_unlit: import('./extensions/KHR_materials_unlit.js').KHRMaterialsUnlitMaterial
+                KHR_materials_unlit?: import('./extensions/KHR_materials_unlit.js').KHRMaterialsUnlitMaterial
             }
 
             //KHR_materials_variants
@@ -342,16 +344,16 @@ declare namespace Revelry {
                 KHRMaterialsVariantsMeshPrimitiveMapping : KHRMaterialsVariantsMeshPrimitiveMapping,
             }
             interface glTF {
-                KHR_materials_variants: import('./extensions/KHR_materials_variants.js').khrMaterialsVariantsGLTF
+                KHR_materials_variants?: import('./extensions/KHR_materials_variants.js').khrMaterialsVariantsGLTF
             }
             interface GLTF {
-                KHR_materials_variants: import('./extensions/KHR_materials_variants.js').KHRMaterialsVariantsGLTF
+                KHR_materials_variants?: import('./extensions/KHR_materials_variants.js').KHRMaterialsVariantsGLTF
             }
             interface meshPrimitive {
-                KHR_materials_variants: import('./extensions/KHR_materials_variants.js').khrMaterialsVariantsMeshPrimitive
+                KHR_materials_variants?: import('./extensions/KHR_materials_variants.js').khrMaterialsVariantsMeshPrimitive
             }
             interface MeshPrimitive {
-                KHR_materials_variants: import('./extensions/KHR_materials_variants.js').KHRMaterialsVariantsMeshPrimitive
+                KHR_materials_variants?: import('./extensions/KHR_materials_variants.js').KHRMaterialsVariantsMeshPrimitive
             }
 
             //KHR_materials_volume
@@ -361,10 +363,10 @@ declare namespace Revelry {
                 KHRMaterialsVolumeMaterial : KHRMaterialsVolumeMaterial,
             }
             interface material {
-                KHR_materials_volume: import('./extensions/KHR_materials_volume.js').khrMaterialsVolumeMaterial
+                KHR_materials_volume?: import('./extensions/KHR_materials_volume.js').khrMaterialsVolumeMaterial
             }
             interface Material {
-                KHR_materials_volume: import('./extensions/KHR_materials_volume.js').KHRMaterialsVolumeMaterial
+                KHR_materials_volume?: import('./extensions/KHR_materials_volume.js').KHRMaterialsVolumeMaterial
             }
 
             //KHR_texture_basisu
@@ -374,10 +376,10 @@ declare namespace Revelry {
                 KHRTextureBasisuTexture : KHRTextureBasisuTexture,
             }
             interface texture {
-                KHR_texture_basisu: import('./extensions/KHR_texture_basisu.js').khrTextureBasisuTexture
+                KHR_texture_basisu?: import('./extensions/KHR_texture_basisu.js').khrTextureBasisuTexture
             }
             interface Texture {
-                KHR_texture_basisu: import('./extensions/KHR_texture_basisu.js').KHRTextureBasisuTexture
+                KHR_texture_basisu?: import('./extensions/KHR_texture_basisu.js').KHRTextureBasisuTexture
             }
 
             //KHR_texture_transform
@@ -387,23 +389,23 @@ declare namespace Revelry {
                 KHRTextureTransform : KHRTextureTransform,
             }
             interface textureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').khrTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').khrTextureTransform
             }
             interface TextureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
             }
             interface materialNormalTextureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').khrTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').khrTextureTransform
             }
             interface MaterialNormalTextureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
             }
 
             interface materialOcclusionTextureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').khrTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').khrTextureTransform
             }
             interface MaterialOcclusionTextureInfo {
-                KHR_texture_transform: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
+                KHR_texture_transform?: import('./extensions/KHR_texture_transform.js').KHRTextureTransform
             }
 
             //KHR_xmp_json_ld
@@ -416,52 +418,52 @@ declare namespace Revelry {
                 KHRXMPJSONLDNode : KHRXMPJSONLDNode,
             }
             interface glTF {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDGLTF
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDGLTF
             }
             interface GLTF {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDGLTF
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDGLTF
             }
             interface animation {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Animation {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface asset {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Asset {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface image {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Image {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface material {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Material {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface mesh {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Mesh {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface node {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Node {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
             interface scene {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').khrXMPJSONLDNode
             }
             interface Scene {
-                KHR_xmp_json_ld: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
+                KHR_xmp_json_ld?: import('./extensions/KHR_xmp_json_ld.js').KHRXMPJSONLDNode
             }
 
             //archived
@@ -473,10 +475,10 @@ declare namespace Revelry {
                 KHRMaterialsPBRSpecularGlossinessMaterial : KHRMaterialsPBRSpecularGlossinessMaterial,
             }
             interface material {
-                KHR_materials_pbrSpecularGlossiness: import('./extensions/archived/KHR_materials_pbrSpecularGlossiness.js').khrMaterialsPBRSpecularGlossinessMaterial
+                KHR_materials_pbrSpecularGlossiness?: import('./extensions/archived/KHR_materials_pbrSpecularGlossiness.js').khrMaterialsPBRSpecularGlossinessMaterial
             }
             interface Material {
-                KHR_materials_pbrSpecularGlossiness: import('./extensions/archived/KHR_materials_pbrSpecularGlossiness.js').KHRMaterialsPBRSpecularGlossinessMaterial
+                KHR_materials_pbrSpecularGlossiness?: import('./extensions/archived/KHR_materials_pbrSpecularGlossiness.js').KHRMaterialsPBRSpecularGlossinessMaterial
             }
 
             //KHR_xmp
@@ -489,52 +491,52 @@ declare namespace Revelry {
                 KHRXMPNode : KHRXMPNode,
             }
             interface glTF {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPGLTF
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPGLTF
             }
             interface GLTF {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPGLTF
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPGLTF
             }
             interface animation {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Animation {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface asset {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Asset {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface image {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Image {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface material {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Material {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface mesh {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Mesh {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface node {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Node {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
             interface scene {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').khrXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').khrXMPNode
             }
             interface Scene {
-                KHR_xmp: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
+                KHR_xmp?: import('./extensions/archived/KHR_xmp.js').KHRXMPNode
             }
 
             //Non-KHR
@@ -546,10 +548,10 @@ declare namespace Revelry {
                 REVGameObjectNode : REVGameObjectNode,
             }
             interface node {
-                REV_game_object: import('./extensions/REV_game_object.js').revGameObjectNode
+                REV_game_object?: import('./extensions/REV_game_object.js').revGameObjectNode
             }
             interface Node {
-                REV_game_object: import('./extensions/REV_game_object.js').REVGameObjectNode
+                REV_game_object?: import('./extensions/REV_game_object.js').REVGameObjectNode
             }
 
             type Supported = keyof ({ [K in keyof ExtendableProperties as keyof ExtendableProperties[K]]: boolean });
