@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
-import { FakeTime                            } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assert           } from 'std/assert/assert.ts';
-import { assertEquals     } from 'std/assert/assert_equals.ts';
-import { assertThrows     } from 'std/assert/assert_throws.ts';
-import { assertFalse      } from 'std/assert/assert_false.ts';
+import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertThrows     } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertFalse      } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
 
 import { Component, ComponentSet } from '../lib/component.js';
 
@@ -13,17 +13,9 @@ import { UUID      } from '../lib/utils/uuid.js';
 import { Watchable } from '../lib/utils/watchable.js';
 
 /**
- * @typedef {import('std/testing/mock.ts').Spy} Spy
- */
-
-/**
- * @typedef {{  
- *   a: { value: string },
- *   b: { value: number },
- *   c: { value: import('../lib/utils/watchable.js').Watchable },
- *   d: { value: import('../lib/component.js').ComplexComponentValue, json: { foo: string } },
- *   e: { value: string },
- * }} ComponentTypes
+ * @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy
+ *
+ * @typedef {Revelry.ECS.ComponentTypeKeys} Keys
  */
 
 describe('Component', () => {
@@ -33,9 +25,12 @@ describe('Component', () => {
     let handler;
 
     /** @type {string} */
-    let entityA; 
+    let entityA;
 
-    /** @type {Component<ComponentTypes, 'a'>} */
+    /** @type {string} */
+    let ownerA;
+
+    /** @type {Component<'a'>} */
     let component;
 
     beforeEach(() => {
@@ -43,7 +38,9 @@ describe('Component', () => {
 
         entityA = UUID();
 
-        component = new Component({ entity: entityA, type: 'a', value: 'a' });
+        ownerA = UUID();
+
+        component = new Component({ entity: entityA, owner: ownerA, type: 'a', value: 'a' });
     });
 
     afterEach(() => {
@@ -57,6 +54,11 @@ describe('Component', () => {
     it('should have reference to type', () => {
         assertEquals(component.type, 'a');
     });
+
+    it('should have reference to owner', () => {
+        assertEquals(component.owner, ownerA);
+    });
+
 
     describe('value change', () => {
         beforeEach(() => {
@@ -77,13 +79,13 @@ describe('Component', () => {
     });
 
     describe('watchable value event', () => {
-        /** @type {Component<ComponentTypes, 'c'>} */
+        /** @type {Component<'c'>} */
         let component;
         /** @type {Watchable} */
-        let watchableA; 
+        let watchableA;
         /** @type {Watchable} */
         let watchableB;
-        
+
         beforeEach(() => {
             watchableA = new Watchable();
             watchableB = new Watchable();
@@ -92,7 +94,7 @@ describe('Component', () => {
             component = new Component({ entity: entityA, type: 'c', value: watchableA });
             component.watch('value:notify',  handler);
         });
-        
+
 
         it('should call watch handler when watchable notifies event', async () => {
             watchableA.notify('a', 'abc');
@@ -123,9 +125,9 @@ describe('Component', () => {
     });
 
     describe('toJSON', () => {
-        /** @type {import('../lib/component.js').ComponentData<ComponentTypes,'a'>} */
+        /** @type {Revelry.ECS.ComponentData<'a'>} */
         let json;
-        
+
         beforeEach(() => {
             json = component.toJSON();
         });
@@ -138,20 +140,20 @@ describe('Component', () => {
     });
 
     describe('getJSONValue', () => {
-        /** @type {Component<ComponentTypes, 'd'>} */
+        /** @type {Component<'d'>} */
         let component;
-        /** @type {ComponentTypes['d']['json']} */
+        /** @type {Revelry.ECS.ComponentTypes['d']['json']} */
         let json;
 
         class Foobar {
             set() {
-    
+
             }
             toJSON() {
                 return { foo: 'bar' }
             }
         }
-    
+
         /** @type {Foobar} */
         let foobar;
 
@@ -173,34 +175,34 @@ describe('ComponentSet', () => {
     /** @type {Spy} */
     let handler;
 
-    /** @type {ComponentSet<ComponentTypes>} */
+    /** @type {ComponentSet} */
     let components;
 
     /** @type {string} */
-    let entityA; 
+    let entityA;
     /** @type {string} */
     let entityB;
 
     /** @type {Watchable} */
-    let watchableA; 
+    let watchableA;
     /** @type {Watchable} */
     let watchableB;
 
-    /** @type {Component<ComponentTypes, 'a'>} */
+    /** @type {Component<'a'>} */
     let componentA;
-    /** @type {Component<ComponentTypes, 'b'>} */
+    /** @type {Component<'b'>} */
     let componentB;
-    /** @type {Component<ComponentTypes, 'c'>} */
+    /** @type {Component<'c'>} */
     let componentC;
-    /** @type {Component<ComponentTypes, 'd'>} */
+    /** @type {Component<'d'>} */
     let componentD;
-    /** @type {Component<ComponentTypes, 'a'>} */
+    /** @type {Component<'a'>} */
     let componentE;
-    /** @type {Component<ComponentTypes, 'b'>} */
+    /** @type {Component<'b'>} */
     let componentF;
-    /** @type {Component<ComponentTypes, 'c'>} */
+    /** @type {Component<'c'>} */
     let componentG;
-    /** @type {Component<ComponentTypes, 'd'>} */
+    /** @type {Component<'d'>} */
     let componentH;
 
     class Foobar {
@@ -230,7 +232,7 @@ describe('ComponentSet', () => {
 
         foobarA = new Foobar();
         foobarB = new Foobar();
-        
+
         componentA = components.add({ entity: entityA, type: 'a', value: 'a' });
         componentB = components.add({ entity: entityA, type: 'b', value: 123 });
         componentC = components.add({ entity: entityA, type: 'c', value: watchableA });
@@ -246,7 +248,7 @@ describe('ComponentSet', () => {
         time.restore();
     });
 
-    
+
 
     describe('add', () => {
         it('should throw error if duplicate entity and type is added', () => {
@@ -263,7 +265,7 @@ describe('ComponentSet', () => {
             assertFalse(components.delete({ entity: UUID(), type: 'e' }));
         });
     });
-    
+
     describe('find', () => {
         it('should find a single component when specifying entity and type', () => {
             assertEquals(components.find({ entity: entityA, type: 'a' }), componentA);
@@ -374,10 +376,10 @@ describe('ComponentSet', () => {
     });
 
     describe('events', () => {
-        
+
         /** @type {string} */
         let entityC;
-        
+
         beforeEach(() => {
             entityC = UUID();
             handler = spy();
@@ -400,7 +402,7 @@ describe('ComponentSet', () => {
             components.add({ entity: entityC, type: 'c', value: new Watchable() });
             assertSpyCalls(handler, 1);
         });
-        
+
         it('should notify component:delete when a component is deleted', () => {
             components.watch('component:delete', handler);
             components.delete({ entity: entityA, type: 'a' });
@@ -457,34 +459,34 @@ describe('ComponentSet', () => {
     });
 
     describe('references', () => {
-    
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'a'>} */ 
+
+        /** @type {import('../lib/component.js').ComponentReference<'a'>} */
         let refA;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'b'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'b'>} */
         let refB;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'c'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'c'>} */
         let refC;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'd'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'d'>} */
         let refD;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'a'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'a'>} */
         let refE;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'b'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'b'>} */
         let refF;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'c'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'c'>} */
         let refG;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'd'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'d'>} */
         let refH;
-        /** @type {import('../lib/component.js').ComponentReference<ComponentTypes, 'e'>} */ 
+        /** @type {import('../lib/component.js').ComponentReference<'e'>} */
         let refI;
 
         /** @type {string} */
         let entityC = UUID();
-    
+
         beforeEach(() => {
             handler = spy();
 
             components.add({ entity: entityC, type: 'a', value: 'a' })
-    
+
             refA = components.references.add(entityC, { entity: entityA, type: 'a' });
             refB = components.references.add(entityC, { entity: entityA, type: 'b' });
             refC = components.references.add(entityC, { entity: entityA, type: 'c' });
@@ -496,7 +498,7 @@ describe('ComponentSet', () => {
 
             refI = components.references.add(entityC, { entity: entityA, type: 'e' });
         });
-    
+
         afterEach(() => {
             refA.release();
             refB.release();
@@ -513,7 +515,7 @@ describe('ComponentSet', () => {
             assertEquals(refA.component?.entity, entityA);
             assertEquals(refA.component?.type, 'a');
         });
-    
+
         it('should resolve to a non existing component async', async () => {
             const promise = refI.waitFor('resolve');
             components.add({ entity: entityA, type: 'e', value: 'e' });
@@ -522,14 +524,14 @@ describe('ComponentSet', () => {
             assertEquals(component.entity, entityA);
             assertEquals(component.type, 'e');
         });
-    
+
         it('should notify destroy if component removed', async () => {
             refA.watch('destroy', handler);
             components.delete({ entity: entityA, type: 'a' });
             await time.runMicrotasks();
             assertSpyCalls(handler, 1);
         });
-    
+
         it('should notify release if released', async () => {
             refA.watch('release', handler);
             refA.release();
@@ -540,42 +542,42 @@ describe('ComponentSet', () => {
         it('should have a reference to the referer', () => {
             assertEquals(refA.referer, entityC);
         });
-    
+
         it('should have a reference to the entity', () => {
             assertEquals(refA.entity, entityA);
         });
-    
+
         it('should have a reference to the type', () => {
             assertEquals(refA.type, 'a');
         });
 
-        
-    
+
+
         describe('state', () => {
             it('should return "released" if released', () => {
                 refA.release();
                 assertEquals(refA.state, 'released');
             });
-    
+
             it('should return "destroyed" if component was removed', async () => {
                 components.delete({ entity: entityA, type: 'a' });
                 await time.runMicrotasks();
                 assertEquals(refA.state, 'destroyed');
             });
-    
+
             it('should return "aborted" if ref was released before resolving', async () => {
                 refI.release();
                 await time.runMicrotasks();
                 assertEquals(refI.state, 'aborted');
             });
-    
+
             it('should return "resolved" if component has been resolved', async () => {
                 assertEquals(refA.state, 'resolved');
                 components.add({ entity: entityA, type: 'e', value: 'e' });
                 await time.runMicrotasks();
                 assertEquals(refI.state, 'resolved');
             });
-    
+
             it('should return "pending" if component has not been resolved', async () => {
                 await time.runMicrotasks();
                 assertEquals(refI.state, 'pending');
@@ -611,7 +613,7 @@ describe('ComponentSet', () => {
                 assertEquals([...components.references.find({ entity: entityA })], [refA, refB, refC, refD, refI]);
                 assertEquals([...components.references.find({ entity: entityB })], [refE, refF, refG, refH]);
             });
-    
+
             it('should not error when iterating over a non existent entity', () => {
                 assertEquals([...components.references.find({ entity: 'z' })], []);
             });
@@ -619,7 +621,7 @@ describe('ComponentSet', () => {
             it('should not error when iterating over a non existent type', () => {
                 assertEquals([...components.references.find({ entity: 'a', type: 'e' })], []);
             });
-    
+
             describe('predicate', () => {
                 it('should only return the references where the predicate is true', () => {
                     const refZ = components.references.add(UUID(), { entity: entityB, type: 'b' });
@@ -630,7 +632,7 @@ describe('ComponentSet', () => {
                 });
             });
         });
-    
+
         describe('count', () => {
             it('should return the number of references created for that specific entity', () => {
                 assertEquals(components.references.count({ entity: entityA }), 5);
@@ -643,22 +645,22 @@ describe('ComponentSet', () => {
                 components.references.add(entityC, { entity: entityA, type: 'b' });
                 assertEquals(components.references.count({ entity: entityA }), 6);
             });
-    
-        
+
+
             it('should decrement the number of references when releasing', async () => {
                 assertEquals(components.references.count({ entity: entityA }), 5);
                 refA.release();
                 await time.runMicrotasks();
                 assertEquals(components.references.count({ entity: entityA }), 4);
             });
-    
+
             it('should return the number of references created for that specific entity and component type', () => {
                 components.references.add(UUID(), { entity: entityB, type: 'b' });
 
                 assertEquals(components.references.count({ entity: entityA, type: 'a' }), 1);
                 assertEquals(components.references.count({ entity: entityB, type: 'a' }), 1);
                 assertEquals(components.references.count({ entity: entityB, type: 'b' }), 2);
-                
+
             });
 
             describe('predicate', () => {
@@ -676,19 +678,19 @@ describe('ComponentSet', () => {
             it('should return true if there are any references for the specified entity and type', () => {
                 assert(components.references.has({ entity: entityA, type: 'a' }));
             });
-    
+
             it('should return false if there are not any references for the specified entity and type', () => {
                 assertFalse(components.references.has({ entity: entityB, type: 'e' }));
             });
-    
+
             it('should return true if there are any references for the specified entity', () => {
                 assert(components.has({ entity: entityA }));
             });
-    
+
             it('should return false if there are not any references for the specified entity', () => {
                 assertFalse(components.has({ entity: UUID() }));
             });
-    
+
             describe('predicate', () => {
                 it('should only return true if the predicate is true', () => {
                     assert(components.references.has({ entity: entityA, type: 'a', predicate: (c) => c.referer === entityC }));
@@ -696,7 +698,7 @@ describe('ComponentSet', () => {
 
                     assert(components.references.has({ entity: entityB, predicate: (c) => c.type === 'a' }));
                     assertFalse(components.references.has({ entity: entityB, predicate: (c) => c.type === 'e' }));
-                    
+
                     assert(components.references.has({ predicate: (c) => c.entity === entityA && c.type === 'e' }));
                     assertFalse(components.references.has({ predicate: (c) => c.entity === entityB && c.type === 'e' }));
                 });

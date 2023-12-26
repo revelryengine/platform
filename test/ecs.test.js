@@ -1,6 +1,6 @@
-import { describe, it } from 'std/testing/bdd.ts';
+import { describe, it } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assertExists } from 'std/assert/assert_exists.ts';
+import { assertExists } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
 
 import * as ECS from '../lib/ecs.js';
 

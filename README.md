@@ -1,15 +1,20 @@
 # Revelry Engine ECS
 > The Entity Component System for the Revelry Game Engine
 
+### Development
 
-## Running tests
+Package should be developed from the [revelryengine/platform](https://github.com/revelryengine/platform) repo.
 
-```sh
-rm -rf cov_profile && deno test --coverage=cov_profile --reporter=dot && deno coverage cov_profile
-```
 
 #### Install testing types
 
 ```sh
 find test/*.test.js | xargs deno vendor --force
 ```
+
+## Running tests
+
+```sh
+deno task test
+```
+

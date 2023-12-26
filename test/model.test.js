@@ -1,8 +1,8 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
-import { FakeTime                            } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
 
 import { Game      } from '../lib/game.js';
 import { Stage     } from '../lib/stage.js';
@@ -11,46 +11,18 @@ import { Model     } from '../lib/model.js';
 import { UUID      } from '../lib/utils/uuid.js';
 import { Watchable } from '../lib/utils/watchable.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
-
-/**
- * @typedef {{  
- *   a: { value: string },
- *   b: { value: number },
- *   c: { value: import('../lib/utils/watchable.js').Watchable },
- *   d: { value: import('../lib/component.js').ComplexComponentValue, json: { foo: string } },
- * }} ComponentTypes
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').Component<ComponentTypes, K>} Component
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').ComponentData<ComponentTypes, K>} ComponentData
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').ComponentReference<ComponentTypes, K>} ComponentReference
- */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
 
 describe('Model', () => {
-    const types = /** @type {ComponentTypes} */({});
-    const TypedModel  = Model.Typed(types);
-    const TypedSystem = System.Typed(types);
-
-    class ModelA extends TypedModel({
+    class ModelA extends Model.Typed({
         components: {
-            a: { type: 'a' }, 
+            a: { type: 'a' },
             b: { type: 'b' },
             c: { type: 'c' },
         }
     }) { }
 
-    class SystemA extends TypedSystem({
+    class SystemA extends System.Typed({
         models: {
             modelA: { model: ModelA },
         },
@@ -59,18 +31,18 @@ describe('Model', () => {
     /** @type {FakeTime} */
     let time;
 
-    /** @type {ComponentData<'a'>} */
+    /** @type {Revelry.ECS.ComponentData<'a'>} */
     let componentA;
-    /** @type {ComponentData<'b'>} */
+    /** @type {Revelry.ECS.ComponentData<'b'>} */
     let componentB;
-    /** @type {ComponentData<'c'>} */
+    /** @type {Revelry.ECS.ComponentData<'c'>} */
     let componentC;
     /** @type {string} */
     let entity;
 
     /** @type {Game} */
     let game;
-    /** @type {Stage<ComponentTypes>} */
+    /** @type {Stage} */
     let stage;
     /** @type {SystemA} */
     let system;
@@ -95,9 +67,9 @@ describe('Model', () => {
 
         modelA = system.modelA;
 
-        componentA = /** @type {ComponentData<'a'>} */(stage.components.find({ entity, type: 'a' }));
-        componentB = /** @type {ComponentData<'b'>} */(stage.components.find({ entity, type: 'b' }));
-        componentC = /** @type {ComponentData<'c'>} */(stage.components.find({ entity, type: 'c' }));
+        componentA = /** @type {Revelry.ECS.ComponentData<'a'>} */(stage.components.find({ entity, type: 'a' }));
+        componentB = /** @type {Revelry.ECS.ComponentData<'b'>} */(stage.components.find({ entity, type: 'b' }));
+        componentC = /** @type {Revelry.ECS.ComponentData<'c'>} */(stage.components.find({ entity, type: 'c' }));
     });
 
     afterEach(() => {
@@ -133,7 +105,7 @@ describe('Model', () => {
                 assertSpyCall(handler, 0, { args: ['a:change', 'abc'] });
                 assertSpyCall(handler, 1, { args: ['b:change', 123] });
                 assertSpyCalls(handler, 2);
-            });    
+            });
         });
         describe('all components deferred', () => {
             beforeEach(() => {
@@ -150,7 +122,7 @@ describe('Model', () => {
                 assertEquals(handler.calls[0].args[0].get('b:change'), 123);
             });
         })
-        
+
         describe('watch individual property', () => {
             beforeEach(() => {
                 handler = spy();
@@ -196,7 +168,7 @@ describe('Model', () => {
 
     describe('default components', () => {
         it('should not error when using the base Model class', () => {
-            stage.systems.add(new (TypedSystem({ models: { modelA: { model: Model } } })));
+            stage.systems.add(new (System.Typed({ models: { modelA: { model: Model } } })));
             stage.components.add({ entity: UUID(), type: 'a', value: 'a' });
         });
     });

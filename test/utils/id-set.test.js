@@ -1,14 +1,14 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assert       } from 'std/assert/assert.ts';
-import { assertEquals } from 'std/assert/assert_equals.ts';
-import { assertFalse  } from 'std/assert/assert_false.ts';
-import { assertThrows } from 'std/assert/assert_throws.ts';
+import { assert       } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertFalse  } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertThrows } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
 
 import { IdSet } from '../../lib/utils/id-set.js';
 import { UUID  } from '../../lib/utils/uuid.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
 
 describe('IdSet', () => {
     /** @type {{id: string }} */
@@ -58,7 +58,7 @@ describe('IdSet', () => {
     it('should generate a uuid for a item if it is not provided', () => {
         const item = {};
         idSet.add(item);
-        const lastItem = [...idSet].pop(); 
+        const lastItem = [...idSet].pop();
         assertEquals(item, lastItem)
         assert(lastItem && UUID.isUUID(lastItem.id));
     });

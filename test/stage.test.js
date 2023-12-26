@@ -1,12 +1,12 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall                  } from 'std/testing/mock.ts';
-import { FakeTime                            } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCall                  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assert           } from 'std/assert/assert.ts';
-import { assertEquals     } from 'std/assert/assert_equals.ts';
-import { assertExists     } from 'std/assert/assert_exists.ts';
-import { assertFalse      } from 'std/assert/assert_false.ts';
-import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
+import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertFalse      } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
 import { Stage     } from '../lib/stage.js';
 import { System    } from '../lib/system.js';
@@ -15,53 +15,25 @@ import { UUID      } from '../lib/utils/uuid.js';
 import { Watchable } from '../lib/utils/watchable.js';
 
 /**
- * @typedef {import('std/testing/mock.ts').Spy} Spy
- */
-
-/**
- * @typedef {{  
- *   a: { value: string },
- *   b: { value: number },
- *   c: { value: import('../lib/utils/watchable.js').Watchable },
- *   d: { value: import('../lib/component.js').ComplexComponentValue, json: { foo: string } },
- *   e: { value: string },
- * }} ComponentTypes
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').Component<ComponentTypes,K>} Component
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').ComponentData<ComponentTypes,K>} ComponentData
- */
-
-/**
- * @template {Extract<keyof ComponentTypes, string>} [K = Extract<keyof ComponentTypes, string>]
- * @typedef {import('../lib/component.js').ComponentReference<ComponentTypes, K>} ComponentReference
+ * @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy
  */
 
 describe('Stage', () => {
-    const types = /** @type {ComponentTypes} */({});
-    const TypedModel  = Model.Typed(types);
-    const TypedSystem = System.Typed(types);
 
-    class ModelA extends TypedModel({
+    class ModelA extends Model.Typed({
         components: {
             a: { type: 'a' },
         },
     }) { }
-        
-    class ModelB extends TypedModel({
+
+    class ModelB extends Model.Typed({
         components: {
             a: { type: 'a' },
             b: { type: 'b' },
         }
     }) { }
 
-    class ModelC extends TypedModel({
+    class ModelC extends Model.Typed({
         components: {
             c: { type: 'c' },
             d: { type: 'd' },
@@ -73,16 +45,16 @@ describe('Stage', () => {
     }
 
 
-    class SystemA extends TypedSystem({
+    class SystemA extends System.Typed({
         models: {
             modelA:  { model: ModelA },
             modelB:  { model: ModelB },
             modelCs: { model: ModelC, isSet: true },
         }
-        
+
     }) { }
 
-    class SystemB extends TypedSystem({
+    class SystemB extends System.Typed({
         models: {
             modelA:  { model: ModelA },
             modelB:  { model: ModelB },
@@ -100,14 +72,14 @@ describe('Stage', () => {
 
     /** @type {FakeTime} */
     let time;
-    /** @type {Stage<ComponentTypes>} */
+    /** @type {Stage} */
     let stage;
     /** @type {SystemA} */
     let systemA;
     /** @type {SystemB} */
     let systemB;
     /** @type {string} */
-    let entityA; 
+    let entityA;
     /** @type {string} */
     let entityB;
     /** @type {Spy} */
@@ -124,9 +96,9 @@ describe('Stage', () => {
         entityA = UUID();
         entityB = UUID();
 
-        systemA  = new SystemA('systemA');
-        systemB  = new SystemB('systemB');
-        
+        systemA  = new SystemA({ id: 'systemA' });
+        systemB  = new SystemB({ id: 'systemB' });
+
         stage.systems.add(systemA);
         stage.systems.add(systemB);
 
@@ -156,11 +128,11 @@ describe('Stage', () => {
             assert(Object.hasOwn(systemB, 'modelA'));
             assert(Object.hasOwn(systemB, 'modelB'));
         });
-    
+
         it('should add a system property as as Set when isSet is true', () => {
             assertInstanceOf(systemA.modelCs, Set);
         });
-    
+
         it('should add each entity to set when isSet is true', () => {
             assertEquals(systemA.modelCs.size, 2);
             assertEquals([...systemA.modelCs][0].entity, entityA);
@@ -182,7 +154,7 @@ describe('Stage', () => {
 
     describe('components.delete', () => {
         beforeEach(() => {
-            
+
             stage.components.delete({ entity: entityA, type: 'b' });
 
             stage.components.delete({ entity: entityB, type: 'a' });
@@ -218,7 +190,7 @@ describe('Stage', () => {
         let entityC;
         /** @type {string} */
         let entityD;
-        
+
         beforeEach(() => {
             entityC = UUID();
             entityD = UUID();
@@ -226,7 +198,7 @@ describe('Stage', () => {
         });
 
         describe('system:add', () => {
-            class SystemC extends TypedSystem({
+            class SystemC extends System.Typed({
                 models: {
                     modelA: { model: ModelA }
                 }
@@ -301,7 +273,7 @@ describe('Stage', () => {
     });
 
     describe('systems.add', () => {
-        class SystemC extends TypedSystem({
+        class SystemC extends System.Typed({
             models: {
                 modelA: { model: ModelA }
             }
@@ -335,7 +307,7 @@ describe('Stage', () => {
             assertSpyCall(cleanupSpy, 0, { args: [entityA] });
         });
     });
-    
+
     describe('createEntity', () => {
         beforeEach(() => {
             stage = new Stage();
@@ -353,10 +325,36 @@ describe('Stage', () => {
         });
     });
 
+    describe('deleteEntity', () => {
+        /**
+         * @type {string}
+         */
+        let entity;
+
+        beforeEach(() => {
+            stage = new Stage();
+            entity = stage.createEntity({ a: 'a', b: 123, c: new Watchable(), d: { foo: 'bar' } });
+        })
+        it('should delete all the components for the specified entity', () => {
+            assertEquals(stage.components.count(), 4);
+            assertEquals([...stage.components][0].entity, [...stage.components][1].entity);
+            assertEquals([...stage.components][0].entity, [...stage.components][2].entity);
+            assertEquals([...stage.components][0].entity, [...stage.components][3].entity);
+
+            stage.deleteEntity(entity);
+
+            assertEquals(stage.components.count(), 0);
+        });
+
+        it('should return the number of components deleted ', () => {
+            assertEquals(stage.deleteEntity(entity), 4);
+        });
+    });
+
     describe('getEntityModel', () => {
         it('should return an existing model for a given entity', () => {
             assertInstanceOf(stage.getEntityModel(entityA, ModelA), ModelA);
-        }); 
+        });
     });
 
     describe('systems', () => {

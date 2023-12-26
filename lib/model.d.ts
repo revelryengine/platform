@@ -1,34 +1,29 @@
 import { Game  } from './game.js';
 import { Stage } from './stage.js';
-import { Component, ComponentTypesDefinition, ComponentTypeMap } from './component.js';
-import { EventMap, Watchable } from './utils/watchable.js';
+import { Component } from './component.js';
+import { WatchableEventMap, Watchable } from './utils/watchable.js';
 
-type ModelComponentsDefinition<T extends ComponentTypesDefinition = any> = Record<string, { type: Extract<keyof T, string> }>;
+type ModelComponentsDefinition = Record<string, { type: Revelry.ECS.ComponentTypeKeys }>;
 
-type ModelConstructor<T extends ComponentTypesDefinition = any> = {
-    new (stage: Stage<T>, entity: string): Model<T>;
-    components: ModelComponentsDefinition<T>;
-}
-
-type ModelConstructorTyped<T extends ComponentTypesDefinition, D extends ModelComponentsDefinition<T>, E extends EventMap = any> = {
-    new (stage: Stage<T>, entity: string): { [K in Extract<keyof D, string>]: ComponentTypeMap<T>[D[K]['type']]['value'] } & Model<T, D, E>;
+type ModelConstructor<D extends ModelComponentsDefinition = any, E extends WatchableEventMap = any> = {
+    new (stage: Stage, entity: string): { [K in Extract<keyof D, string>]: Revelry.ECS.ComponentTypeMap[D[K]['type']]['value'] } & Model<D, E>;
     components: D;
 }
 
-export declare class Model<T extends ComponentTypesDefinition = any, D extends ModelComponentsDefinition<T> = any, E extends EventMap = any> extends Watchable<E> {
-    constructor(stage: Stage<T>, entity: string);
+export declare class Model<D extends ModelComponentsDefinition = any, E extends WatchableEventMap = any> extends Watchable<E> {
+    constructor(stage: Stage, entity: string);
 
     /** A reference to the Stage */
-    readonly stage: Stage<T>;
+    readonly stage: Stage;
 
     /** The entity that the model is built from */
     readonly entity: string;
 
     /** An object containing all the components for the model indexed by type */
-    readonly components: { [K in Extract<keyof D, string>]: Component<T, D[K]['type']> };
+    readonly components: { [K in Extract<keyof D, string>]: Component<D[K]['type']> };
 
     /** A set of all the types the model contains */
-    readonly types: Set<Extract<keyof T, string>>;
+    readonly types: Set<Revelry.ECS.ComponentTypeKeys>;
 
     /** A reference to the game. It will be undefined if the model's stage does not belong to a Game yet. */
     readonly game: Game|undefined;
@@ -37,8 +32,7 @@ export declare class Model<T extends ComponentTypesDefinition = any, D extends M
     cleanup(): void;
 
     /** A convenience wrapper to derive a Model class and ensure types are inferred correctly */
-    static Typed<T extends ComponentTypesDefinition>(types: T): 
-        <D extends { components: ModelComponentsDefinition<T>, events?: EventMap }>(components: D) => ModelConstructorTyped<T, D['components'], D extends { events: EventMap } ? D['events'] : any >;
+    static Typed<D extends { components: ModelComponentsDefinition, events?: WatchableEventMap }>(components: D): ModelConstructor<D['components'], D extends { events: WatchableEventMap } ? D['events'] : any >;
 
     static components: ModelComponentsDefinition;
 }

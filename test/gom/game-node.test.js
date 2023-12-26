@@ -1,11 +1,13 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCalls      } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 
-import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
 
 import { GameNode } from '../../lib/gom/game-node.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
 
 describe('GameNode', () => {
     /** @type {GameNode<any, any>} */
@@ -27,13 +29,17 @@ describe('GameNode', () => {
     */
     let parentB;
 
-    beforeEach(() => {
-        node = new GameNode('node');
+    /** @type {HTMLElement} */
+    let element;
 
-        parentA = new GameNode('parentA');
-        parentB = new GameNode('parentB');
-        childA  = new GameNode('childA');
-        childB  = new GameNode('childB');
+    beforeEach(() => {
+        element = /** @type {HTMLElement} */({}); // The ECS library doesn't do anything with this, it's just used for reference externally so we just need ensure it is set.
+        node = new GameNode({ id: 'node' });
+
+        parentA = new GameNode({ id: 'parentA', element });
+        parentB = new GameNode({ id: 'parentB' });
+        childA  = new GameNode({ id: 'childA' });
+        childB  = new GameNode({ id: 'childB' });
 
         node.parent = parentA;
         parentA.parent = parentB;
@@ -105,9 +111,9 @@ describe('GameNode', () => {
         let childB;
 
         beforeEach(() => {
-            root   = new GameNode('root');
-            childA = new GameNode('childA');
-            childB = new GameNode('childB');
+            root   = new GameNode({ id: 'root' });
+            childA = new GameNode({ id: 'childA' });
+            childB = new GameNode({ id: 'childB' });
 
             root.children.add(childA);
             childA.children.add(childB);
@@ -121,4 +127,10 @@ describe('GameNode', () => {
             assertEquals(root.root, undefined);
         });
     });
+
+    describe('element', () => {
+        it('should contain a reference to the element provided', () => {
+            assertStrictEquals(parentA.element, element);
+        });
+    })
 });

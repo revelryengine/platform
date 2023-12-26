@@ -1,40 +1,27 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assertEquals     } from 'std/assert/assert_equals.ts';
-import { assertExists     } from 'std/assert/assert_exists.ts';
-import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
+import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
 import { System } from '../lib/system.js';
 import { Model  } from '../lib/model.js';
 
-/**
- * @typedef {{  
-*   a: { value: string },
-*   b: { value: number },
-*   c: { value: import('../lib/utils/watchable.js').Watchable },
-*   d: { value: { foo: string }, complex: import('../lib/component.js').ComplexComponentValue },
-* }} ComponentTypes
-*/
-
 describe('System', () => {
-    const types = /** @type {ComponentTypes} */({});
-    const TypedModel  = Model.Typed(types);
-    const TypedSystem = System.Typed(types);
-
-    class ModelA extends TypedModel({ 
+    class ModelA extends Model.Typed({
         components: {
             b: { type: 'b' },
         }
-        
+
     }) { }
 
-    class ModelB extends TypedModel({ 
+    class ModelB extends Model.Typed({
         components: {
-            a: { type: 'a' }, 
+            a: { type: 'a' },
         }
     }) { }
 
-    class SystemA extends TypedSystem({
+    class SystemA extends System.Typed({
         models: {
             modelA:  { model: ModelA, },
             modelBs: { model: ModelB, isSet: true },
@@ -45,7 +32,7 @@ describe('System', () => {
     let system;
 
     beforeEach(() => {
-        system = new SystemA('system');
+        system = new SystemA({ id: 'system' });
     });
 
     describe('models', () => {
@@ -58,14 +45,14 @@ describe('System', () => {
 
     describe('stage', () => {
         it('should be a reference to the parent stage', () => {
-            system.parent = /** @type {import('../lib/stage.js').Stage<ComponentTypes>} */({});
+            system.parent = /** @type {import('../lib/stage.js').Stage} */({});
             assertEquals(system.stage, system.parent);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the stage parent game', () => {
-            system.parent =  /** @type {import('../lib/stage.js').Stage<ComponentTypes>} */({ parent:  /** @type {import('../lib/game.js').Game} */({}) });
+            system.parent =  /** @type {import('../lib/stage.js').Stage} */({ parent:  /** @type {import('../lib/game.js').Game} */({}) });
             assertExists(system.stage?.parent);
             assertEquals(system.game, system.stage?.parent);
         });

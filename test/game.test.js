@@ -1,14 +1,16 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'std/testing/mock.ts';
-import { FakeTime                            } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertThrows } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';
 import { System } from '../lib/system.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
 
 describe('Game', () => {
     /** @type {Game} */
@@ -35,7 +37,7 @@ describe('Game', () => {
     });
 
     afterEach(() => {
-        time.restore();      
+        time.restore();
     });
 
     describe('start', () => {
@@ -114,8 +116,8 @@ describe('Game', () => {
         let systemA;
 
         beforeEach(() => {
-            stageA  = new Stage('stageA');
-            systemA = new System('systemA');
+            stageA  = new Stage({ id: 'stageA' });
+            systemA = new System({ id: 'systemA' });
             stageA.systems.add(systemA);
 
             game.stages.add(stageA);
@@ -127,6 +129,18 @@ describe('Game', () => {
 
         it('should return the system by stage:system id', () => {
             assertEquals(game.getContext('stageA:systemA'), systemA);
+        });
+
+        it('should throw if stage is not found', () => {
+            assertThrows(() => {
+                game.getContext('foo');
+            }, 'Stage context not found');
+        });
+
+        it('should throw if system is not found', () => {
+            assertThrows(() => {
+                game.getContext('stageA:foo');
+            }, 'System context not found');
         });
     });
 
@@ -141,7 +155,7 @@ describe('Game', () => {
         });
 
         it('should use globalThis.requestAnimationFrame if defined', () => {
-            const raf = /** @type {import('std/testing/mock.ts').Spy<any, any[], number>} */(spy());
+            const raf = /** @type {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy<any, any[], number>} */(spy());
             globalThis.requestAnimationFrame = raf;
             game = new Game();
             game.requestAnimationFrame(() => {});

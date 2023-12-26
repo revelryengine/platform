@@ -1,17 +1,17 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCalls      } from 'std/testing/mock.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCalls      } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 
-import { assert       } from 'std/assert/assert.ts';
-import { assertEquals } from 'std/assert/assert_equals.ts';
-import { assertFalse  } from 'std/assert/assert_false.ts';
+import { assert       } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertFalse  } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
 
 import { GameNodeChildSet } from '../../lib/gom/game-node-child-set.js';
 import { GameNode         } from '../../lib/gom/game-node.js';
-import { Game             } from '../../lib/game.js';   
+import { Game             } from '../../lib/game.js';
 import { Stage            } from '../../lib/stage.js';
 import { System           } from '../../lib/system.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
 
 describe('GameNodeChildSet', () => {
 
@@ -36,11 +36,11 @@ describe('GameNodeChildSet', () => {
 
     beforeEach(() => {
         game     = new Game();
-        stageA   = new Stage('stageA');
-        stageB   = new Stage('stageB');
-        systemA  = new SystemA('systemA');
-        systemB  = new SystemB('systemB');
-        childSet = new GameNodeChildSet(new GameNode('parent'), [new GameNode('child')]);
+        stageA   = new Stage({ id: 'stageA' });
+        stageB   = new Stage({ id: 'stageB' });
+        systemA  = new SystemA({ id: 'systemA' });
+        systemB  = new SystemB({ id: 'systemB' });
+        childSet = new GameNodeChildSet(new GameNode({ id: 'parent' }), [new GameNode({ id: 'child' })]);
     });
 
     describe('constructor', () => {
@@ -157,7 +157,7 @@ describe('GameNodeChildSet', () => {
         let disconnectedSystemA;
         /** @type {Spy} */
         let disconnectedSystemB;
-        
+
         beforeEach(() => {
             disconnectedStageA  = spy(stageA,  'disconnectedCallback');
             disconnectedStageB  = spy(stageB,  'disconnectedCallback');

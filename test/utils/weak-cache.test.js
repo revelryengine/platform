@@ -1,15 +1,15 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assert                } from 'std/assert/assert.ts';
-import { assertFalse           } from 'std/assert/assert_false.ts';
-import { assertEquals          } from 'std/assert/assert_equals.ts';
-import { assertStrictEquals    } from 'std/assert/assert_strict_equals.ts';
-import { assertNotStrictEquals } from 'std/assert/assert_not_strict_equals.ts';
-import { assertSpyCalls, spy   } from 'std/testing/mock.ts';
+import { assert                } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertFalse           } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertEquals          } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertStrictEquals    } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
+import { assertNotStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_not_strict_equals.ts';
+import { assertSpyCalls, spy   } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 
 import { WeakCache } from '../../lib/utils/weak-cache.js';
 
-/** @typedef {import('std/testing/mock.ts').Spy}  Spy */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy}  Spy */
 
 describe('WeakCache', () => {
     /** @type {WeakCache<{ foo: string }>} */

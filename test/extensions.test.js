@@ -1,6 +1,6 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assertEquals } from 'std/assert/assert_equals.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
 
 import { Game       } from '../lib/game.js';
 import { extensions } from '../lib/extensions.js';
@@ -14,7 +14,7 @@ describe('extensions', () => {
     /** @type {GameSubClassA} */
     let gameA;
     /** @type {GameSubClassB} */
-    let gameB; 
+    let gameB;
     /** @type {GameSubClassC} */
     let gameC;
 
