@@ -1,21 +1,21 @@
-import { describe, it, beforeEach, afterEach } from 'std/testing/bdd.ts';
-import { spy, assertSpyCalls                 } from 'std/testing/mock.ts';
-import { FakeTime                            } from 'std/testing/time.ts';
+import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { spy, assertSpyCalls                 } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assertEquals          } from 'std/assert/assert_equals.ts';
-import { assertNotEquals       } from 'std/assert/assert_not_equals.ts';
-import { assertStrictEquals    } from 'std/assert/assert_strict_equals.ts';
-import { assertNotStrictEquals } from 'std/assert/assert_not_strict_equals.ts';
-import { assertExists          } from 'std/assert/assert_exists.ts';
-import { assertThrows          } from 'std/assert/assert_throws.ts';
-import { assertInstanceOf      } from 'std/assert/assert_instance_of.ts';
+import { assertEquals          } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertNotEquals       } from 'https://deno.land/std@0.208.0/assert/assert_not_equals.ts';
+import { assertStrictEquals    } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
+import { assertNotStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_not_strict_equals.ts';
+import { assertExists          } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertThrows          } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertInstanceOf      } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
 import { Asset } from '../lib/asset.js';
 
 
 
-/** @typedef {import('std/testing/mock.ts').Spy} Spy */
-/** @typedef {import('std/testing/mock.ts').Stub} Stub */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
+/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Stub} Stub */
 
 /**
  * @typedef {import('../lib/prefab.js').ComponentTypes} ComponentTypes
@@ -138,7 +138,7 @@ describe('Asset', () => {
         });
 
         it('should move to error state if asset failed to load', async () => {
-            const assetC = new Asset({ entity: 'entityC', value: { path: 'nonexistentpath.json' } }); 
+            const assetC = new Asset({ entity: 'entityC', value: { path: 'nonexistentpath.json' } });
             await assetC.waitFor('error');
             assertEquals(assetC.state, 'error');
         });
@@ -184,7 +184,7 @@ describe('Asset', () => {
             await assetC.waitFor('data:load');
             assertStrictEquals(assetA.data, assetC.data);
         });
-    });    
+    });
 
 
     describe('set', () => {
@@ -231,7 +231,7 @@ describe('Asset', () => {
     describe('static clearCache', () => {
         it('should abort all assets', async () => {
             Asset.clearCache();
-            
+
             await time.runMicrotasks();
 
             assertEquals(assetA.error, 'Aborted');

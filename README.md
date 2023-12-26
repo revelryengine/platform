@@ -1,9 +1,7 @@
-# Revelry Engine Core Systems and Utils
+# Revelry Engine Core
 
 !> Project Status - This project is in a very alpha state and is not fully implemented yet.
 
-#### Install vendor dependencies
+### Development
 
-```sh
-find {lib,test}/*.js | xargs deno vendor --force
-```
+Package should be developed from the [revelryengine/platform](https://github.com/revelryengine/platform) repo.

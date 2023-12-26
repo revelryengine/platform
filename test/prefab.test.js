@@ -1,10 +1,10 @@
-import { describe, it, beforeEach } from 'std/testing/bdd.ts';
+import { describe, it, beforeEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 
-import { assertEquals     } from 'std/assert/assert_equals.ts';
-import { assertExists     } from 'std/assert/assert_exists.ts';
-import { assertInstanceOf } from 'std/assert/assert_instance_of.ts';
+import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
-import { Stage } from 'revelryengine/ecs/lib/stage.js';
+import { Stage } from '../deps/ecs.js';
 import { PrefabSystem } from '../lib/prefab.js';
 
 

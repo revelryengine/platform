@@ -1,4 +1,4 @@
-import { Watchable } from 'revelryengine/ecs/lib/utils/watchable.js';
+import { Watchable } from '../deps/ecs.js';
 
 export declare class Asset<V extends { path: string | URL}= any, D = any, I = any, E = Record<string, unknown>> extends Watchable<E & { 'data:load': D, 'instance:create': { instance: I, previous: (I | undefined) }, 'error': string, 'unload': void }> {
     constructor(component: { entity: string, value: { path: string | URL } }, referer?: Asset<V, D, I, E>[]);
