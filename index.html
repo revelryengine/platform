@@ -1,51 +1,65 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" media="(prefers-color-scheme: dark)"   href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+        <link rel="stylesheet" media="(prefers-color-scheme: light)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
 
-        <script src="/importmap.js"></script>
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/BabylonJS/Spector.js/dist/spector.bundle.js"></script>
-        <title>Revelry Game Engine</title>
         <style>
             :root {
-                --theme-color: #ffeb3b;
-
-                --mono-hue: 240;
-                --mono-saturation: 5%;
-                --mono-shade3: hsl(var(--mono-hue), var(--mono-saturation), 10%);
-                --mono-shade2: hsl(var(--mono-hue), var(--mono-saturation), 15%);
-                --mono-shade1: hsl(var(--mono-hue), var(--mono-saturation), 20%);
-                --mono-base:   hsl(var(--mono-hue), var(--mono-saturation), 25%);
-                --mono-tint1:  hsl(var(--mono-hue), var(--mono-saturation), 35%);
-                --mono-tint2:  hsl(var(--mono-hue), var(--mono-saturation), 40%);
-                --mono-tint3:  hsl(var(--mono-hue), var(--mono-saturation), 47%);
-
-                --primary:       var(--mono-shade3);
-                --primary-light: var(--mono-base);
-                --primary-dark:  var(--mono-tint3);
-                --primary-text:#ffffff;
-
-                --font-family: 'Roboto', sans-serif;
-
+                --theme-color: #fdda0d;
+                --sidebar-nav-pagelink-padding: 0.15em 0;
+                --sidebar-nav-pagelink-background--collapse: none;
+                --sidebar-nav-pagelink-background--active: none;
             }
 
-            html, body {
-                width: 100%;
-                height: 100%;
-                padding: 0;
-                margin: 0;
-                color: var(--primary-text);
-                font-family: var(--font-family);
+            @media(prefers-color-scheme: light) {
+                .app-name-link img {
+                    content: url('/assets/revelry-engine-light.svg');
+                }
+
+                :root {
+                    --sidebar-background: #ffffff;
+                }
             }
+
+            @media(prefers-color-scheme: dark) {
+                .app-name-link img {
+                    content: url('/assets/revelry-engine-dark.svg');
+                }
+
+                :root {
+                    --mono-hue: 240;
+                    --mono-saturation: 5%;
+                    --mono-shade3: hsl(var(--mono-hue), var(--mono-saturation), 10%);
+                    --mono-shade2: hsl(var(--mono-hue), var(--mono-saturation), 15%);
+                    --mono-shade1: hsl(var(--mono-hue), var(--mono-saturation), 5%);
+                    --mono-base:   hsl(var(--mono-hue), var(--mono-saturation), 10%);
+                    --mono-tint1:  hsl(var(--mono-hue), var(--mono-saturation), 35%);
+                    --mono-tint2:  hsl(var(--mono-hue), var(--mono-saturation), 40%);
+                    --mono-tint3:  hsl(var(--mono-hue), var(--mono-saturation), 47%);
+                }
+            }
+
         </style>
-        <script type="module" src="./viewer/elements/viewer.js"></script>
     </head>
     <body>
-        <rev-gltf-viewer></rev-gltf-viewer>
+        <div id="app"></div>
+        <script>
+            window.$docsify = {
+                name: 'Revelry Engine',
+                logo: '/assets/revelry-engine-dark.svg',
+                loadSidebar: true,
+                subMaxLevel: 3,
+            };
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
     </body>
 </html>

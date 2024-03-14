@@ -32,7 +32,7 @@ class RevGLTFViewerElement extends RevParamElement  {
     static get properties() {
         return {
             loading:       { type: Boolean, reflect: true },
-            unsupported:   { type: Boolean },
+            unsupported:   { type: Boolean, reflect: true },
 
             loadingSample: { type: Boolean },
             loadingEnv:    { type: Boolean },
@@ -160,12 +160,12 @@ class RevGLTFViewerElement extends RevParamElement  {
     spectorCapture() {
         const spector = new SPECTOR.Spector();
         this.toast.addMessage(html`Capturing Render...`, 2000);
-        spector.captureCanvas(this.renderer.gal.context.canvas);
         spector.onCapture.add((json) => {
             const url = URL.createObjectURL(new Blob([JSON.stringify(json)], { type: "text/json" }));
             console.log(url);
             this.toast.addMessage(html`Render Captured | <a href="${url}" download="capture.json">Download</a>`, 5000);
         });
+        spector.captureCanvas(this.renderer.gal.context.canvas);
     }
 
     // get settings() {
@@ -292,8 +292,12 @@ class RevGLTFViewerElement extends RevParamElement  {
         }
 
 
-        if(changedProperties.has('forceWebGL2') && this.renderer) {
-            this.createRenderer();
+        if(changedProperties.has('forceWebGL2')) {
+            this.unsupported = false;
+            if(this.renderer) {
+                this.createRenderer();
+            }
+
         }
 
         if(changedProperties.has('renderPath') && this.renderer) {
@@ -368,8 +372,7 @@ class RevGLTFViewerElement extends RevParamElement  {
 
     render(){
         if(this.unsupported) {
-            console.log('Not supported');
-            return html`<p>Your browser may not support WebGPU or WebGL2</p>`;
+            return html`<p>This browser or device does not support WebGPU or WebGL2 and all required extensions.</p>${this.controls}`;
         }
 
         this.loading = !!(this.loadingSample || this.loadingEnv);
@@ -559,6 +562,10 @@ class RevGLTFViewerElement extends RevParamElement  {
             display: inline-block;
         }
 
+        :host([unsupported]) p {
+            padding: 5px;
+            text-align: center;
+        }
 
         .loader {
             display: none;
@@ -619,6 +626,8 @@ class RevGLTFViewerElement extends RevParamElement  {
             background: rgba(0,0,0, 0.75);
             padding: 5px;
         }
+
+
         `;
     }
 }
