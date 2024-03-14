@@ -19,3 +19,6 @@
 [submodule "packages/core"]
 	path = packages/core
 	url = git@github.com:revelryengine/core.git
+[submodule "packages/utils"]
+	path = packages/utils
+	url = git@github.com:revelryengine/utils.git

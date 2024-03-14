@@ -1,1 +1,6 @@
 *.bak
+vendor
+@packages
+lib.deno.d.ts
+editor
+scripts
