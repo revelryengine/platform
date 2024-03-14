@@ -295,7 +295,7 @@ describe('ComponentSet', () => {
 
         describe('predicate', () => {
             it('should only return the components where the predicate is true', () => {
-                assertEquals(components.find({ entity: entityA, type: 'a', predicate: (c) => c.value !== 'a' }), undefined);
+                assertEquals(components.find({ entity: entityA, type: 'a', predicate: (c) => c.value !== 'a' }), null);
                 assertEquals([...components.find({ entity: entityA, predicate: (c) => c.type === 'c' })], [componentC]);
                 assertEquals([...components.find({ type: 'c', predicate: (c) => c.entity === entityB })], [componentG]);
                 assertEquals([...components.find({ predicate: (c) => c.entity === entityB })], [componentE, componentF, componentG, componentH]);
