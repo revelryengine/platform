@@ -1,6 +1,6 @@
 type RenderOptions = {
     target?: { type: 'canvas', width: number, height: number } | { type: 'canvas', autosize: true, scale?: number }
-} & Revelry.Renderer.RenderPathSettingsOptions;
+} & Revelry.Renderer.RenderPathSettingsOptions<Exclude<Revelry.Renderer.RenderPathKeys, 'query'>>;
 
 declare namespace Revelry {
 
@@ -17,8 +17,8 @@ declare namespace Revelry {
             worldInput:  { value: { gamepad?: boolean, keyboard?: boolean, pointers?: boolean } },
 
             camera:  {
-                json:  import('../deps/gltf.js').camera & { renderOptions?: RenderOptions },
-                value: import('../deps/gltf.js').Camera & { renderOptions?: RenderOptions },
+                json:  import('../deps/gltf.js').camera & { renderOptions?: RenderOptions, query?: boolean },
+                value: import('../deps/gltf.js').Camera & { renderOptions?: RenderOptions, query?: boolean },
             },
             orbitControl: { value: { button?: number, target?: vec3 | string } },
 

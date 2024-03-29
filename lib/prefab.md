@@ -1,6 +1,6 @@
 # Prefabs
 
-A prefab is a predifined set of components that are loaded at runtime. 
+A prefab is a predifined set of components that are loaded at runtime.
 
 ## Entity UUIDs
 
@@ -226,4 +226,4 @@ Stage:
     | ------------------------------------ | ------ | --------------------------------- |
     | e5ee7a2f-550e-43e0-b3f1-609693ca2a63 | prefab | { path: `@assets/parent.revfab` } |
 
-Load time error: `Asset recursive loop detected`
+Load time error: `Prefab recursive loop detected`
