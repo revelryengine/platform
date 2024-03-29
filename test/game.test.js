@@ -2,12 +2,14 @@ import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208
 import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertThrows } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';
 import { System } from '../lib/system.js';
+
 
 
 /** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
@@ -46,6 +48,7 @@ describe('Game', () => {
         });
 
         it('should loop repeatedly', async () => {
+            await time.tickAsync();
             await time.tickAsync(game.targetFrameRate);
             await time.tickAsync(game.targetFrameRate);
             await time.tickAsync(game.targetFrameRate);
@@ -103,44 +106,38 @@ describe('Game', () => {
         });
     });
 
-    describe('stages', () => {
-        it('should be a reference to the game children', () => {
-            assertEquals(game.stages, game.children);
-        });
-    });
-
     describe('getContext', () => {
         /** @type {Stage} */
-        let stageA;
+        let stage;
         /** @type {System} */
-        let systemA;
+        let system;
 
         beforeEach(() => {
-            stageA  = new Stage({ id: 'stageA' });
-            systemA = new System({ id: 'systemA' });
-            stageA.systems.add(systemA);
+            stage   = new Stage();
+            system = new System();
+            stage.systems.add(system);
 
-            game.stages.add(stageA);
+            game.stages.add(stage);
         });
 
         it('should return the stage by id', () => {
-            assertEquals(game.getContext('stageA'), stageA);
+            assertEquals(game.getContext('stage'), stage);
         });
 
         it('should return the system by stage:system id', () => {
-            assertEquals(game.getContext('stageA:systemA'), systemA);
+            assertEquals(game.getContext('stage:system'), system);
         });
 
         it('should throw if stage is not found', () => {
             assertThrows(() => {
                 game.getContext('foo');
-            }, 'Stage context not found');
+            }, 'Stage with id "foo" not found');
         });
 
         it('should throw if system is not found', () => {
             assertThrows(() => {
-                game.getContext('stageA:foo');
-            }, 'System context not found');
+                game.getContext('stage:foo');
+            }, 'System with id "foo" not found');
         });
     });
 
@@ -183,5 +180,159 @@ describe('Game', () => {
             // @ts-ignore unsetting cancelAnimationFrame in deno
             delete globalThis.cancelAnimationFrame;
         });
-    })
+    });
+
+    describe('stages.add', () => {
+        /** @type {Stage} */
+        let stage;
+        /** @type {System} */
+        let system;
+
+        /** @type {Spy} */
+        let stageConnected;
+        /** @type {Spy} */
+        let systemConnected
+
+        beforeEach(() => {
+            stage  = new Stage();
+            system = new System();
+
+            stageConnected  = spy(stage, 'connectedCallback');
+            systemConnected = spy(system, 'connectedCallback');
+
+            stage.systems.add(system);
+            game.stages.add(stage);
+        });
+
+        it('should assign game to stage', () => {
+            assertStrictEquals(stage.game, game);
+        });
+
+        it('should assign stage to system', () => {
+            assertStrictEquals(system.stage, stage);
+        });
+
+        it('should not error if stage already exists', () => {
+            game.stages.add(stage);
+        });
+
+        it('should error if another stage with the same name is added', () => {
+            assertThrows(() => {
+                game.stages.add(new Stage({ id: stage.id }));
+            }, `Stage with id ${stage.id} already exists`)
+        });
+
+        it('should call connectedCallback on stage', () => {
+            assertSpyCalls(stageConnected, 1);
+        });
+
+        it('should call connectedCallback on system', () => {
+            assertSpyCalls(systemConnected, 1);
+        });
+
+        it('should not call connectedCallback on system if stage is not connected', () => {
+            const stage  = new Stage();
+            const system = new System();
+            const systemConnected = spy(system, 'connectedCallback');
+            stage.systems.add(system);
+            assertSpyCalls(systemConnected, 0);
+        });
+
+        it('should not call disconnectedCallback on system if stage is not connected', () => {
+            const stage  = new Stage();
+            const system = new System();
+            const systemDisconnected = spy(system, 'disconnectedCallback');
+            stage.systems.add(system);
+            stage.systems.delete(system);
+            assertSpyCalls(systemDisconnected, 0);
+        });
+    });
+
+    describe('stages.delete', () => {
+        /** @type {Stage} */
+        let stage;
+        /** @type {System} */
+        let system;
+
+
+        beforeEach(() => {
+            stage  = new Stage();
+            system = new System();
+
+            stage.systems.add(system);
+
+            game.stages.add(stage);
+            game.stages.delete(stage);
+        });
+
+        it('should unassign game from stage', () => {
+            assertStrictEquals(stage.game, null);
+        });
+
+        it('should unassign game from system', () => {
+            assertStrictEquals(system.game, null);
+        });
+
+        it('should return false if stage is not present', () => {
+            assertEquals(game.stages.delete(new Stage()), false);
+        });
+    });
+
+    describe('update', () => {
+        /** @type {Stage} */
+        let stageA;
+        /** @type {Stage} */
+        let stageB;
+
+        /** @type {Spy} */
+        let updateA;
+        /** @type {Spy} */
+        let updateB;
+
+        beforeEach(() => {
+            stageA   = new Stage({ id: 'stageA' });
+            stageB   = new Stage({ id: 'stageB' });
+
+            game.stages.add(stageA);
+            game.stages.add(stageB);
+
+            updateA = spy(stageA, 'update');
+            updateB = spy(stageB, 'update');
+        });
+
+        it('should call update on all stages', () => {
+            game.update(1);
+            assertSpyCalls(updateA, 1);
+            assertSpyCalls(updateB, 1);
+        });
+    });
+
+    describe('render', () => {
+        /** @type {Stage} */
+        let stageA;
+        /** @type {Stage} */
+        let stageB;
+
+        /** @type {Spy} */
+        let renderA;
+        /** @type {Spy} */
+        let renderB;
+
+        beforeEach(() => {
+            stageA   = new Stage({ id: 'stageA' });
+            stageB   = new Stage({ id: 'stageB' });
+
+            game.stages.add(stageA);
+            game.stages.add(stageB);
+
+            renderA = spy(stageA, 'render');
+            renderB = spy(stageB, 'render');
+        });
+
+        it('should call render on all stages', () => {
+            game.render();
+            assertSpyCalls(renderA, 1);
+            assertSpyCalls(renderB, 1);
+        });
+    });
 });

@@ -32,10 +32,10 @@ type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> =
     once?:      boolean;
     signal?:    AbortSignal;
 } & ({
-    type: symbol;
+    type: undefined;
     handler: WatchableWildCardImmediateHandler<T>;
 } | {
-    type: symbol;
+    type: undefined;
     handler: WatchableWildCardDeferredHandler<T>;
 } | {
     type: keyof T;
@@ -73,7 +73,6 @@ export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
      * Watch for events of a specific type
      */
     watch<K extends keyof T>(type: K, options: WatchableAnyOptions<T, K>): void;
-
 
     /**
      * Remove watch handler.

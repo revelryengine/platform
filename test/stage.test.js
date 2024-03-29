@@ -1,12 +1,14 @@
 import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall                  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
+import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
-import { assertFalse      } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
-import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
+import { assert             } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertExists       } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertFalse        } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertInstanceOf   } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
+import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
+import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
 
 import { Stage     } from '../lib/stage.js';
 import { System    } from '../lib/system.js';
@@ -91,7 +93,7 @@ describe('Stage', () => {
         time = new FakeTime();
         stage = new Stage();
 
-        stage.initializers['d'] = (c) => new Foobar();
+        stage.initializers['d'] = () => new Foobar();
 
         entityA = UUID();
         entityB = UUID();
@@ -216,6 +218,7 @@ describe('Stage', () => {
             it('should notify system:add when a new system is added', () => {
                 assertSpyCall(handler, 0, { args: [{ system: systemC }]});
             });
+
         });
 
         describe('system:delete', () => {
@@ -225,6 +228,39 @@ describe('Stage', () => {
             });
 
             it('should notify system:delete when a system is deleted', () => {
+                assertSpyCall(handler, 0, { args: [{ system: systemA }]});
+            });
+        });
+
+        describe('system:registered', () => {
+            class SystemC extends System.Typed({
+                models: {
+                    modelA: { model: ModelA }
+                }
+            }) { }
+
+            /** @type {SystemC} */
+            let systemC;
+
+            beforeEach(() => {
+                systemC = new SystemC();
+                stage.watch('system:registered', handler);
+                stage.systems.add(systemC);
+            });
+
+            it('should notify system:registered when a new system is added', () => {
+                assertSpyCall(handler, 0, { args: [{ system: systemC }]});
+            });
+
+        });
+
+        describe('system:unregistered', () => {
+            beforeEach(() => {
+                stage.watch('system:unregistered', handler);
+                stage.systems.delete(systemA);
+            });
+
+            it('should notify system:unregistered when a system is deleted', () => {
                 assertSpyCall(handler, 0, { args: [{ system: systemA }]});
             });
         });
@@ -290,6 +326,20 @@ describe('Stage', () => {
         it('should add existing components to new system', () => {
             assertExists(systemC.modelA);
         });
+
+        it('should assign stage to system', () => {
+            assertStrictEquals(systemC.stage, stage);
+        });
+
+        it('should not error if system already exists', () => {
+            stage.systems.add(systemC);
+        });
+
+        it('should error if another system with the same name is added', () => {
+            assertThrows(() => {
+                stage.systems.add(new SystemC());
+            }, `System with id ${systemC.id} already exists`)
+        });
     });
 
     describe('systems.delete', () => {
@@ -305,6 +355,10 @@ describe('Stage', () => {
 
         it('should delete models that only existed for system that was deleted', () => {
             assertSpyCall(cleanupSpy, 0, { args: [entityA] });
+        });
+
+        it('should return false if system is not present', () => {
+            assertEquals(stage.systems.delete(new SystemA()), false);
         });
     });
 
@@ -357,16 +411,64 @@ describe('Stage', () => {
         });
     });
 
-    describe('systems', () => {
-        it('should be a reference to the stage children', () => {
-            assertEquals(stage.systems, stage.children);
+
+    describe('update', () => {
+        /** @type {SystemA} */
+        let systemA;
+        /** @type {SystemB} */
+        let systemB;
+
+        /** @type {Spy} */
+        let updateA;
+        /** @type {Spy} */
+        let updateB;
+
+        beforeEach(() => {
+            stage   = new Stage();
+            systemA = new SystemA();
+            systemB = new SystemB();
+
+            stage.systems.add(systemA);
+            stage.systems.add(systemB);
+
+            updateA = spy(systemA, 'update');
+            updateB = spy(systemB, 'update');
+        });
+
+        it('should call update on all stages', () => {
+            stage.update(1);
+            assertSpyCalls(updateA, 1);
+            assertSpyCalls(updateB, 1);
         });
     });
 
-    describe('game', () => {
-        it('should be a reference to the parent game', () => {
-            stage.parent = /** @type {import('../lib/game.js').Game} */({});
-            assertEquals(stage.game, stage.parent);
+    describe('render', () => {
+        /** @type {SystemA} */
+        let systemA;
+        /** @type {SystemB} */
+        let systemB;
+
+        /** @type {Spy} */
+        let renderA;
+        /** @type {Spy} */
+        let renderB;
+
+        beforeEach(() => {
+            stage   = new Stage();
+            systemA = new SystemA();
+            systemB = new SystemB();
+
+            stage.systems.add(systemA);
+            stage.systems.add(systemB);
+
+            renderA = spy(systemA, 'render');
+            renderB = spy(systemB, 'render');
+        });
+
+        it('should call render on all stages', () => {
+            stage.render();
+            assertSpyCalls(renderA, 1);
+            assertSpyCalls(renderB, 1);
         });
     });
 });

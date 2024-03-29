@@ -26,7 +26,7 @@ export declare class Model<D extends ModelComponentsDefinition = any, E extends 
     readonly types: Set<Revelry.ECS.ComponentTypeKeys>;
 
     /** A reference to the game. It will be undefined if the model's stage does not belong to a Game yet. */
-    readonly game: Game|undefined;
+    readonly game: Game|null;
 
     /** A cleanup method that will be called when the model is removed from the Stage */
     cleanup(): void;

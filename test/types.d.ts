@@ -12,7 +12,7 @@ declare namespace Revelry {
 
 
         interface SystemContexts {
-            systemA: import('../lib/system.js').System
+            system: import('../lib/system.js').System
         }
     }
 }

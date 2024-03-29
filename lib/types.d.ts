@@ -90,7 +90,7 @@ declare namespace Revelry {
 
         type SystemContextKeys = Extract<keyof SystemContexts, string>;
 
-        type SystemBundle = { systems?: import('./system.js').SystemConstructor[], initializers?: ComponentInitializers }
+        type SystemBundle = { load?: () => Promise<void>, systems?: import('./system.js').SystemConstructor[], initializers?: ComponentInitializers, bundles?: SystemBundle[] };
 
         type ConnectedSystemContexts = {
             [K in SystemContextKeys]: SystemContexts[K] & { stage: import('./stage.js').Stage}

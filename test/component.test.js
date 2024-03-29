@@ -487,16 +487,16 @@ describe('ComponentSet', () => {
 
             components.add({ entity: entityC, type: 'a', value: 'a' })
 
-            refA = components.references.add(entityC, { entity: entityA, type: 'a' });
-            refB = components.references.add(entityC, { entity: entityA, type: 'b' });
-            refC = components.references.add(entityC, { entity: entityA, type: 'c' });
-            refD = components.references.add(entityC, { entity: entityA, type: 'd' });
-            refE = components.references.add(entityC, { entity: entityB, type: 'a' });
-            refF = components.references.add(entityC, { entity: entityB, type: 'b' });
-            refG = components.references.add(entityC, { entity: entityB, type: 'c' });
-            refH = components.references.add(entityC, { entity: entityB, type: 'd' });
+            refA = components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'a' });
+            refB = components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'b' });
+            refC = components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'c' });
+            refD = components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'd' });
+            refE = components.references.add({ entity: entityC, type: 'a' }, { entity: entityB, type: 'a' });
+            refF = components.references.add({ entity: entityC, type: 'a' }, { entity: entityB, type: 'b' });
+            refG = components.references.add({ entity: entityC, type: 'a' }, { entity: entityB, type: 'c' });
+            refH = components.references.add({ entity: entityC, type: 'a' }, { entity: entityB, type: 'd' });
 
-            refI = components.references.add(entityC, { entity: entityA, type: 'e' });
+            refI = components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'e' });
         });
 
         afterEach(() => {
@@ -540,7 +540,7 @@ describe('ComponentSet', () => {
         });
 
         it('should have a reference to the referer', () => {
-            assertEquals(refA.referer, entityC);
+            assertEquals(refA.referer, { entity: entityC, type: 'a' });
         });
 
         it('should have a reference to the entity', () => {
@@ -603,7 +603,7 @@ describe('ComponentSet', () => {
 
         describe('find', () => {
             it('should iterate over all references of specified entity and type', () => {
-                const refZ = components.references.add(entityC, { entity: entityB, type: 'b' });
+                const refZ = components.references.add({ entity: entityC, type: 'a' }, { entity: entityB, type: 'b' });
 
                 assertEquals([...components.references.find({ entity: entityA, type: 'a' })], [refA]);
                 assertEquals([...components.references.find({ entity: entityA, type: 'b' })], [refB]);
@@ -624,9 +624,9 @@ describe('ComponentSet', () => {
 
             describe('predicate', () => {
                 it('should only return the references where the predicate is true', () => {
-                    const refZ = components.references.add(UUID(), { entity: entityB, type: 'b' });
+                    const refZ = components.references.add({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
-                    assertEquals([...components.references.find({ entity: entityB, type: 'b', predicate: (c) => c.referer !== entityC })], [refZ]);
+                    assertEquals([...components.references.find({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC })], [refZ]);
                     assertEquals([...components.references.find({ entity: entityA, predicate: (c) => c.type === 'a' })], [refA]);
                     assertEquals([...components.references.find({ predicate: (c) => c.type === 'a' })], [refA, refE]);
                 });
@@ -642,7 +642,7 @@ describe('ComponentSet', () => {
 
             it('should increment the number of references when creating a new reference', () => {
                 assertEquals(components.references.count({ entity: entityA }), 5);
-                components.references.add(entityC, { entity: entityA, type: 'b' });
+                components.references.add({ entity: entityC, type: 'a' }, { entity: entityA, type: 'b' });
                 assertEquals(components.references.count({ entity: entityA }), 6);
             });
 
@@ -655,7 +655,7 @@ describe('ComponentSet', () => {
             });
 
             it('should return the number of references created for that specific entity and component type', () => {
-                components.references.add(UUID(), { entity: entityB, type: 'b' });
+                components.references.add({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
                 assertEquals(components.references.count({ entity: entityA, type: 'a' }), 1);
                 assertEquals(components.references.count({ entity: entityB, type: 'a' }), 1);
@@ -665,9 +665,9 @@ describe('ComponentSet', () => {
 
             describe('predicate', () => {
                 it('should only count the references where the predicate is true', () => {
-                    components.references.add(UUID(), { entity: entityB, type: 'b' });
+                    components.references.add({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
-                    assertEquals(components.references.count({ entity: entityB, type: 'b', predicate: (c) => c.referer !== entityC }), 1);
+                    assertEquals(components.references.count({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC }), 1);
                     assertEquals(components.references.count({ entity: entityA, predicate: (c) => c.type === 'a' }), 1);
                     assertEquals(components.references.count({ predicate: (c) => c.type === 'a' }), 2);
                 });
@@ -693,8 +693,8 @@ describe('ComponentSet', () => {
 
             describe('predicate', () => {
                 it('should only return true if the predicate is true', () => {
-                    assert(components.references.has({ entity: entityA, type: 'a', predicate: (c) => c.referer === entityC }));
-                    assertFalse(components.references.has({ entity: entityA, type: 'a', predicate: (c) => c.referer !== entityC }));
+                    assert(components.references.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity === entityC }));
+                    assertFalse(components.references.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity !== entityC }));
 
                     assert(components.references.has({ entity: entityB, predicate: (c) => c.type === 'a' }));
                     assertFalse(components.references.has({ entity: entityB, predicate: (c) => c.type === 'e' }));
@@ -706,11 +706,11 @@ describe('ComponentSet', () => {
         });
 
         describe('events', () => {
-            /** @type {string} */
+            /** @type {{ entity: string, type: Revelry.ECS.ComponentTypeKeys }} */
             let referer;
             beforeEach(() => {
                 handler = spy();
-                referer = UUID();
+                referer = { entity: UUID(), type: 'a' };
             });
 
             it('should notify reference:add when a new reference is added', () => {
@@ -736,21 +736,21 @@ describe('ComponentSet', () => {
                 components.references.watch('reference:release', handler);
                 refA.release();
                 await time.runMicrotasks();
-                assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 8 }]});
+                assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 8 }]});
             });
 
             it('should notify reference:release:${entity} when reference is released', async () => {
                 components.references.watch(`reference:release:${entityA}`, handler);
                 refA.release();
                 await time.runMicrotasks();
-                assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 4 }]});
+                assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 4 }]});
             });
 
             it('should notify reference:release:${entity}:${type} when reference is released', async () => {
                 components.references.watch(`reference:release:${entityA}:a`, handler);
                 refA.release();
                 await time.runMicrotasks();
-                assertSpyCall(handler, 0, { args: [{ referer: entityC, count: 0 }]});
+                assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 0 }]});
             });
         });
 
