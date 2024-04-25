@@ -1,0 +1,10 @@
+{
+    "meta": {
+        "name": "Test Game",
+        "description": ""
+    },
+    "stages": {
+        "a": "./a.revstg",
+        "b": "./b.revstg"
+    }
+}

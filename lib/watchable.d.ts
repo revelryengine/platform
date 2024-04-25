@@ -45,7 +45,7 @@ type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> =
 
 /**
  * A watchable is an object that can be watched for changes events. This does not rely on property setters or dirty checking as it relies solely on
- * code that makes changes to explicitly call notify when changes are complete. EVents are then batched in the microtask queue.
+ * code that makes changes to explicitly call notify when changes are complete. Events are then batched in the microtask queue.
  */
 export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
     /**
@@ -54,8 +54,8 @@ export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
      *
      * Handlers added with the immediate option will be called immediately instead of batched.
      */
-    notify<K extends keyof T, V extends T[K]>(type: V extends void ? K : never): void;
-    notify<K extends keyof T, V extends T[K]>(type: K, data: V): void;
+    notify<K extends keyof T>(type: T[K] extends void ? K : never): void;
+    notify<K extends keyof T>(type: K, data: T[K]): void;
 
     /**
      * Watch for all events
@@ -96,6 +96,16 @@ export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
      * @example ```const data = await watchable.waitFor('example');```
      */
     waitFor<K extends keyof T>(type: K, signal?: AbortSignal ): Promise<T[K]>;
+
+    /**
+     * Returns true if any watchers are watching for this specific type.
+     */
+    isWatched<K extends keyof T>(type?: K): boolean;
+
+    /**
+     * Returns true if any notification is in the queue for this specific type.
+     */
+    isQueued<K extends keyof T>(type?: K): boolean;
 
     /**
      * Returns true if input is a watchable object

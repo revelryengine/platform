@@ -1,42 +1,40 @@
 import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
 import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
 
-import { Game      } from '../lib/game.js';
-import { Stage     } from '../lib/stage.js';
-import { System    } from '../lib/system.js';
-import { Model     } from '../lib/model.js';
-import { UUID      } from '../lib/utils/uuid.js';
-import { Watchable } from '../lib/utils/watchable.js';
+import { Game   } from '../lib/game.js';
+import { Stage  } from '../lib/stage.js';
+import { System } from '../lib/system.js';
+import { Model  } from '../lib/model.js';
+import { UUID   } from '../deps/utils.js';
 
-/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
+/**
+ * @import { Component } from '../lib/ecs.js';
+ */
 
 describe('Model', () => {
-    class ModelA extends Model.Typed({
-        components: {
-            a: { type: 'a' },
-            b: { type: 'b' },
-            c: { type: 'c' },
-        }
-    }) { }
+    class ModelA extends Model.Typed(/** @type {const} */({
+        components: ['a', 'b', 'c']
+    })) { }
 
-    class SystemA extends System.Typed({
+    class SystemA extends System.Typed(/** @type {const} */({
+        id: 'systemA',
         models: {
             modelA: { model: ModelA },
         },
-    }) { }
+    })) { }
 
     /** @type {FakeTime} */
     let time;
 
-    /** @type {Revelry.ECS.ComponentData<'a'>} */
+    /** @type {Component<'a'>} */
     let componentA;
-    /** @type {Revelry.ECS.ComponentData<'b'>} */
+    /** @type {Component<'b'>} */
     let componentB;
-    /** @type {Revelry.ECS.ComponentData<'c'>} */
+    /** @type {Component<'c'>} */
     let componentC;
+
     /** @type {string} */
     let entity;
 
@@ -52,8 +50,8 @@ describe('Model', () => {
     beforeEach(() => {
         time   = new FakeTime();
         game   = new Game();
-        stage  = new Stage();
-        system = new SystemA();
+        stage  = new Stage(game, 'stage');
+        system = new SystemA(stage);
 
         game.stages.add(stage);
 
@@ -61,15 +59,11 @@ describe('Model', () => {
 
         entity = UUID();
 
-        stage.components.add({ entity, type: 'a', value: 'abc' });
-        stage.components.add({ entity, type: 'b', value: 123 });
-        stage.components.add({ entity, type: 'c', value: new Watchable() });
+        componentA = stage.createComponent({ entity, type: 'a', value: 'a' });
+        componentB = stage.createComponent({ entity, type: 'b', value: 123 });
+        componentC = stage.createComponent({ entity, type: 'c', value: true });
 
-        modelA = system.modelA;
-
-        componentA = /** @type {Revelry.ECS.ComponentData<'a'>} */(stage.components.find({ entity, type: 'a' }));
-        componentB = /** @type {Revelry.ECS.ComponentData<'b'>} */(stage.components.find({ entity, type: 'b' }));
-        componentC = /** @type {Revelry.ECS.ComponentData<'c'>} */(stage.components.find({ entity, type: 'c' }));
+        modelA = system.models.modelA;
     });
 
     afterEach(() => {
@@ -77,81 +71,11 @@ describe('Model', () => {
     });
 
     describe('components', () => {
-        it('should have model property references to the component values', () => {
-            assertEquals(modelA.a, componentA.value);
-            assertEquals(modelA.b, componentB.value);
+        it('should have component property references to the components', () => {
+            assertEquals(modelA.components.a, componentA);
+            assertEquals(modelA.components.b, componentB);
+            assertEquals(modelA.components.c, componentC);
         });
-
-        it('should update the component values when updating the model properties', () => {
-            modelA.a = 'def';
-            modelA.b = 456;
-            assertEquals(componentA.value, 'def');
-            assertEquals(componentB.value, 456);
-        });
-    });
-
-    describe('watching', () => {
-        let /** @type {Spy} */handler;
-
-        describe('all components', () => {
-            beforeEach(() => {
-                handler = spy();
-                modelA.watch(handler);
-            });
-
-            it('should call the handler for all components that change', () => {
-                modelA.a = 'def';
-                modelA.b = 456;
-                assertSpyCall(handler, 0, { args: ['a:change', 'abc'] });
-                assertSpyCall(handler, 1, { args: ['b:change', 123] });
-                assertSpyCalls(handler, 2);
-            });
-        });
-        describe('all components deferred', () => {
-            beforeEach(() => {
-                handler = spy();
-                modelA.watch({ handler, deferred: true });
-            });
-
-            it('should watch all components for changes', async () => {
-                modelA.a = 'def';
-                modelA.b = 456;
-                await time.runMicrotasks();
-                assertSpyCalls(handler, 1);
-                assertEquals(handler.calls[0].args[0].get('a:change'), 'abc');
-                assertEquals(handler.calls[0].args[0].get('b:change'), 123);
-            });
-        })
-
-        describe('watch individual property', () => {
-            beforeEach(() => {
-                handler = spy();
-                modelA.watch('a:change', handler);
-            });
-
-
-            it('should watch only component specified', () => {
-                modelA.a = 'def';
-                modelA.b = 456;
-                assertSpyCall(handler, 0, { args: ['abc'] });
-                assertSpyCalls(handler, 1);
-            });
-        });
-
-        describe('watchable component value', () => {
-            beforeEach(() => {
-                handler = spy();
-                modelA.watch('c:notify', handler);
-            });
-
-            it('should capture component value notify events', async () => {
-                componentC.value.notify('c', 'test1');
-                componentC.value.notify('d', 'test2');
-                await time.runMicrotasks();
-                assertSpyCall(handler, 0, { args: [new Map([['c', 'test1'], ['d', 'test2']])] });
-                assertSpyCalls(handler, 1);
-            });
-        })
     });
 
     describe('stage', () => {
@@ -168,8 +92,8 @@ describe('Model', () => {
 
     describe('default components', () => {
         it('should not error when using the base Model class', () => {
-            stage.systems.add(new (System.Typed({ models: { modelA: { model: Model } } })));
-            stage.components.add({ entity: UUID(), type: 'a', value: 'a' });
+            stage.createSystem(System.Typed({ id: 'system', models: { modelA: { model: Model } } }));
+            stage.createComponent({ entity: UUID(), type: 'a', value: 'a' });
         });
     });
 });

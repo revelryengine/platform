@@ -1,16 +1,17 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
+import { describe, it, beforeEach, afterEach       } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
 import { spy, stub, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
+import { FakeTime                                  } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
 import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
 import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
 import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
 import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
-import { Watchable } from '../../lib/utils/watchable.js';
+import { Watchable } from '../lib/watchable.js';
 
-/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy}  Spy */
-/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Stub} Stub */
+/**
+ * @import { Spy, Stub } from 'https://deno.land/std@0.208.0/testing/mock.ts'
+ */
 
 describe('Watchable', () => {
 
@@ -105,6 +106,7 @@ describe('Watchable', () => {
                 watchable = new ExtendedWatchable();
                 abortCtl  = new AbortController();
                 watchable.watch({ handler, signal: abortCtl.signal });
+                watchable.watch({ handler, signal: abortCtl.signal, deferred: true });
             });
 
             it('should not call handler if aborted', () => {
@@ -416,11 +418,19 @@ describe('Watchable', () => {
         /** @type {Stub} */
         let waitForStub;
 
+        /** @type {Stub} */
+        let isWatchedStub;
+
+        /** @type {Stub} */
+        let isQueuedStub;
+
         beforeEach(() => {
-            notifyStub  = stub(Watchable.prototype, 'notify');
-            watchStub   = stub(Watchable.prototype, 'watch');
-            unwatchStub = stub(Watchable.prototype, 'unwatch');
-            waitForStub = stub(Watchable.prototype, 'waitFor');
+            notifyStub    = stub(Watchable.prototype, 'notify');
+            watchStub     = stub(Watchable.prototype, 'watch');
+            unwatchStub   = stub(Watchable.prototype, 'unwatch');
+            waitForStub   = stub(Watchable.prototype, 'waitFor');
+            isWatchedStub = stub(Watchable.prototype, 'isWatched');
+            isQueuedStub  = stub(Watchable.prototype, 'isQueued');
 
             float = new ExtendedFloat(4);
         });
@@ -430,6 +440,8 @@ describe('Watchable', () => {
             watchStub.restore();
             unwatchStub.restore();
             waitForStub.restore();
+            isWatchedStub.restore();
+            isQueuedStub.restore();
         })
 
         it('should maintain specified super class', () => {
@@ -455,6 +467,16 @@ describe('Watchable', () => {
         it('should add the waitFor method', async () => {
             float.waitFor('a');
             assertSpyCalls(waitForStub, 1);
+        });
+
+        it('should add the isWatched method', async () => {
+            float.isWatched('a');
+            assertSpyCalls(isWatchedStub, 1);
+        });
+
+        it('should add the isQueued method', async () => {
+            float.isQueued('a');
+            assertSpyCalls(isQueuedStub, 1);
         });
     });
 
@@ -557,6 +579,46 @@ describe('Watchable', () => {
                 await time.runMicrotasks();
                 assertSpyCall(rejectHandler, 0, { args: ['aborted']});
             });
+        });
+    });
+
+    describe('isWatched', () => {
+        beforeEach(() => {
+            handler   = spy();
+            watchable = new ExtendedWatchable();
+            watchable.watch('a', { handler });
+            watchable.watch({ handler });
+        });
+
+        it('should return true if the watchable has a watcher', async () => {
+            assertEquals(watchable.isWatched('a'), true);
+            assertEquals(watchable.isWatched(), true);
+        });
+
+        it('should return false if the watchable does not have a watcher of that type', async () => {
+            assertEquals(watchable.isWatched('b'), false);
+        });
+    });
+
+    describe('isQueued', () => {
+        beforeEach(() => {
+            handler   = spy();
+            watchable = new ExtendedWatchable();
+            watchable.watch('a', { handler, deferred: true });
+            watchable.watch({ handler, deferred: true });
+        });
+
+        it('should return true if the a notification is queued', async () => {
+            watchable.notify('a', 'a');
+            assertEquals(watchable.isQueued('a'), true);
+            assertEquals(watchable.isQueued(), true);
+        });
+
+        it('should return false if the a notification is no longer queued', async () => {
+            watchable.notify('a', 'a');
+            await time.runMicrotasks();
+            assertEquals(watchable.isQueued('a'), false);
+            assertEquals(watchable.isQueued(), false);
         });
     });
 });

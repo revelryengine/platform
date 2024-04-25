@@ -2,9 +2,10 @@ import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208
 import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
-import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
+import { assert       } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertThrows } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertFalse  } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';
@@ -12,7 +13,9 @@ import { System } from '../lib/system.js';
 
 
 
-/** @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy */
+/**
+ * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts'
+ */
 
 describe('Game', () => {
     /** @type {Game} */
@@ -94,18 +97,6 @@ describe('Game', () => {
         });
     });
 
-    describe('command', () => {
-        beforeEach(() => {
-            command = spy();
-            game.extensions.set('command:test-command', command);
-        });
-
-        it('should call the defined function with a game reference followed by supplied arguments', () => {
-            game.command('test-command', 0, 1, 2, 'test');
-            assertSpyCall(command, 0, { args: [game, 0, 1, 2, 'test'] });
-        });
-    });
-
     describe('getContext', () => {
         /** @type {Stage} */
         let stage;
@@ -113,8 +104,8 @@ describe('Game', () => {
         let system;
 
         beforeEach(() => {
-            stage   = new Stage();
-            system = new System();
+            stage  = new Stage(game, 'stage');
+            system = new System(stage);
             stage.systems.add(system);
 
             game.stages.add(stage);
@@ -188,28 +179,13 @@ describe('Game', () => {
         /** @type {System} */
         let system;
 
-        /** @type {Spy} */
-        let stageConnected;
-        /** @type {Spy} */
-        let systemConnected
 
         beforeEach(() => {
-            stage  = new Stage();
-            system = new System();
-
-            stageConnected  = spy(stage, 'connectedCallback');
-            systemConnected = spy(system, 'connectedCallback');
+            stage  = new Stage(game, 'stage');
+            system = new System(stage);
 
             stage.systems.add(system);
             game.stages.add(stage);
-        });
-
-        it('should assign game to stage', () => {
-            assertStrictEquals(stage.game, game);
-        });
-
-        it('should assign stage to system', () => {
-            assertStrictEquals(system.stage, stage);
         });
 
         it('should not error if stage already exists', () => {
@@ -218,33 +194,27 @@ describe('Game', () => {
 
         it('should error if another stage with the same name is added', () => {
             assertThrows(() => {
-                game.stages.add(new Stage({ id: stage.id }));
+                game.stages.add(new Stage(game, stage.id));
             }, `Stage with id ${stage.id} already exists`)
         });
+    });
 
-        it('should call connectedCallback on stage', () => {
-            assertSpyCalls(stageConnected, 1);
+    describe('createStage', () => {
+        /** @type {Stage} */
+        let stage;
+
+        beforeEach(() => {
+            stage = game.createStage('stage');
         });
 
-        it('should call connectedCallback on system', () => {
-            assertSpyCalls(systemConnected, 1);
+        it('should add stage to stages', () => {
+            assert(game.stages.has(stage));
         });
 
-        it('should not call connectedCallback on system if stage is not connected', () => {
-            const stage  = new Stage();
-            const system = new System();
-            const systemConnected = spy(system, 'connectedCallback');
-            stage.systems.add(system);
-            assertSpyCalls(systemConnected, 0);
-        });
-
-        it('should not call disconnectedCallback on system if stage is not connected', () => {
-            const stage  = new Stage();
-            const system = new System();
-            const systemDisconnected = spy(system, 'disconnectedCallback');
-            stage.systems.add(system);
-            stage.systems.delete(system);
-            assertSpyCalls(systemDisconnected, 0);
+        it('should error if another stage with the same name is added', () => {
+            assertThrows(() => {
+                game.createStage('stage');
+            }, `Stage with id ${stage.id} already exists`)
         });
     });
 
@@ -256,8 +226,8 @@ describe('Game', () => {
 
 
         beforeEach(() => {
-            stage  = new Stage();
-            system = new System();
+            stage  = new Stage(game, 'stage');
+            system = new System(stage);
 
             stage.systems.add(system);
 
@@ -265,16 +235,27 @@ describe('Game', () => {
             game.stages.delete(stage);
         });
 
-        it('should unassign game from stage', () => {
-            assertStrictEquals(stage.game, null);
+
+        it('should return false if stage is not present', () => {
+            assertEquals(game.stages.delete(new Stage(game, 'stageB')), false);
+        });
+    });
+
+    describe('deleteStage', () => {
+        /** @type {Stage} */
+        let stage;
+
+        beforeEach(() => {
+            stage = game.createStage('stage');
+            game.deleteStage('stage');
         });
 
-        it('should unassign game from system', () => {
-            assertStrictEquals(system.game, null);
+        it('should remove stage from stages', () => {
+            assertFalse(game.stages.has(stage));
         });
 
         it('should return false if stage is not present', () => {
-            assertEquals(game.stages.delete(new Stage()), false);
+            assertFalse(game.deleteStage('stage2'));
         });
     });
 
@@ -290,8 +271,8 @@ describe('Game', () => {
         let updateB;
 
         beforeEach(() => {
-            stageA   = new Stage({ id: 'stageA' });
-            stageB   = new Stage({ id: 'stageB' });
+            stageA   = new Stage(game, 'stageA' );
+            stageB   = new Stage(game, 'stageB' );
 
             game.stages.add(stageA);
             game.stages.add(stageB);
@@ -319,8 +300,8 @@ describe('Game', () => {
         let renderB;
 
         beforeEach(() => {
-            stageA   = new Stage({ id: 'stageA' });
-            stageB   = new Stage({ id: 'stageB' });
+            stageA   = new Stage(game, 'stageA');
+            stageB   = new Stage(game, 'stageB');
 
             game.stages.add(stageA);
             game.stages.add(stageB);
@@ -333,6 +314,38 @@ describe('Game', () => {
             game.render();
             assertSpyCalls(renderA, 1);
             assertSpyCalls(renderB, 1);
+        });
+    });
+
+    describe('loadFile', () => {
+        /**
+         * @type {Spy}
+         */
+        let fetchSpy;
+
+        beforeEach(async () => {
+            fetchSpy = spy(globalThis, 'fetch');
+
+            await game.loadFile(import.meta.resolve('./fixtures/a.revgam'));
+        });
+
+        afterEach(() => {
+            fetchSpy.restore();
+        });
+
+        it('should create a stage for each stage in the file', () => {
+            assertEquals(game.stages.size, 2);
+        });
+
+        it('should call loadFile on each stage', () => {
+            assertSpyCalls(fetchSpy, 3);
+        })
+
+        it('should clear any existing stages', async () => {
+            await game.loadFile(import.meta.resolve('./fixtures/b.revgam'));
+            assertEquals(game.stages.size, 2);
+            assert(game.getContext('c'));
+            assert(game.getContext('d'));
         });
     });
 });

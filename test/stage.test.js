@@ -10,44 +10,30 @@ import { assertInstanceOf   } from 'https://deno.land/std@0.208.0/assert/assert_
 import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
 import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
 
-import { Stage     } from '../lib/stage.js';
-import { System    } from '../lib/system.js';
-import { Model     } from '../lib/model.js';
-import { UUID      } from '../lib/utils/uuid.js';
-import { Watchable } from '../lib/utils/watchable.js';
+import { Game, Stage, System, Model, UUID, componentSchemas, assetLoaders, unregisterSchema, unregisterLoader } from '../lib/ecs.js';
+
 
 /**
- * @typedef {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy} Spy
+ * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts'
  */
 
 describe('Stage', () => {
 
     class ModelA extends Model.Typed({
-        components: {
-            a: { type: 'a' },
-        },
+        components: ['a']
     }) { }
 
     class ModelB extends Model.Typed({
-        components: {
-            a: { type: 'a' },
-            b: { type: 'b' },
-        }
+        components: ['a', 'b']
     }) { }
 
     class ModelC extends Model.Typed({
-        components: {
-            c: { type: 'c' },
-            d: { type: 'd' },
-        }
-    }) {
-        cleanup() {
-            cleanupSpy(this.entity);
-        }
-    }
+        components: ['c', 'd']
+    }) { }
 
 
     class SystemA extends System.Typed({
+        id: 'systemA',
         models: {
             modelA:  { model: ModelA },
             modelB:  { model: ModelB },
@@ -57,23 +43,18 @@ describe('Stage', () => {
     }) { }
 
     class SystemB extends System.Typed({
+        id: 'systemB',
         models: {
             modelA:  { model: ModelA },
             modelB:  { model: ModelB },
         }
     }) { }
 
-    class Foobar {
-        set() {
-
-        }
-        toJSON() {
-            return { foo: 'bar' }
-        }
-    }
-
     /** @type {FakeTime} */
     let time;
+    /** @type {Game} */
+    let game;
+
     /** @type {Stage} */
     let stage;
     /** @type {SystemA} */
@@ -86,104 +67,97 @@ describe('Stage', () => {
     let entityB;
     /** @type {Spy} */
     let handler;
-    /** @type {Spy} */
-    let cleanupSpy;
 
     beforeEach(() => {
-        time = new FakeTime();
-        stage = new Stage();
+        time  = new FakeTime();
+        game  = new Game();
+        stage = new Stage(game, 'stage');
 
-        stage.initializers['d'] = () => new Foobar();
+        // stage.initializers['d'] = () => new Foobar();
 
         entityA = UUID();
         entityB = UUID();
 
-        systemA  = new SystemA({ id: 'systemA' });
-        systemB  = new SystemB({ id: 'systemB' });
+        systemA  = new SystemA(stage);
+        systemB  = new SystemB(stage);
 
         stage.systems.add(systemA);
         stage.systems.add(systemB);
 
-        stage.components.add({ entity: entityA, type: 'a', value: 'a' });
-        stage.components.add({ entity: entityA, type: 'b', value: 123 });
-        stage.components.add({ entity: entityA, type: 'c', value: new Watchable() });
-        stage.components.add({ entity: entityA, type: 'd', value: { foo: 'bar' } });
+        stage.createComponent({ entity: entityA, type: 'a', value: 'a'  });
+        stage.createComponent({ entity: entityA, type: 'b', value: 123  });
+        stage.createComponent({ entity: entityA, type: 'c', value: true });
+        stage.createComponent({ entity: entityA, type: 'd', value: { a: 'a' } });
 
-        stage.components.add({ entity: entityB, type: 'a', value: 'a' });
-        stage.components.add({ entity: entityB, type: 'b', value: 123 });
-        stage.components.add({ entity: entityB, type: 'c', value: new Watchable() });
-        stage.components.add({ entity: entityB, type: 'd', value: { foo: 'bar' } });
-
-        cleanupSpy = spy();
+        stage.createComponent({ entity: entityB, type: 'a', value: 'a'  });
+        stage.createComponent({ entity: entityB, type: 'b', value: 123  });
+        stage.createComponent({ entity: entityB, type: 'c', value: true });
+        stage.createComponent({ entity: entityB, type: 'd', value: { a: 'a' } });
     });
 
     afterEach(() => {
         time.restore();
     });
 
-    describe('components.add', () => {
+    describe('createComponent', () => {
         it('should add a system property for each matched Model', () => {
-            assert(Object.hasOwn(systemA, 'modelA'));
-            assert(Object.hasOwn(systemA, 'modelB'));
-            assert(Object.hasOwn(systemA, 'modelCs'));
+            assert(Object.hasOwn(systemA.models, 'modelA'));
+            assert(Object.hasOwn(systemA.models, 'modelB'));
+            assert(Object.hasOwn(systemA.models, 'modelCs'));
 
-            assert(Object.hasOwn(systemB, 'modelA'));
-            assert(Object.hasOwn(systemB, 'modelB'));
+            assert(Object.hasOwn(systemB.models, 'modelA'));
+            assert(Object.hasOwn(systemB.models, 'modelB'));
         });
 
         it('should add a system property as as Set when isSet is true', () => {
-            assertInstanceOf(systemA.modelCs, Set);
+            assertInstanceOf(systemA.models.modelCs, Set);
         });
 
         it('should add each entity to set when isSet is true', () => {
-            assertEquals(systemA.modelCs.size, 2);
-            assertEquals([...systemA.modelCs][0].entity, entityA);
-            assertEquals([...systemA.modelCs][1].entity, entityB);
+            assertEquals(systemA.models.modelCs.size, 2);
+            assertEquals([...systemA.models.modelCs][0].entity, entityA);
+            assertEquals([...systemA.models.modelCs][1].entity, entityB);
         });
 
         it('should share component between models matching the same entity', () => {
-            assertEquals(systemA.modelA.components['a'], systemA.modelB.components['a']);
+            assertEquals(systemA.models.modelA.components['a'], systemA.models.modelB.components['a']);
         });
 
         it('should only create a single model across multiple systems', () => {
-            assertEquals(systemA.modelA, systemB.modelA);
+            assertEquals(systemA.models.modelA, systemB.models.modelA);
         });
 
-        it('should initialize the component value if an initializer is specified', () => {
-            assertInstanceOf([...systemA.modelCs][0].d, Foobar);
-        });
+        // it('should initialize the component value if an initializer is specified', () => {
+        //     assertInstanceOf([...systemA.models.modelCs][0].d, Foobar);
+        // });
     });
 
-    describe('components.delete', () => {
+    describe('deleteComponent', () => {
         beforeEach(() => {
 
-            stage.components.delete({ entity: entityA, type: 'b' });
+            stage.deleteComponent({ entity: entityA, type: 'b' });
 
-            stage.components.delete({ entity: entityB, type: 'a' });
-            stage.components.delete({ entity: entityB, type: 'b' });
-            stage.components.delete({ entity: entityB, type: 'c' });
-            stage.components.delete({ entity: entityB, type: 'd' });
+            stage.deleteComponent({ entity: entityB, type: 'a' });
+            stage.deleteComponent({ entity: entityB, type: 'b' });
+            stage.deleteComponent({ entity: entityB, type: 'c' });
+            stage.deleteComponent({ entity: entityB, type: 'd' });
         });
 
         it('should delete system property when model no longer matches', () => {
-            assertEquals(systemA.modelB, undefined);
-            assertEquals(systemB.modelB, undefined);
-        });
-
-        it('should call model.cleanup on model when model no longer matches', () => {
-            assertSpyCall(cleanupSpy, 0, { args: [entityB] });
+            assertEquals(systemA.models.modelB, undefined);
+            assertEquals(systemB.models.modelB, undefined);
         });
 
         it('should remove entities from system property Set when model is removed', () => {
-            assertEquals(systemA.modelCs.size, 1);
+            assertEquals(systemA.models.modelCs.size, 1);
         });
 
         it('should return false if component is not present', () => {
-            assertFalse(stage.components.delete({ entity: entityA, type: 'e' }));
+            assertFalse(stage.deleteComponent({ entity: entityA, type: 'e' }));
         });
 
         it('should return false if entity is not present', () => {
-            assertFalse(stage.components.delete({ entity: UUID(), type: 'e' }));
+            assertFalse(stage.deleteComponent({ entity: UUID(), type: 'e' }));
         });
     });
 
@@ -201,6 +175,7 @@ describe('Stage', () => {
 
         describe('system:add', () => {
             class SystemC extends System.Typed({
+                id: 'SystemC',
                 models: {
                     modelA: { model: ModelA }
                 }
@@ -210,7 +185,7 @@ describe('Stage', () => {
             let systemC;
 
             beforeEach(() => {
-                systemC = new SystemC();
+                systemC = new SystemC(stage);
                 stage.watch('system:add', handler);
                 stage.systems.add(systemC);
             });
@@ -234,6 +209,7 @@ describe('Stage', () => {
 
         describe('system:registered', () => {
             class SystemC extends System.Typed({
+                id: 'SystemC',
                 models: {
                     modelA: { model: ModelA }
                 }
@@ -243,7 +219,7 @@ describe('Stage', () => {
             let systemC;
 
             beforeEach(() => {
-                systemC = new SystemC();
+                systemC = new SystemC(stage);
                 stage.watch('system:registered', handler);
                 stage.systems.add(systemC);
             });
@@ -268,9 +244,9 @@ describe('Stage', () => {
         it('should notify model:add when all the components for that model are registered', () => {
             systemA.watch('model:add', { handler: ({ model, key}) => handler(model.constructor, key) });
 
-            stage.components.add({ entity: entityC, type: 'a', value: 'a' });
-            stage.components.add({ entity: entityD, type: 'a', value: 'a' });
-            stage.components.add({ entity: entityD, type: 'b', value: 123 });
+            stage.createComponent({ entity: entityC, type: 'a', value: 'a' });
+            stage.createComponent({ entity: entityD, type: 'a', value: 'a' });
+            stage.createComponent({ entity: entityD, type: 'b', value: 123 });
 
             assertSpyCall(handler, 0, { args: [ModelA, 'modelA']});
             assertSpyCall(handler, 1, { args: [ModelA, 'modelA']});
@@ -280,9 +256,9 @@ describe('Stage', () => {
         it('should call onModelAdd when all the components for that model are registered', () => {
             systemA.onModelAdd = (model, key) => handler(model.constructor, key);
 
-            stage.components.add({ entity: entityC, type: 'a', value: 'a' });
-            stage.components.add({ entity: entityD, type: 'a', value: 'a' });
-            stage.components.add({ entity: entityD, type: 'b', value: 123 });
+            stage.createComponent({ entity: entityC, type: 'a', value: 'a' });
+            stage.createComponent({ entity: entityD, type: 'a', value: 'a' });
+            stage.createComponent({ entity: entityD, type: 'b', value: 123 });
 
             assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
             assertSpyCall(handler, 1, { args: [ModelA, 'modelA'] });
@@ -308,8 +284,9 @@ describe('Stage', () => {
         });
     });
 
-    describe('systems.add', () => {
+    describe('createSystem', () => {
         class SystemC extends System.Typed({
+            id: 'SystemC',
             models: {
                 modelA: { model: ModelA }
             }
@@ -319,55 +296,37 @@ describe('Stage', () => {
         let systemC;
 
         beforeEach(() => {
-            systemC = new SystemC();
-            stage.systems.add(systemC);
+            systemC = stage.createSystem(SystemC);
         });
 
         it('should add existing components to new system', () => {
-            assertExists(systemC.modelA);
-        });
-
-        it('should assign stage to system', () => {
-            assertStrictEquals(systemC.stage, stage);
-        });
-
-        it('should not error if system already exists', () => {
-            stage.systems.add(systemC);
-        });
-
-        it('should error if another system with the same name is added', () => {
-            assertThrows(() => {
-                stage.systems.add(new SystemC());
-            }, `System with id ${systemC.id} already exists`)
+            assertExists(systemC.models.modelA);
         });
     });
 
-    describe('systems.delete', () => {
+    describe('deleteSystem', () => {
         beforeEach(() => {
-            stage.systems.delete(systemA);
+            stage.deleteSystem(SystemA);
         });
 
         it('should no longer add models to system', () => {
-            const size = systemA.modelCs.size;
-            stage.components.add({ entity: UUID(), type: 'c', value: new Watchable });
-            assertEquals(systemA.modelCs.size, size);
+            const size = systemA.models.modelCs.size;
+            stage.createComponent({ entity: UUID(), type: 'c', value: true });
+            assertEquals(systemA.models.modelCs.size, size);
         });
 
-        it('should delete models that only existed for system that was deleted', () => {
-            assertSpyCall(cleanupSpy, 0, { args: [entityA] });
-        });
-
-        it('should return false if system is not present', () => {
-            assertEquals(stage.systems.delete(new SystemA()), false);
+        it('should return false if System is not present', () => {
+            assertFalse(stage.deleteSystem(SystemA));
         });
     });
 
     describe('createEntity', () => {
         beforeEach(() => {
-            stage = new Stage();
+            stage = new Stage(game, 'stage');
         })
         it('should create all the components specified sharing the same entity id', () => {
-            stage.createEntity({ a: 'a', b: 123, c: new Watchable(), d: { foo: 'bar' } });
+            stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } });
+
             assertEquals(stage.components.count(), 4);
             assertEquals([...stage.components][0].entity, [...stage.components][1].entity);
             assertEquals([...stage.components][0].entity, [...stage.components][2].entity);
@@ -375,7 +334,7 @@ describe('Stage', () => {
         });
 
         it('should generate and return a new entity id if not specified', () => {
-            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 123, c: new Watchable() })));
+            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } })));
         });
     });
 
@@ -386,8 +345,8 @@ describe('Stage', () => {
         let entity;
 
         beforeEach(() => {
-            stage = new Stage();
-            entity = stage.createEntity({ a: 'a', b: 123, c: new Watchable(), d: { foo: 'bar' } });
+            stage = new Stage(game, 'stage');
+            entity = stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } });
         })
         it('should delete all the components for the specified entity', () => {
             assertEquals(stage.components.count(), 4);
@@ -424,9 +383,9 @@ describe('Stage', () => {
         let updateB;
 
         beforeEach(() => {
-            stage   = new Stage();
-            systemA = new SystemA();
-            systemB = new SystemB();
+            stage   = new Stage(game, 'stage');
+            systemA = new SystemA(stage);
+            systemB = new SystemB(stage);
 
             stage.systems.add(systemA);
             stage.systems.add(systemB);
@@ -454,9 +413,9 @@ describe('Stage', () => {
         let renderB;
 
         beforeEach(() => {
-            stage   = new Stage();
-            systemA = new SystemA();
-            systemB = new SystemB();
+            stage   = new Stage(game, 'stage');
+            systemA = new SystemA(stage);
+            systemB = new SystemB(stage);
 
             stage.systems.add(systemA);
             stage.systems.add(systemB);
@@ -469,6 +428,71 @@ describe('Stage', () => {
             stage.render();
             assertSpyCalls(renderA, 1);
             assertSpyCalls(renderB, 1);
+        });
+    });
+
+    describe('loadFile', () => {
+        /**
+         * @type {Stage}
+         */
+        let stageA;
+
+        /**
+         * @type {Stage}
+         */
+        let stageB;
+
+        beforeEach(async () => {
+            stageA = game.createStage('a');
+            stageB = game.createStage('b');
+
+            await stageA.loadFile(import.meta.resolve('./fixtures/a.revstg'));
+            await stageB.loadFile(import.meta.resolve('./fixtures/b.revstg'));
+        });
+
+        afterEach(() => {
+            unregisterSchema('a');
+            unregisterSchema('b');
+            unregisterSchema('c');
+            unregisterSchema('k');
+            unregisterLoader('a');
+        });
+
+        it('should add systems to each stage', () => {
+            assert(stageA.getContext('system-a'));
+            assert(stageA.getContext('system-b'));
+
+            assert(stageB.getContext('system-c'));
+        });
+
+        it('should registerSchemas from bundle', () => {
+            assert(componentSchemas['a']);
+            assert(componentSchemas['b']);
+            assert(componentSchemas['c']);
+            assert(componentSchemas['k']);
+        });
+
+        it('should registerLoaders from bundle', () => {
+            assert(assetLoaders['a']);
+        });
+
+        it('should call load if present in the bundle', () => {
+            // @ts-expect-error
+            assert(stageB.getContext('system-c').loadCalled);
+        });
+
+        it('should support recursive loading', async () => {
+            assert(stageB.getContext('system-b'));
+        });
+
+        it('should throw DOMException on abort', async () => {
+            const abortCtrl = new AbortController();
+
+            let error;
+            stageA.loadFile(import.meta.resolve('./fixtures/a.revstg'), abortCtrl.signal).catch(e => error = e);
+            abortCtrl.abort();
+            await time.runMicrotasks();
+            assertInstanceOf(error, DOMException);
         });
     });
 });
