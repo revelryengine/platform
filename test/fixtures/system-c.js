@@ -1,14 +1,14 @@
 import { System, Model } from '../../lib/ecs.js';
 import { bundle as bundleB } from './system-b.js';
-import { c, k } from './schemas.js';
 
-let loadCalled = false;
 /**
  * @import { SystemBundle } from '../../lib/ecs.js'
  */
 
+let loadCalled = false;
+
 export class ModelC extends Model.Typed({
-    components: ['c', 'k']
+    components: ['c', 'f']
 }) {}
 
 export class SystemC extends System.Typed({
@@ -22,13 +22,15 @@ export class SystemC extends System.Typed({
     }
 }
 
-/** @satisfies {SystemBundle} */
-export const bundle = {
+export const bundle = /** @type {const} @satisfies {SystemBundle} */({
     bundles: [bundleB],
     systems: [SystemC],
-    schemas: { c, k },
+    schemas: {
+        c: { type: 'boolean' },
+        f: { type: 'string', asset: 'f' },
+    },
     loaders: {
-        'a': (uri, signal) => fetch(uri, { signal }).then(res => res.json()),
+        'f': (uri, signal) => fetch(uri, { signal }).then(res => res.json()),
     },
     load: async () => { loadCalled = true },
-};
+});

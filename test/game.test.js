@@ -20,8 +20,6 @@ import { System } from '../lib/system.js';
 describe('Game', () => {
     /** @type {Game} */
     let game;
-    /** @type {Spy} */
-    let command;
     /** @type {FakeTime} */
     let time;
 

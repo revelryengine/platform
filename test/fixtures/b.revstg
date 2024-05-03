@@ -9,6 +9,7 @@
     "components": [
         { "entity": "e2710368-284d-4852-b228-81d402a60213", "owner": "test", "type": "a", "value": "a"  },
         { "entity": "e2710368-284d-4852-b228-81d402a60213", "owner": "test", "type": "b", "value": 123  },
-        { "entity": "e2710368-284d-4852-b228-81d402a60213", "owner": "test", "type": "c", "value": true }
+        { "entity": "e2710368-284d-4852-b228-81d402a60213", "owner": "test", "type": "c", "value": true },
+        { "entity": "e2710368-284d-4852-b228-81d402a60213", "owner": "test", "type": "d", "value": { "e": "e" } }
     ]
 }

@@ -587,16 +587,23 @@ describe('Watchable', () => {
             handler   = spy();
             watchable = new ExtendedWatchable();
             watchable.watch('a', { handler });
-            watchable.watch({ handler });
         });
 
         it('should return true if the watchable has a watcher', async () => {
             assertEquals(watchable.isWatched('a'), true);
-            assertEquals(watchable.isWatched(), true);
         });
 
         it('should return false if the watchable does not have a watcher of that type', async () => {
             assertEquals(watchable.isWatched('b'), false);
+        });
+
+        it('should return true if the watchable has a wildcard watcher', async () => {
+            watchable.watch({ handler });
+            assertEquals(watchable.isWatched('b'), true);
+        });
+
+        it('should return false if the watchable does not have any watchers at all', async () => {
+            assertEquals( new ExtendedWatchable().isWatched('b'), false);
         });
     });
 
@@ -605,20 +612,19 @@ describe('Watchable', () => {
             handler   = spy();
             watchable = new ExtendedWatchable();
             watchable.watch('a', { handler, deferred: true });
-            watchable.watch({ handler, deferred: true });
         });
 
         it('should return true if the a notification is queued', async () => {
             watchable.notify('a', 'a');
             assertEquals(watchable.isQueued('a'), true);
-            assertEquals(watchable.isQueued(), true);
+            assertEquals(watchable.isQueued('b'), false);
         });
 
         it('should return false if the a notification is no longer queued', async () => {
             watchable.notify('a', 'a');
             await time.runMicrotasks();
             assertEquals(watchable.isQueued('a'), false);
-            assertEquals(watchable.isQueued(), false);
+            assertEquals(watchable.isQueued('b'), false);
         });
     });
 });

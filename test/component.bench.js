@@ -1,22 +1,12 @@
 
-import { Game, Stage, registerSchema } from '../lib/ecs.js';
-import { a, b, c, d, e, f, g, h, i, j } from './fixtures/schemas.js';
+import { Game, Stage } from '../lib/ecs.js';
 
 const { bench } = /** @type {any} */(globalThis).Deno;
 
 const game  = new Game();
 const stage = new Stage(game, 'stage');
 
-registerSchema('a', a);
-registerSchema('b', b);
-registerSchema('c', c);
-registerSchema('d', d);
-registerSchema('e', e);
-registerSchema('f', f);
-registerSchema('g', g);
-registerSchema('h', h);
-registerSchema('i', i);
-registerSchema('j', j);
+await stage.loadFile(import.meta.resolve('./fixtures/a.revstg'));
 
 let id = 0;
 bench('String component creation', () => {

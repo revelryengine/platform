@@ -7,10 +7,9 @@ import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_
 import { assertFalse        } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
 import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
 import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assertRejects      } from 'https://deno.land/std@0.208.0/assert/assert_rejects.ts';
 
 import { Game, Stage, UUID, AssetReference, registerLoader, unregisterLoader } from '../lib/ecs.js';
-
-
 
 const JSON_DATA_URI_A ='data:application/json;charset=utf-8;base64,eyAiYSI6ICJhIiB9';
 const JSON_DATA_URI_B ='data:application/json;charset=utf-8;base64,eyAiYiI6ICJiIiB9';
@@ -51,25 +50,25 @@ describe('assets', () => {
     /** @type {string} */
     let entityC;
 
-    /** @type {AssetReference<'a'>} */
+    /** @type {AssetReference} */
     let refA;
-    /** @type {AssetReference<'b'>} */
+    /** @type {AssetReference} */
     let refB;
-    /** @type {AssetReference<'c'>} */
+    /** @type {AssetReference} */
     let refC;
 
-    /** @type {AssetReference<'a'>} */
+    /** @type {AssetReference} */
     let refD;
-    /** @type {AssetReference<'b'>} */
+    /** @type {AssetReference} */
     let refE;
-    /** @type {AssetReference<'c'>} */
+    /** @type {AssetReference} */
     let refF;
 
-    /** @type {AssetReference<'a'>} */
+    /** @type {AssetReference} */
     let refG;
-    /** @type {AssetReference<'b'>} */
+    /** @type {AssetReference} */
     let refH;
-    /** @type {AssetReference<'c'>} */
+    /** @type {AssetReference} */
     let refI;
 
     beforeEach(() => {
@@ -193,6 +192,28 @@ describe('assets', () => {
 
     it('should have a reference to the type', () => {
         assertEquals(refA.type, 'a');
+    });
+
+    describe('get', () => {
+        it('should resolve the data if it exists', async () => {
+            await refA.waitFor('resolve');
+            assertEquals(await refA.get(), { a: 'a' });
+        });
+
+        it('should resolve the data if is finished fetching later', async () => {
+            assertEquals(await refA.get(), { a: 'a' });
+        });
+
+        it('should reject if reference is released before resolving', async () => {
+            const promise = assertRejects(() => refI.get());
+            refI.release();
+            await promise;
+        });
+
+        it('should reject if reference is not in a state of pending', async () => {
+            refI.release();
+            await assertRejects(() => refI.get());
+        });
     });
 
     describe('state', () => {

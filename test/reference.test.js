@@ -2,9 +2,10 @@ import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208
 import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assert       } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertFalse  } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assert        } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals  } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertFalse   } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertRejects } from 'https://deno.land/std@0.208.0/assert/assert_rejects.ts';
 
 import { Game, Stage, Component, UUID } from '../lib/ecs.js';
 
@@ -147,6 +148,37 @@ describe('references', () => {
 
     it('should have a reference to the type', () => {
         assertEquals(refA.type, 'a');
+    });
+
+    describe('get', () => {
+        it('should resolve the component if it exists', async () => {
+            assertEquals(await refA.get(), stage.components.find({ entity: entityA, type: 'a' }));
+        });
+
+        it('should resolve the component if it is added later', async () => {
+            const promise = refI.get();
+
+            stage.components.add(new Component(stage, { entity: entityA, type: 'e', value: { a: { b: 'b', c: 1 } } }));
+
+            assertEquals(await promise, stage.components.find({ entity: entityA, type: 'e' }));
+        });
+
+        it('should reject if reference is released before resolving', async () => {
+            const promise = assertRejects(() => refI.get());
+            refI.release();
+            await promise;
+        });
+
+        it('should reject if reference is destoryed before resolving', async () => {
+            const promise = assertRejects(() => refI.get());
+            refI.destroy();
+            await promise;
+        });
+
+        it('should reject if reference is not in a state of pending', async () => {
+            refI.release();
+            await assertRejects(() => refI.get());
+        });
     });
 
     describe('state', () => {

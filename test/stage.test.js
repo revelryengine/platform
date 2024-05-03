@@ -2,16 +2,13 @@ import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208
 import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
 import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
 
-import { assert             } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertExists       } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
-import { assertFalse        } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
-import { assertInstanceOf   } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
-import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
-import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
+import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
+import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { assertFalse      } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
 
 import { Game, Stage, System, Model, UUID, componentSchemas, assetLoaders, unregisterSchema, unregisterLoader } from '../lib/ecs.js';
-
 
 /**
  * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts'
@@ -126,10 +123,6 @@ describe('Stage', () => {
         it('should only create a single model across multiple systems', () => {
             assertEquals(systemA.models.modelA, systemB.models.modelA);
         });
-
-        // it('should initialize the component value if an initializer is specified', () => {
-        //     assertInstanceOf([...systemA.models.modelCs][0].d, Foobar);
-        // });
     });
 
     describe('deleteComponent', () => {
@@ -454,8 +447,9 @@ describe('Stage', () => {
             unregisterSchema('a');
             unregisterSchema('b');
             unregisterSchema('c');
-            unregisterSchema('k');
-            unregisterLoader('a');
+            unregisterSchema('d');
+            unregisterSchema('f');
+            unregisterLoader('f');
         });
 
         it('should add systems to each stage', () => {
@@ -469,11 +463,12 @@ describe('Stage', () => {
             assert(componentSchemas['a']);
             assert(componentSchemas['b']);
             assert(componentSchemas['c']);
-            assert(componentSchemas['k']);
+            assert(componentSchemas['d']);
+            assert(componentSchemas['f']);
         });
 
         it('should registerLoaders from bundle', () => {
-            assert(assetLoaders['a']);
+            assert(assetLoaders['f']);
         });
 
         it('should call load if present in the bundle', () => {

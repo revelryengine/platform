@@ -22,12 +22,12 @@ import { Stage  } from '../lib/stage.js';
 
 describe('System', () => {
     class ModelA extends Model.Typed({
-        components: ['b']
+        components: ['a']
 
     }) { }
 
     class ModelB extends Model.Typed({
-        components: ['a']
+        components: ['b']
     }) { }
 
     class SystemA extends System.Typed({

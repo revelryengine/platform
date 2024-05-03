@@ -33,7 +33,7 @@ describe('Component', () => {
     /** @type {string} */
     let ownerA;
 
-    /** @type {Component<'a'>} */
+    /** @type {Component} */
     let component;
 
     beforeEach(() => {
@@ -104,21 +104,21 @@ describe('Component', () => {
         /** @type {string} */
         let entityB;
 
-        /** @type {Component<'a'>} */
+        /** @type {Component} */
         let componentA;
-        /** @type {Component<'b'>} */
+        /** @type {Component} */
         let componentB;
-        /** @type {Component<'c'>} */
+        /** @type {Component} */
         let componentC;
-        /** @type {Component<'d'>} */
+        /** @type {Component} */
         let componentD;
-        /** @type {Component<'a'>} */
+        /** @type {Component} */
         let componentE;
-        /** @type {Component<'b'>} */
+        /** @type {Component} */
         let componentF;
-        /** @type {Component<'c'>} */
+        /** @type {Component} */
         let componentG;
-        /** @type {Component<'d'>} */
+        /** @type {Component} */
         let componentH;
 
         class Foobar {

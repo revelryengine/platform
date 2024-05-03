@@ -1,7 +1,7 @@
 {
   "tasks": {
     "test": "rm -rf cov_profile && deno test --allow-read --import-map ../../importmap.json --no-check --coverage=cov_profile --reporter=dot && deno coverage cov_profile --exclude=utils --exclude=fixtures",
-    "bench": "deno bench --import-map ../../importmap.json"
+    "bench": "deno bench --allow-read --import-map ../../importmap.json"
   },
   "lock": false
 }

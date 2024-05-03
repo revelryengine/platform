@@ -1,5 +1,4 @@
 import { System, Model } from '../../lib/ecs.js';
-import { a } from './schemas.js';
 
 /**
  * @import { SystemBundle } from '../../lib/ecs.js'
@@ -16,8 +15,12 @@ export class SystemA extends System.Typed({
     }
 }) { }
 
-/** @satisfies {SystemBundle} */
-export const bundle = {
+export const bundle = /** @type {const} @satisfies {SystemBundle} */({
     systems: [SystemA],
-    schemas: { a },
-};
+    schemas: {
+        a: { type: 'string'  },
+        b: { type: 'number'  },
+        c: { type: 'boolean' },
+        d: { type: 'object', properties: { e: { type: 'string' } } },
+    },
+});

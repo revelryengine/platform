@@ -28,11 +28,11 @@ describe('Model', () => {
     /** @type {FakeTime} */
     let time;
 
-    /** @type {Component<'a'>} */
+    /** @type {Component} */
     let componentA;
-    /** @type {Component<'b'>} */
+    /** @type {Component} */
     let componentB;
-    /** @type {Component<'c'>} */
+    /** @type {Component} */
     let componentC;
 
     /** @type {string} */

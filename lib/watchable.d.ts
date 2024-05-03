@@ -1,4 +1,4 @@
-type WatchableEventMap = Record<string, unknown>;
+type WatchableEventMap = Record<string, any>;
 
 type WatchHandler<T extends WatchableEventMap, K extends keyof T>   = (data: T[K]) => void;
 type WatchableWildCardDeferredHandler<T extends WatchableEventMap>  = (data: Map<keyof T, T[keyof T]>) => void;
@@ -47,7 +47,7 @@ type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> =
  * A watchable is an object that can be watched for changes events. This does not rely on property setters or dirty checking as it relies solely on
  * code that makes changes to explicitly call notify when changes are complete. Events are then batched in the microtask queue.
  */
-export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
+export class Watchable<E extends WatchableEventMap = WatchableEventMap, T = E & WatchableEventMap> {
     /**
      * Notifies handlers of events in the next microtask execution.
      * Subsequent calls are batched until the next microtask execution.
@@ -56,6 +56,7 @@ export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
      */
     notify<K extends keyof T>(type: T[K] extends void ? K : never): void;
     notify<K extends keyof T>(type: K, data: T[K]): void;
+    notify(type: string, data?: uknown): void;
 
     /**
      * Watch for all events
@@ -98,14 +99,14 @@ export class Watchable<T extends WatchableEventMap = WatchableEventMap> {
     waitFor<K extends keyof T>(type: K, signal?: AbortSignal ): Promise<T[K]>;
 
     /**
-     * Returns true if any watchers are watching for this specific type.
+     * Returns true if any watchers are watching for this specific type or a wildcard.
      */
-    isWatched<K extends keyof T>(type?: K): boolean;
+    isWatched<K extends keyof T>(type: K): boolean;
 
     /**
      * Returns true if any notification is in the queue for this specific type.
      */
-    isQueued<K extends keyof T>(type?: K): boolean;
+    isQueued<K extends keyof T>(type: K): boolean;
 
     /**
      * Returns true if input is a watchable object
