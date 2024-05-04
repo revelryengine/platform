@@ -815,6 +815,38 @@ describe('Component Schemas', () => {
                 assetDeep.value = { a: { b: JSON_DATA_URI_A } };
                 assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 4);
             });
+
+            it('should not release an AssetReference when the reference value is set to the same value', () => {
+                const handler = spy();
+
+                /**  @type {AssetReference}*/(assetSimple.references?.['/'])?.watch('release', handler);
+                assetSimple.value = JSON_DATA_URI_B;
+                assertSpyCalls(handler, 0);
+
+                /**  @type {AssetReference}*/(assetObject.references?.['/a'])?.watch('release', handler);
+                assetObject.value.a = JSON_DATA_URI_B;
+                assertSpyCalls(handler, 0);
+
+                /**  @type {AssetReference}*/(assetArray.references?.['/0'])?.watch('release', handler);
+                assetArray.value[0] = JSON_DATA_URI_B;
+                assertSpyCalls(handler, 0);
+
+                /**  @type {AssetReference}*/(assetTuple.references?.['/0'])?.watch('release', handler);
+                assetTuple.value[0] = JSON_DATA_URI_B;
+                assertSpyCalls(handler, 0);
+
+                /**  @type {AssetReference}*/(assetDeep.references?.['/a/b'])?.watch('release', handler);
+                assetDeep.value.a.b = JSON_DATA_URI_B;
+                assertSpyCalls(handler, 0);
+            });
+
+            it('should not release a deeply nested AssetReference when the value or parent reference is set to the same value', () => {
+                const handler = spy();
+
+                /**  @type {AssetReference}*/(assetDeep.references?.['/a/b'])?.watch('release', handler);
+                assetDeep.value = { a: { b: JSON_DATA_URI_B } };
+                assertSpyCalls(handler, 0);
+            });
         });
     });
 

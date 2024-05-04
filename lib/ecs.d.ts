@@ -44,7 +44,7 @@ export type ComponentDataMap = {
         type:   string;
         value?: any;
         owner?: string;
-        references?: Record<string, { release(): void, get(): unknown } | undefined>;
+        references?: Record<string, AssetReference | ComponentReference | undefined>;
     }
 };
 
