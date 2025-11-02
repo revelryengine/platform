@@ -1,6 +1,0 @@
-{
-  "tasks": {
-    "test": "rm -rf cov_profile && deno test --allow-read --coverage=cov_profile && deno coverage cov_profile"
-  },
-  "lock": false
-}

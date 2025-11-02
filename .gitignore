@@ -1,4 +1,1 @@
 *.bak
-vendor
-node_modules
-cov_profile
