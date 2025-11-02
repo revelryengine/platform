@@ -1,1 +1,1 @@
-export * from 'https://cdn.jsdelivr.net/npm/ktx-parse@v0.4.5/dist/ktx-parse.esm.js';
+export * from 'ktx-parse';

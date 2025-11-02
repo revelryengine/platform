@@ -1,27 +1,43 @@
 /**
- *
- * @typedef {import('https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts').DracoDecoderModule} DracoDecoderModule
- * @typedef {import('https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts').DecoderModule} DecoderModule
- * @typedef {import('https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts').Mesh} Mesh
- * @typedef {import('https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts').PointCloud} PointCloud
- * @typedef {import('https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts').Status} Status
- *
- * @typedef {{ DracoDecoderModule: import("https://cdn.jsdelivr.net/npm/@types/draco3d@1.4.3/index.d.ts").DracoDecoderModule }} Draco3dExports
+ * @import { DracoDecoderModule, DecoderModule } from 'npm:@types/draco3d';
  */
 
+/**
+ * @internal
+ * @callback Draco3DDefine
+ * @param {string|Array<string>} _
+ * @param {() => DracoDecoderModule} factory
+ *
+ * @internal
+ * @typedef {Draco3DDefine & { amd?: boolean }} AMDDefine
+ */
 
-/** @return {Promise<DecoderModule>} */
+/**
+ * @type {Promise<DecoderModule>|null}
+ */
+let promise = null
+
 export async function Draco3dFactory() {
-    //import from commonjs by overriding exports
-    const global   = /** @type {{ [key: string]: unknown }}} */(globalThis);
-    const original = global.exports;
+    promise ??= new Promise(async (resolve, reject) => {
+        //import from UMD by setting global AMD define function
+        const global   = /** @type {{ define: AMDDefine }} */(/** @type {unknown} */(globalThis));
+        const original = global.define;
 
-    global.exports = {};
-    await import('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.js');
-    const { exports: { DracoDecoderModule } } = /** @type {{ exports: Draco3dExports }} */(global);
-    global.exports = original;
-
-    // I don't think draco3d actually even uses the wasm binary here :-/
-    // const wasmBinary = await fetch(import.meta.resolve('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm')).then(res => res.arrayBuffer());
-    return new Promise((resolve) => DracoDecoderModule({ /** wasmBinary, */ onModuleLoaded: (module) => resolve(module) }));
+        try {
+            global.define = (_, factory) => {
+                factory()({
+                    // locateFile: () => import.meta.resolve('draco3d/draco_decoder.wasm'),
+                    onModuleLoaded: (module) => { console.log(module); resolve(module); },
+                });
+                global.define = original;
+            };
+            global.define.amd = true;
+            await import('draco3d/draco_decoder.js');
+        } catch(e) {
+            reject(e);
+        } finally {
+            global.define = original;
+        }
+    });
+    return promise;
 }

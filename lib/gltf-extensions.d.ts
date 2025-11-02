@@ -552,7 +552,7 @@ declare namespace Revelry {
                 EXT_texture_webp?: import('./extensions/EXT_texture_webp.js').extTextureWebP
             }
             interface Texture {
-                EXT_texture_webp?: import('./extensions/EXT_texture_basisu.js').EXT_texture_webp
+                EXT_texture_webp?: import('./extensions/EXT_texture_webp.js').EXTTextureWebP
             }
 
             //REV_game_object
