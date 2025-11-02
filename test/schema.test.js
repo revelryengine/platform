@@ -1,13 +1,10 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
-import { assertEquals       } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertThrows       } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
-import { assertObjectMatch  } from 'https://deno.land/std@0.208.0/assert/assert_object_match.ts';
-import { assertInstanceOf   } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
-import { assertStrictEquals } from 'https://deno.land/std@0.208.0/assert/assert_strict_equals.ts';
-import { assertExists       } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game, Stage, Component, ComponentReference, registerSchema, unregisterSchema, UUID, registerLoader, AssetReference, unregisterLoader } from '../lib/ecs.js';
+import { Game, Stage, ComponentReference, registerSchema, unregisterSchema, UUID, registerLoader, AssetReference, unregisterLoader } from '../lib/ecs.js';
+
+/**
+ * @import { Component } from '../lib/ecs.js';
+ */
 
 const JSON_DATA_URI_A ='data:application/json;charset=utf-8;base64,eyAiYSI6ICJhIiB9';
 const JSON_DATA_URI_B ='data:application/json;charset=utf-8;base64,eyAiYiI6ICJiIiB9';
@@ -95,61 +92,61 @@ describe('Component Schemas', () => {
         it('should not modify value', () => {
             const refObject       = { string: 'a', number: 1, boolean: true };
             const componentObject = stage.createComponent({ entity: entityA, type: 'simpleObject', value: refObject });
-            assertStrictEquals(componentObject.value, refObject);
+            expect(componentObject.value).to.equal(refObject);
 
             const refArray       = ['a', 'b', 'c'];
             const componentArray = stage.createComponent({ entity: entityA, type: 'simpleArray', value: refArray });
-            assertStrictEquals(componentArray.value, refArray);
+            expect(componentArray.value).to.equal(refArray);
 
             const refTuple       = ['a', 1, true];
             const componentTuple = stage.createComponent({ entity: entityA, type: 'simpleTuple', value: refTuple });
-            assertStrictEquals(componentTuple.value, refTuple);
+            expect(componentTuple.value).to.equal(refTuple);
 
             const refObjectDeep       = { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] };
             const componentObjectDeep = stage.createComponent({ entity: entityA, type: 'simpleObjectDeep', value: refObjectDeep });
-            assertStrictEquals(componentObjectDeep.value, refObjectDeep);
+            expect(componentObjectDeep.value).to.equal(refObjectDeep);
 
             const refArrayDeep       = [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]];
             const componentArrayDeep = stage.createComponent({ entity: entityA, type: 'simpleArrayDeep', value: refArrayDeep });
-            assertStrictEquals(componentArrayDeep.value, refArrayDeep);
+            expect(componentArrayDeep.value).to.equal(refArrayDeep);
 
             const refTupleDeep       = [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]];
             const componentTupleDeep = stage.createComponent({ entity: entityA, type: 'simpleTupleDeep', value: refTupleDeep });
-            assertStrictEquals(componentTupleDeep.value, refTupleDeep);
+            expect(componentTupleDeep.value).to.equal(refTupleDeep);
         });
 
         it('should fire value:change:/ when root object is set', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'simpleObject' });
             componentObject.watch('value:change:/', handler);
             componentObject.value = { string: 'a', number: 1, boolean: true };
-            assertSpyCall(handler, 0, { args: [undefined] });
+            expect(handler).to.have.callCount(1);
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'simpleArray' });
             componentArray.watch('value:change:/', handler);
             componentArray.value = ['a', 'b', 'c'];
-            assertSpyCall(handler, 1, { args: [undefined] });
+            expect(handler).to.have.callCount(2);
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'simpleTuple' });
             componentTuple.watch('value:change:/', handler);
             componentTuple.value = ['a', 1, true];
-            assertSpyCall(handler, 2, { args: [undefined] });
+            expect(handler).to.have.callCount(3);
 
             const componentObjectDeep = stage.createComponent({ entity: entityA, type: 'simpleObjectDeep' });
             componentObjectDeep.watch('value:change:/', handler);
             componentObjectDeep.value = { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] };
-            assertSpyCall(handler, 3, { args: [undefined] });
+            expect(handler).to.have.callCount(4);
 
             const componentArrayDeep = stage.createComponent({ entity: entityA, type: 'simpleArrayDeep' });
             componentArrayDeep.watch('value:change:/', handler);
             componentArrayDeep.value = [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]];
-            assertSpyCall(handler, 4, { args: [undefined] });
+            expect(handler).to.have.callCount(5);
 
             const componentTupleDeep = stage.createComponent({ entity: entityA, type: 'simpleTupleDeep' });
             componentTupleDeep.watch('value:change:/', handler);
             componentTupleDeep.value = [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]];
-            assertSpyCall(handler, 5, { args: [undefined] });
+            expect(handler).to.have.callCount(6);
         });
     });
 
@@ -188,28 +185,28 @@ describe('Component Schemas', () => {
 
         it('should serialize the values', () => {
             const componentString = stage.createComponent({ entity: entityA, type: 'string', value: 'a' });
-            assertEquals(componentString.toJSON().value, 'a');
+            expect(componentString.toJSON().value).to.deep.equal('a');
 
             const componentNumber = stage.createComponent({ entity: entityA, type: 'number', value: 1 });
-            assertEquals(componentNumber.toJSON().value, 1);
+            expect(componentNumber.toJSON().value).to.deep.equal(1);
 
             const componentBoolean = stage.createComponent({ entity: entityA, type: 'boolean', value: true });
-            assertEquals(componentBoolean.toJSON().value, true);
+            expect(componentBoolean.toJSON().value).to.deep.equal(true);
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'object', value: { string: 'a', number: 1, boolean: true } });
-            assertEquals(componentObject.toJSON().value, { string: 'a', number: 1, boolean: true });
+            expect(componentObject.toJSON().value).to.deep.equal({ string: 'a', number: 1, boolean: true });
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'array', value: ['a', 'b', 'c'] });
-            assertEquals(componentArray.toJSON().value, ['a', 'b', 'c']);
+            expect(componentArray.toJSON().value).to.deep.equal(['a', 'b', 'c']);
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'tuple', value: ['a', 1, true] });
-            assertEquals(componentTuple.toJSON().value, ['a', 1, true]);
+            expect(componentTuple.toJSON().value).to.deep.equal(['a', 1, true]);
 
             const componentObjectDeep = stage.createComponent({ entity: entityA, type: 'objectDeep', value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
-            assertEquals(componentObjectDeep.toJSON().value, { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] });
+            expect(componentObjectDeep.toJSON().value).to.deep.equal({ object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] });
 
             const componentArrayDeep = stage.createComponent({ entity: entityA, type: 'arrayDeep', value: [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]] });
-            assertEquals(componentArrayDeep.toJSON().value, [[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]]);
+            expect(componentArrayDeep.toJSON().value).to.deep.equal([[{ string: 'a', number: 1, boolean: true }], [{ string: 'b', number: 2, boolean: false }]]);
         });
 
     });
@@ -269,107 +266,107 @@ describe('Component Schemas', () => {
 
         it('should set default value', () => {
             const defaultString = stage.createComponent({ entity: entityA, type: 'defaultString' });
-            assertEquals(defaultString.value, 'a');
+            expect(defaultString.value).to.equal('a');
 
             const defaultNumber = stage.createComponent({ entity: entityA, type: 'defaultNumber' });
-            assertEquals(defaultNumber.value, 1);
+            expect(defaultNumber.value).to.equal(1);
 
             const defaultBoolean = stage.createComponent({ entity: entityA, type: 'defaultBoolean' });
-            assertEquals(defaultBoolean.value, true);
+            expect(defaultBoolean.value).to.equal(true);
 
             const defaultObject = stage.createComponent({ entity: entityA, type: 'defaultObject' });
-            assertObjectMatch({ value: defaultObject.value }, { value: { string: 'a', number: 1, boolean: true } });
+            expect({ value: defaultObject.value }).to.deep.include({ value: { string: 'a', number: 1, boolean: true } });
 
             const defaultArray = stage.createComponent({ entity: entityA, type: 'defaultArray' });
-            assertObjectMatch({ value: defaultArray.value }, { value: ['a', 'b', 'c'] });
+            expect({ value: defaultArray.value }).to.deep.include({ value: ['a', 'b', 'c'] });
 
             const defaultTuple = stage.createComponent({ entity: entityA, type: 'defaultTuple' });
-            assertObjectMatch({ value: defaultTuple.value }, { value: ['a', 1, true] });
+            expect({ value: defaultTuple.value }).to.deep.include({ value: ['a', 1, true] });
 
             const defaultObjectDeep = stage.createComponent({ entity: entityA, type: 'defaultObjectDeep', value: {} });
-            assertObjectMatch({ value: defaultObjectDeep.value }, { value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
+            expect(JSON.parse(JSON.stringify({ value: defaultObjectDeep.value }))).to.deep.include({ value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
 
             const defaultArrayDeep = stage.createComponent({ entity: entityA, type: 'defaultArrayDeep', value: [[{}]] });
-            assertObjectMatch({ value: defaultArrayDeep.value }, { value: [[{ string: 'a', number: 1, boolean: true }]] });
+            expect(JSON.parse(JSON.stringify({ value: defaultArrayDeep.value }))).to.deep.include({ value: [[{ string: 'a', number: 1, boolean: true }]] });
 
             const defaultTupleDeep = stage.createComponent({ entity: entityA, type: 'defaultTupleDeep', value: [[]] });
-            assertObjectMatch({ value: defaultTupleDeep.value }, { value: [['a', 1, true]] });
+            expect(JSON.parse(JSON.stringify({ value: defaultTupleDeep.value }))).to.deep.include({ value: [['a', 1, true]] });
         });
 
         it('should reset the default value when setting to undefined', () => {
             const defaultString = stage.createComponent({ entity: entityA, type: 'defaultString' });
             defaultString.value = undefined;
-            assertEquals(defaultString.value, 'a');
+            expect(defaultString.value).to.equal('a');
 
             const defaultNumber = stage.createComponent({ entity: entityA, type: 'defaultNumber' });
             defaultNumber.value = undefined;
-            assertEquals(defaultNumber.value, 1);
+            expect(defaultNumber.value).to.equal(1);
 
             const defaultBoolean = stage.createComponent({ entity: entityA, type: 'defaultBoolean' });
             defaultBoolean.value = undefined;
-            assertEquals(defaultBoolean.value, true);
+            expect(defaultBoolean.value).to.equal(true);
 
             const defaultObject = stage.createComponent({ entity: entityA, type: 'defaultObject' });
             defaultObject.value = undefined;
-            assertObjectMatch({ value: defaultObject.value }, { value: { string: 'a', number: 1, boolean: true } });
+            expect({ value: defaultObject.value }).to.deep.include({ value: { string: 'a', number: 1, boolean: true } });
 
             const defaultArray = stage.createComponent({ entity: entityA, type: 'defaultArray' });
             defaultArray.value = undefined;
-            assertObjectMatch({ value: defaultArray.value }, { value: ['a', 'b', 'c'] });
+            expect({ value: defaultArray.value }).to.deep.include({ value: ['a', 'b', 'c'] });
 
             const defaultTuple = stage.createComponent({ entity: entityA, type: 'defaultTuple' });
             defaultTuple.value = undefined;
-            assertObjectMatch({ value: defaultTuple.value }, { value: ['a', 1, true] });
+            expect({ value: defaultTuple.value }).to.deep.include({ value: ['a', 1, true] });
 
             const defaultObjectDeep = stage.createComponent({ entity: entityA, type: 'defaultObjectDeep', value: {} });
             defaultObjectDeep.value.object = undefined;
             defaultObjectDeep.value.array  = undefined;
             defaultObjectDeep.value.tuple  = undefined;
-            assertObjectMatch({ value: defaultObjectDeep.value }, { value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
+            expect(JSON.parse(JSON.stringify({ value: defaultObjectDeep.value }))).to.deep.include({ value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
 
             const defaultArrayDeep = stage.createComponent({ entity: entityA, type: 'defaultArrayDeep', value: [[{}]] });
             defaultArrayDeep.value[0][0].string  = undefined;
             defaultArrayDeep.value[0][0].number  = undefined;
             defaultArrayDeep.value[0][0].boolean = undefined;
-            assertObjectMatch({ value: defaultArrayDeep.value }, { value: [[{ string: 'a', number: 1, boolean: true }]] });
+            expect(JSON.parse(JSON.stringify({ value: defaultArrayDeep.value }))).to.deep.include({ value: [[{ string: 'a', number: 1, boolean: true }]] });
 
             const defaultTupleDeep = stage.createComponent({ entity: entityA, type: 'defaultTupleDeep', value: [[]] });
             defaultTupleDeep.value[0][0] = undefined;
             defaultTupleDeep.value[0][1] = undefined;
             defaultTupleDeep.value[0][2] = undefined;
-            assertObjectMatch({ value: defaultTupleDeep.value }, { value: [['a', 1, true]] });
+            expect(JSON.parse(JSON.stringify({ value: defaultTupleDeep.value }))).to.deep.include({ value: [['a', 1, true]] });
         });
 
         describe('toJSON', () => {
             it('should strip default values', () => {
                 const defaultString = stage.createComponent({ entity: entityA, type: 'defaultString' });
-                assertEquals(defaultString.toJSON().value, undefined);
+                expect(defaultString.toJSON().value).not.to.exist;
 
                 const defaultNumber = stage.createComponent({ entity: entityA, type: 'defaultNumber' });
-                assertEquals(defaultNumber.toJSON().value, undefined);
+                expect(defaultNumber.toJSON().value).not.to.exist;
 
                 const defaultBoolean = stage.createComponent({ entity: entityA, type: 'defaultBoolean' });
-                assertEquals(defaultBoolean.toJSON().value, undefined);
+                expect(defaultBoolean.toJSON().value).not.to.exist;
 
                 const defaultObject = stage.createComponent({ entity: entityA, type: 'defaultObject', value: { string: 'a', number: 1, boolean: true } });
-                assertEquals(defaultObject.toJSON().value, undefined);
+                expect(defaultObject.toJSON().value).not.to.exist;
 
                 const defaultArray = stage.createComponent({ entity: entityA, type: 'defaultArray' });
-                assertEquals(defaultArray.toJSON().value, undefined);
+                expect(defaultArray.toJSON().value).not.to.exist;
 
                 const defaultTuple = stage.createComponent({ entity: entityA, type: 'defaultTuple' });
-                assertEquals(defaultTuple.toJSON().value, undefined);
+                expect(defaultTuple.toJSON().value).not.to.exist;
 
                 const defaultObjectDeep = stage.createComponent({ entity: entityA, type: 'defaultObjectDeep', value: { object: { string: 'a', number: 1, boolean: true }, array: ['a', 'b', 'c'], tuple: ['a', 1, true] } });
-                assertEquals(defaultObjectDeep.toJSON().value.object, undefined);
-                assertEquals(defaultObjectDeep.toJSON().value.array, undefined);
-                assertEquals(defaultObjectDeep.toJSON().value.tuple, undefined);
+                expect(defaultObjectDeep.toJSON().value.object).not.to.exist;
+                expect(defaultObjectDeep.toJSON().value.array).not.to.exist;
+                expect(defaultObjectDeep.toJSON().value.tuple).not.to.exist;
 
                 const defaultArrayDeep = stage.createComponent({ entity: entityA, type: 'defaultArrayDeep', value: [[{}]] });
-                assertEquals(defaultArrayDeep.toJSON().value[0][0], undefined);
+                expect(defaultArrayDeep.toJSON().value).to.deep.equal([[{}]]);
 
                 const defaultTupleDeep = stage.createComponent({ entity: entityA, type: 'defaultTupleDeep', value: [[]] });
-                assertEquals(defaultTupleDeep.toJSON().value[0], undefined);
+                expect(defaultTupleDeep.toJSON().value).to.deep.equal([[]]);
             });
         });
     });
@@ -431,7 +428,7 @@ describe('Component Schemas', () => {
         });
 
         it('should fire value:change:${prop} when an observed property changes', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'observedObject', value: { string: 'a', number: 1, boolean: true } });
             componentObject.watch('value:change:/string',  handler);
@@ -439,13 +436,13 @@ describe('Component Schemas', () => {
             componentObject.watch('value:change:/boolean', handler);
 
             componentObject.value.string = 'b';
-            assertSpyCall(handler, 0, { args: ['a'] });
+            expect(handler.getCall(0).args[0]).to.equal('a');
 
             componentObject.value.number = 2;
-            assertSpyCall(handler, 1, { args: [1] });
+            expect(handler.getCall(1).args[0]).to.equal(1);
 
             componentObject.value.boolean = false;
-            assertSpyCall(handler, 2, { args: [true] });
+            expect(handler.getCall(2).args[0]).to.equal(true);
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'observedArray', value: [{ string: 'a', number: 1, boolean: true }] });
             componentArray.watch('value:change:/0/string',  handler);
@@ -453,13 +450,13 @@ describe('Component Schemas', () => {
             componentArray.watch('value:change:/0/boolean', handler);
 
             componentArray.value[0].string = 'b';
-            assertSpyCall(handler, 3, { args: ['a'] });
+            expect(handler.getCall(3).args[0]).to.equal('a');
 
             componentArray.value[0].number = 2;
-            assertSpyCall(handler, 4, { args: [1] });
+            expect(handler.getCall(4).args[0]).to.equal(1);
 
             componentArray.value[0].boolean = false;
-            assertSpyCall(handler, 5, { args: [true] });
+            expect(handler.getCall(5).args[0]).to.equal(true);
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'observedTuple', value: [{ string: 'a' }, { number: 1 }, { boolean: true }] });
             componentTuple.watch('value:change:/0/string',  handler);
@@ -467,13 +464,13 @@ describe('Component Schemas', () => {
             componentTuple.watch('value:change:/2/boolean', handler);
 
             componentTuple.value[0].string = 'b';
-            assertSpyCall(handler, 6, { args: ['a'] });
+            expect(handler.getCall(6).args[0]).to.equal('a');
 
             componentTuple.value[1].number = 2;
-            assertSpyCall(handler, 7, { args: [1] });
+            expect(handler.getCall(7).args[0]).to.equal(1);
 
             componentTuple.value[2].boolean = false;
-            assertSpyCall(handler, 8, { args: [true] });
+            expect(handler.getCall(8).args[0]).to.equal(true);
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'observedDeep', value: [[[{ string: 'a', number: 1, boolean: true, object: { string: 'a' } }]]] });
             componentDeep.watch('value:change:/0/0/0/string',  handler);
@@ -482,17 +479,17 @@ describe('Component Schemas', () => {
             componentDeep.watch('value:change:/0/0/0/object/string', handler);
 
             componentDeep.value[0][0][0].string = 'b';
-            assertSpyCall(handler, 9, { args: ['a'] });
+            expect(handler.getCall(9).args[0]).to.equal('a');
 
             componentDeep.value[0][0][0].number = 2;
-            assertSpyCall(handler, 10, { args: [1] });
+            expect(handler.getCall(10).args[0]).to.equal(1);
 
             componentDeep.value[0][0][0].boolean = false;
-            assertSpyCall(handler, 11, { args: [true] });
+            expect(handler.getCall(11).args[0]).to.equal(true);
         });
 
         it('should fire value:change:${prop} when parent value is set', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'observedObject', value: { string: 'a', number: 1, boolean: true } });
             componentObject.watch('value:change:/string',  handler);
@@ -500,9 +497,9 @@ describe('Component Schemas', () => {
             componentObject.watch('value:change:/boolean', handler);
 
             componentObject.value = { string: 'b', number: 2, boolean: false };
-            assertSpyCall(handler, 0, { args: ['a'] });
-            assertSpyCall(handler, 1, { args: [1] });
-            assertSpyCall(handler, 2, { args: [true] });
+            expect(handler.getCall(0).args[0]).to.equal('a');
+            expect(handler.getCall(1).args[0]).to.equal(1);
+            expect(handler.getCall(2).args[0]).to.equal(true);
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'observedArray', value: [{ string: 'a', number: 1, boolean: true }] });
             componentArray.watch('value:change:/0/string',  handler);
@@ -510,9 +507,9 @@ describe('Component Schemas', () => {
             componentArray.watch('value:change:/0/boolean', handler);
 
             componentArray.value[0] = { string: 'b', number: 2, boolean: false };
-            assertSpyCall(handler, 3, { args: ['a'] });
-            assertSpyCall(handler, 4, { args: [1] });
-            assertSpyCall(handler, 5, { args: [true] });
+            expect(handler.getCall(3).args[0]).to.equal('a');
+            expect(handler.getCall(4).args[0]).to.equal(1);
+            expect(handler.getCall(5).args[0]).to.equal(true);
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'observedTuple', value: [{ string: 'a' }, { number: 1 }, { boolean: true }] });
             componentTuple.watch('value:change:/0/string',  handler);
@@ -520,9 +517,9 @@ describe('Component Schemas', () => {
             componentTuple.watch('value:change:/2/boolean', handler);
 
             componentTuple.value = [{ string: 'b' }, { number: 2 }, { boolean: false }];
-            assertSpyCall(handler, 6, { args: ['a'] });
-            assertSpyCall(handler, 7, { args: [1] });
-            assertSpyCall(handler, 8, { args: [true] });
+            expect(handler.getCall(6).args[0]).to.equal('a');
+            expect(handler.getCall(7).args[0]).to.equal(1);
+            expect(handler.getCall(8).args[0]).to.equal(true);
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'observedDeep', value: [[[{ string: 'a', number: 1, boolean: true, object: { string: 'a' } }]]] });
             componentDeep.watch('value:change:/0/0/0/string',  handler);
@@ -531,13 +528,13 @@ describe('Component Schemas', () => {
             componentDeep.watch('value:change:/0/0/0/object/string', handler);
 
             componentDeep.value = [[[{ string: 'b', number: 2, boolean: false, object: { string: 'b' } }]]];
-            assertSpyCall(handler, 9, { args: ['a'] });
-            assertSpyCall(handler, 10, { args: [1] });
-            assertSpyCall(handler, 11, { args: [true] });
+            expect(handler.getCall(9).args[0]).to.equal('a');
+            expect(handler.getCall(10).args[0]).to.equal(1);
+            expect(handler.getCall(11).args[0]).to.equal(true);
         });
 
         it('should not fire value:change:${prop} when an observed property is set to the same value', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'observedObject', value: { string: 'a', number: 1, boolean: true } });
             componentObject.watch('value:change:/string',  handler);
@@ -545,13 +542,13 @@ describe('Component Schemas', () => {
             componentObject.watch('value:change:/boolean', handler);
 
             componentObject.value.string = 'a';
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentObject.value.number = 1;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentObject.value.boolean = true;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'observedArray', value: [{ string: 'a', number: 1, boolean: true }] });
             componentArray.watch('value:change:/0/string',  handler);
@@ -559,13 +556,13 @@ describe('Component Schemas', () => {
             componentArray.watch('value:change:/0/boolean', handler);
 
             componentArray.value[0].string = 'a';
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentArray.value[0].number = 1;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentArray.value[0].boolean = true;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'observedTuple', value: [{ string: 'a' }, { number: 1 }, { boolean: true }] });
             componentTuple.watch('value:change:/0/string',  handler);
@@ -573,13 +570,13 @@ describe('Component Schemas', () => {
             componentTuple.watch('value:change:/2/boolean', handler);
 
             componentTuple.value[0].string = 'a';
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentTuple.value[1].number = 1;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentTuple.value[2].boolean = true;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'observedDeep', value: [[[{ string: 'a', number: 1, boolean: true, object: { string: 'a' } }]]] });
             componentDeep.watch('value:change:/0/0/0/string',  handler);
@@ -588,17 +585,17 @@ describe('Component Schemas', () => {
             componentDeep.watch('value:change:/0/0/0/object/string', handler);
 
             componentDeep.value[0][0][0].string = 'a';
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentDeep.value[0][0][0].number = 1;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
 
             componentDeep.value[0][0][0].boolean = true;
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
         });
 
         it('should not fire value:change:${prop} when parent value is set to same value', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'observedObject', value: { string: 'a', number: 1, boolean: true } });
             componentObject.watch('value:change:/string',  handler);
@@ -606,9 +603,9 @@ describe('Component Schemas', () => {
             componentObject.watch('value:change:/boolean', handler);
 
             componentObject.value = { string: 'a', number: 1, boolean: true };
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
 
             const componentArray = stage.createComponent({ entity: entityA, type: 'observedArray', value: [{ string: 'a', number: 1, boolean: true }] });
             componentArray.watch('value:change:/0/string',  handler);
@@ -616,9 +613,9 @@ describe('Component Schemas', () => {
             componentArray.watch('value:change:/0/boolean', handler);
 
             componentArray.value[0] = { string: 'a', number: 1, boolean: true };
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
 
             const componentTuple = stage.createComponent({ entity: entityA, type: 'observedTuple', value: [{ string: 'a' }, { number: 1 }, { boolean: true }] });
             componentTuple.watch('value:change:/0/string',  handler);
@@ -626,9 +623,9 @@ describe('Component Schemas', () => {
             componentTuple.watch('value:change:/2/boolean', handler);
 
             componentTuple.value = [{ string: 'a' }, { number: 1 }, { boolean: true }];
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'observedDeep', value: [[[{ string: 'a', number: 1, boolean: true, object: { string: 'a' } }]]] });
             componentDeep.watch('value:change:/0/0/0/string',  handler);
@@ -637,9 +634,9 @@ describe('Component Schemas', () => {
             componentDeep.watch('value:change:/0/0/0/object/string', handler);
 
             componentDeep.value = [[[{ string: 'a', number: 1, boolean: true, object: { string: 'a' } }]]];
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
+            expect(handler).not.to.have.been.called;
         });
     });
 
@@ -654,27 +651,27 @@ describe('Component Schemas', () => {
 
         it('should maintain additional properties when setting the value of an object type', () => {
             const componentObject = stage.createComponent({ entity: entityA, type: 'additionalObject', value: { string: 'a', number: 1 } });
-            assertObjectMatch({ value: componentObject.value }, { value: { string: 'a', number: 1 } });
+            expect(JSON.parse(JSON.stringify({ value: componentObject.value }))).to.deep.include({ value: { string: 'a', number: 1 } });
         });
 
         it('should fire value:change:/ when root value changes and include additional properties in original value', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'additionalObject', value: { string: 'a', number: 1 } });
             componentObject.watch('value:change:/', handler);
 
             componentObject.value = { string: 'b', number: 2 };
-            assertSpyCall(handler, 0, { args: [{ string: 'a', number: 1 }] });
+            expect(handler).to.have.been.calledOnceWith({ string: 'a', number: 1 });
         });
 
         it('should not fire value:change:/ when root value is set with the same value including additional properties', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentObject = stage.createComponent({ entity: entityA, type: 'additionalObject', value: { string: 'a', number: 1 } });
             componentObject.watch('value:change:/', handler);
 
             componentObject.value = { string: 'a', number: 1 };
-            assertSpyCalls(handler, 0);
+            expect(handler).not.to.have.been.called;
         });
     });
 
@@ -714,33 +711,33 @@ describe('Component Schemas', () => {
             });
 
             it('should add a ComponentReference to the stage for the defined type', () => {
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 5);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(5);
             });
 
             it('should add a ComponentReference to the component for the defined type', () => {
-                assertInstanceOf(componentSimple.references?.['/'],  ComponentReference);
-                assertInstanceOf(componentObject.references?.['/a'], ComponentReference);
-                assertInstanceOf(componentArray.references?.['/0'],  ComponentReference);
-                assertInstanceOf(componentTuple.references?.['/0'],  ComponentReference);
-                assertInstanceOf(componentDeep.references?.['/a/b'], ComponentReference);
+                expect(componentSimple.references?.['/']).to.be.instanceOf(ComponentReference);
+                expect(componentObject.references?.['/a']).to.be.instanceOf(ComponentReference);
+                expect(componentArray.references?.['/0']).to.be.instanceOf(ComponentReference);
+                expect(componentTuple.references?.['/0']).to.be.instanceOf(ComponentReference);
+                expect(componentDeep.references?.['/a/b']).to.be.instanceOf(ComponentReference);
             });
 
             it('should release a ComponentReference when the reference value or property changes', () => {
                 componentSimple.value = UUID();
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 4);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(4);
                 componentObject.value.a = UUID();
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 3);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(3);
                 componentArray.value[0] = UUID();
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 2);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(2);
                 componentTuple.value[0] = UUID();
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 1);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(1);
                 componentDeep.value.a.b = UUID();
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 0);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(0);
             });
 
             it('should release a deeply nested ComponentReference when the value or parent reference property changes', () => {
                 componentDeep.value = { a: { b: entityA } };
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'a' })].length, 4);
+                expect([...stage.references.components.find({ entity: entityB, type: 'a' })].length).to.equal(4);
             });
 
             it('should not throw if no references have been set yet', () => {
@@ -762,7 +759,7 @@ describe('Component Schemas', () => {
             let assetDeep;
 
             beforeEach(() => {
-                registerLoader('a', (uri) => Promise.resolve({ uri, type: 'a' }));
+                registerLoader('a', (/** @type {string} */uri) => Promise.resolve({ uri, type: 'a' }));
 
                 registerSchema('assetSimple', { type: 'string', asset: 'a' });
                 registerSchema('assetObject', { type: 'object', properties: { a: { type: 'string', asset: 'a' } } });
@@ -787,65 +784,65 @@ describe('Component Schemas', () => {
             });
 
             it('should add an AssetReference to the stage for the defined type', () => {
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 5);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(5);
             });
 
             it('should add an AssetReference to the component for the defined type', () => {
-                assertInstanceOf(assetSimple.references?.['/'],  AssetReference);
-                assertInstanceOf(assetObject.references?.['/a'], AssetReference);
-                assertInstanceOf(assetArray.references?.['/0'],  AssetReference);
-                assertInstanceOf(assetTuple.references?.['/0'],  AssetReference);
-                assertInstanceOf(assetDeep.references?.['/a/b'], AssetReference);
+                expect(assetSimple.references?.['/']).to.be.instanceOf(AssetReference);
+                expect(assetObject.references?.['/a']).to.be.instanceOf(AssetReference);
+                expect(assetArray.references?.['/0']).to.be.instanceOf(AssetReference);
+                expect(assetTuple.references?.['/0']).to.be.instanceOf(AssetReference);
+                expect(assetDeep.references?.['/a/b']).to.be.instanceOf(AssetReference);
             });
 
             it('should release an AssetReference when the reference value or property changes', () => {
                 assetSimple.value = JSON_DATA_URI_A;
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 4);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(4);
                 assetObject.value.a = JSON_DATA_URI_A;
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 3);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(3);
                 assetArray.value[0] = JSON_DATA_URI_A;
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 2);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(2);
                 assetTuple.value[0] = JSON_DATA_URI_A;
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 1);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(1);
                 assetDeep.value.a.b = JSON_DATA_URI_A;
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 0);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(0);
             });
 
             it('should release a deeply nested AssetReference when the value or parent reference property changes', () => {
                 assetDeep.value = { a: { b: JSON_DATA_URI_A } };
-                assertEquals([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length, 4);
+                expect([...stage.references.assets.find({ uri: JSON_DATA_URI_B, type: 'a' })].length).to.equal(4);
             });
 
             it('should not release an AssetReference when the reference value is set to the same value', () => {
-                const handler = spy();
+                const handler = sinon.spy();
 
                 /**  @type {AssetReference}*/(assetSimple.references?.['/'])?.watch('release', handler);
                 assetSimple.value = JSON_DATA_URI_B;
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
 
                 /**  @type {AssetReference}*/(assetObject.references?.['/a'])?.watch('release', handler);
                 assetObject.value.a = JSON_DATA_URI_B;
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
 
                 /**  @type {AssetReference}*/(assetArray.references?.['/0'])?.watch('release', handler);
                 assetArray.value[0] = JSON_DATA_URI_B;
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
 
                 /**  @type {AssetReference}*/(assetTuple.references?.['/0'])?.watch('release', handler);
                 assetTuple.value[0] = JSON_DATA_URI_B;
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
 
                 /**  @type {AssetReference}*/(assetDeep.references?.['/a/b'])?.watch('release', handler);
                 assetDeep.value.a.b = JSON_DATA_URI_B;
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
             });
 
             it('should not release a deeply nested AssetReference when the value or parent reference is set to the same value', () => {
-                const handler = spy();
+                const handler = sinon.spy();
 
                 /**  @type {AssetReference}*/(assetDeep.references?.['/a/b'])?.watch('release', handler);
                 assetDeep.value = { a: { b: JSON_DATA_URI_B } };
-                assertSpyCalls(handler, 0);
+                expect(handler).not.to.have.been.called;
             });
         });
     });
@@ -891,163 +888,170 @@ describe('Component Schemas', () => {
 
         it('should throw when attempting to use certain array methods on complex array values', () => {
             const componentDefault   = stage.createComponent({ entity: entityA, type: 'complexArrayDefault', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentDefault.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentDefault.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentDefault.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentDefault.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentDefault.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentDefault.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentDefault.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentDefault.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentDefault.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentDefault.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentDefault.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentDefault.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
 
             const componentReference = stage.createComponent({ entity: entityA, type: 'complexArrayReference', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentReference.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentReference.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentReference.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentReference.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentReference.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentReference.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentReference.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentReference.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentReference.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentReference.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentReference.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentReference.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentObserved = stage.createComponent({ entity: entityA, type: 'complexArrayObserved', value: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] });
-            assertThrows(() => componentObserved.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentObserved.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentObserved.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentObserved.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentObserved.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentObserved.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentObserved.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentObserved.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentObserved.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentObserved.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentObserved.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentObserved.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'complexArrayDeep', value: { default: ['a', 'b', 'c'], reference: ['a', 'b', 'c'], observed: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] } });
-            assertThrows(() => componentDeep.value.default.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.default.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.default.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.default.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.default.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.default.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentDeep.value.default.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentDeep.value.default.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentDeep.value.default.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentDeep.value.default.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentDeep.value.default.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentDeep.value.default.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
-            assertThrows(() => componentDeep.value.reference.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentDeep.value.reference.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
-            assertThrows(() => componentDeep.value.observed.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentDeep.value.observed.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentTupleDefault = stage.createComponent({ entity: entityA, type: 'complexTupleDefault', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentTupleDefault.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentTupleDefault.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentTupleDefault.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentTupleDefault.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentTupleDefault.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentTupleDefault.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleDefault.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentTupleReference = stage.createComponent({ entity: entityA, type: 'complexTupleReference', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentTupleReference.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentTupleReference.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentTupleReference.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentTupleReference.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentTupleReference.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentTupleReference.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentTupleReference.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleReference.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleReference.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleReference.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleReference.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleReference.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentTupleObserved = stage.createComponent({ entity: entityA, type: 'complexTupleObserved', value: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] });
-            assertThrows(() => componentTupleObserved.value.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentTupleObserved.value.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentTupleObserved.value.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentTupleObserved.value.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentTupleObserved.value.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentTupleObserved.value.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleObserved.value.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
             const componentTupleDeep = stage.createComponent({ entity: entityA, type: 'complexTupleDeep', value: { default: ['a', 'b', 'c'], reference: ['a', 'b', 'c'], observed: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] } });
-            assertThrows(() => componentTupleDeep.value.default.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.default.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.default.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.default.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.default.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.default.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
 
-            assertThrows(() => componentTupleDeep.value.reference.shift(),      'shift not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference.unshift(),    'unshift not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference.splice(),     'splice not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference.sort(),       'sort not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference.reverse(),    'reverse not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference.copyWithin(), 'copyWithin not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.reference.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
+
+            expect(() => componentTupleDeep.value.observed.shift()).to.throw('shift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.observed.unshift()).to.throw('unshift not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.observed.splice()).to.throw('splice not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.observed.sort()).to.throw('sort not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.observed.reverse()).to.throw('reverse not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.observed.copyWithin()).to.throw('copyWithin not allowed on complex component value array');
         });
 
         it('should throw when trying to set a symbol property on complex array values', () => {
             const componentDefault   = stage.createComponent({ entity: entityA, type: 'complexArrayDefault', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentDefault.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentDefault.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentReference = stage.createComponent({ entity: entityA, type: 'complexArrayReference', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentReference.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentReference.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentObserved = stage.createComponent({ entity: entityA, type: 'complexArrayObserved', value: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] });
-            assertThrows(() => componentObserved.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentObserved.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'complexArrayDeep', value: { default: ['a', 'b', 'c'], reference: ['a', 'b', 'c'], observed: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] } });
-            assertThrows(() => componentDeep.value.default[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.reference[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
-            assertThrows(() => componentDeep.value.observed[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentDeep.value.default[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
+            expect(() => componentDeep.value.reference[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
+            expect(() => componentDeep.value.observed[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentTupleDefault   = stage.createComponent({ entity: entityA, type: 'complexTupleDefault', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentTupleDefault.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentTupleDefault.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentTupleReference = stage.createComponent({ entity: entityA, type: 'complexTupleReference', value: ['a', 'b', 'c'] });
-            assertThrows(() => componentTupleReference.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentTupleReference.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentTupleObserved = stage.createComponent({ entity: entityA  , type: 'complexTupleObserved', value: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] });
-            assertThrows(() => componentTupleObserved.value[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentTupleObserved.value[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
 
             const componentTupleDeep = stage.createComponent({ entity: entityA, type: 'complexTupleDeep', value: { default: ['a', 'b', 'c'], reference: ['a', 'b', 'c'], observed: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] } });
-            assertThrows(() => componentTupleDeep.value.default[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.reference[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
-            assertThrows(() => componentTupleDeep.value.observed[Symbol('a')] = 'a', 'symbol properties not allowed on complex component value array');
+            expect(() => componentTupleDeep.value.default[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
+            expect(() => componentTupleDeep.value.reference[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
+            expect(() => componentTupleDeep.value.observed[Symbol('a')] = 'a').to.throw('Cannot set symbol properties on a complex component value array');
         })
 
         it('should deserialized items via push', () => {
-            const handler = spy();
+            const handler = sinon.spy();
 
             const componentDefault = stage.createComponent({ entity: entityA, type: 'complexArrayDefault', value: ['a', 'b', 'c'] });
             componentDefault.value.push(undefined);
-            assertObjectMatch({ value: componentDefault.value }, { value: ['a', 'b', 'c', 'a'] });
+            expect({ value: componentDefault.value }).to.deep.equal({ value: ['a', 'b', 'c', 'a'] });
 
             const componentReference = stage.createComponent({ entity: entityA, type: 'complexArrayReference', value: ['a', 'b', 'c'] });
             componentReference.value.push('d');
-            assertExists(componentReference.references?.['/3']);
+            expect(componentReference.references?.['/3']).to.exist;
 
             const componentObserved = stage.createComponent({ entity: entityA, type: 'complexArrayObserved', value: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] });
             componentObserved.value.push({ string: 'd' });
             componentObserved.watch('value:change:/3/string', handler);
             componentObserved.value[3].string = 'e';
-            assertSpyCall(handler, 0, { args: ['d'] });
+            expect(handler.getCall(0).args[0]).to.equal('d');
 
             const componentDeep = stage.createComponent({ entity: entityA, type: 'complexArrayDeep', value: { default: ['a', 'b', 'c'], reference: ['a', 'b', 'c'], observed: [{ string: 'a' }, { string: 'b' }, { string: 'c' }] } });
             componentDeep.value.default.push(undefined);
-            assertObjectMatch({ value: componentDeep.value.default }, { value: ['a', 'b', 'c', 'a'] });
+            expect({ value: componentDeep.value.default }).to.deep.equal({ value: ['a', 'b', 'c', 'a'] });
 
             componentDeep.value.reference.push('d');
-            assertExists(componentDeep.references?.['/reference/3']);
+            expect(componentDeep.references?.['/reference/3']).to.exist;
 
             componentDeep.value.observed.push({ string: 'd' });
             componentDeep.watch('value:change:/observed/3/string', handler);
             componentDeep.value.observed[3].string = 'e';
-            assertSpyCall(handler, 1, { args: ['d'] });
+            expect(handler.getCall(1).args[0]).to.equal('d');
         });
 
         it('should release references via pop', () => {
             const componentReference = stage.createComponent({ entity: entityA, type: 'complexArrayReference', value: ['a', 'b', 'c'] });
             componentReference.value.pop();
-            assertEquals(componentReference.references?.['/2'], undefined);
+            expect(componentReference.references?.['/2']).not.to.exist;
         });
 
         it('should release references when setting array length to remove items', () => {
             const componentReference = stage.createComponent({ entity: entityA, type: 'complexArrayReference', value: ['a', 'b', 'c'] });
             componentReference.value.length = 1;
-            assertEquals(componentReference.references?.['/1'], undefined);
-            assertEquals(componentReference.references?.['/2'], undefined);
+            expect(componentReference.references?.['/1']).not.to.exist;
+            expect(componentReference.references?.['/2']).not.to.exist;
         });
 
         it('should not throw when popping an empty array if schema has no references', () => {

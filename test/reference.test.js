@@ -1,24 +1,15 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
-
-import { assert        } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals  } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertFalse   } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
-import { assertRejects } from 'https://deno.land/std@0.208.0/assert/assert_rejects.ts';
+import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
 import { Game, Stage, Component, UUID } from '../lib/ecs.js';
 
 /**
- * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts';
- *
  * @import { ComponentReference } from '../lib/reference.js';
  */
 describe('references', () => {
-    /** @type {FakeTime} */
+    /** @type {sinon.SinonFakeTimers} */
     let time;
 
-    /** @type {Spy} */
+    /** @type {sinon.SinonSpy} */
     let handler;
 
     /** @type {Game} */
@@ -56,9 +47,9 @@ describe('references', () => {
     let refI;
 
     beforeEach(() => {
-        time    = new FakeTime();
+        time    = sinon.useFakeTimers();
 
-        handler = spy();
+        handler = sinon.spy();
 
         game  = new Game();
         stage = new Stage(game, 'stage');
@@ -106,53 +97,53 @@ describe('references', () => {
     });
 
     it('should resolve to an existing component immediately', () => {
-        assertEquals(refA.component?.entity, entityA);
-        assertEquals(refA.component?.type, 'a');
+        expect(refA.component?.entity).to.equal(entityA);
+        expect(refA.component?.type).to.equal('a');
     });
 
     it('should resolve to a non existing component async', async () => {
         const promise = refI.waitFor('resolve');
         stage.components.add(new Component(stage, { entity: entityA, type: 'e', value: { a: { b: 'b', c: 1 } } }));
-        await time.runMicrotasks();
+        await time.nextAsync();
         const component = await promise;
-        assertEquals(component.entity, entityA);
-        assertEquals(component.type, 'e');
+        expect(component.entity).to.equal(entityA);
+        expect(component.type).to.equal('e');
     });
 
     it('should notify destroy if component removed', async () => {
         refA.watch('destroy', handler);
         stage.components.delete({ entity: entityA, type: 'a' });
-        await time.runMicrotasks();
-        assertSpyCalls(handler, 1);
+        await time.nextAsync();
+        expect(handler).to.have.been.calledOnce;
     });
 
     it('should notify release if released', async () => {
         refA.watch('release', handler);
         refA.release();
-        await time.runMicrotasks();
-        assertSpyCalls(handler, 1);
+        await time.nextAsync();
+        expect(handler).to.have.been.calledOnce;
     });
 
     it('should remove reference from reference set when released', async () => {
         refA.release();
-        assertEquals([...stage.references.components.find(refA)].length, 0);
+        expect([...stage.references.components.find(refA)].length).to.equal(0);
     });
 
     it('should have a reference to the referer', () => {
-        assertEquals(refA.referer, { entity: entityC, type: 'a' });
+        expect(refA.referer).to.deep.equal({ entity: entityC, type: 'a' });
     });
 
     it('should have a reference to the entity', () => {
-        assertEquals(refA.entity, entityA);
+        expect(refA.entity).to.equal(entityA);
     });
 
     it('should have a reference to the type', () => {
-        assertEquals(refA.type, 'a');
+        expect(refA.type).to.equal('a');
     });
 
     describe('get', () => {
         it('should resolve the component if it exists', async () => {
-            assertEquals(await refA.get(), stage.components.find({ entity: entityA, type: 'a' }));
+            expect(await refA.get()).to.equal(stage.components.find({ entity: entityA, type: 'a' }));
         });
 
         it('should resolve the component if it is added later', async () => {
@@ -160,72 +151,72 @@ describe('references', () => {
 
             stage.components.add(new Component(stage, { entity: entityA, type: 'e', value: { a: { b: 'b', c: 1 } } }));
 
-            assertEquals(await promise, stage.components.find({ entity: entityA, type: 'e' }));
+            expect(await promise).to.equal(stage.components.find({ entity: entityA, type: 'e' }));
         });
 
         it('should reject if reference is released before resolving', async () => {
-            const promise = assertRejects(() => refI.get());
+            const promise = refI.get();
             refI.release();
-            await promise;
+            await expect(promise).to.be.rejectedWith('aborted');
         });
 
         it('should reject if reference is destoryed before resolving', async () => {
-            const promise = assertRejects(() => refI.get());
+            const promise = refI.get();
             refI.destroy();
-            await promise;
+            await expect(promise).to.be.rejectedWith('aborted');
         });
 
         it('should reject if reference is not in a state of pending', async () => {
             refI.release();
-            await assertRejects(() => refI.get());
+            await expect(refI.get()).to.be.rejectedWith('aborted');
         });
     });
 
     describe('state', () => {
         it('should return "released" if released', () => {
             refA.release();
-            assertEquals(refA.state, 'released');
+            expect(refA.state).to.equal('released');
         });
 
         it('should return "destroyed" if component was removed', async () => {
             stage.components.delete({ entity: entityA, type: 'a' });
-            await time.runMicrotasks();
-            assertEquals(refA.state, 'destroyed');
+            await time.nextAsync();
+            expect(refA.state).to.equal('destroyed');
         });
 
         it('should return "aborted" if ref was released before resolving', async () => {
             refI.release();
-            await time.runMicrotasks();
-            assertEquals(refI.state, 'aborted');
+            await time.nextAsync();
+            expect(refI.state).to.equal('aborted');
         });
 
         it('should return "resolved" if component has been resolved', async () => {
-            assertEquals(refA.state, 'resolved');
+            expect(refA.state).to.equal('resolved');
             stage.components.add(new Component(stage, { entity: entityA, type: 'e', value: { a: { b: 'b', c: 1 } } }));
-            await time.runMicrotasks();
-            assertEquals(refI.state, 'resolved');
+            await time.nextAsync();
+            expect(refI.state).to.equal('resolved');
         });
 
         it('should return "pending" if component has not been resolved', async () => {
-            await time.runMicrotasks();
-            assertEquals(refI.state, 'pending');
+            await time.nextAsync();
+            expect(refI.state).to.equal('pending');
         });
     });
 
     it('should release the reference if the referer is removed from the set of components', async () => {
         stage.components.delete({ entity: entityC, type: 'a' });
 
-        await time.runMicrotasks();
+        await time.nextAsync();
 
-        assertEquals(refA.state, 'released');
-        assertEquals(refB.state, 'released');
-        assertEquals(refC.state, 'released');
-        assertEquals(refD.state, 'released');
-        assertEquals(refE.state, 'released');
-        assertEquals(refF.state, 'released');
-        assertEquals(refG.state, 'released');
-        assertEquals(refH.state, 'released');
-        assertEquals(refI.state, 'aborted');
+        expect(refA.state).to.equal('released');
+        expect(refB.state).to.equal('released');
+        expect(refC.state).to.equal('released');
+        expect(refD.state).to.equal('released');
+        expect(refE.state).to.equal('released');
+        expect(refF.state).to.equal('released');
+        expect(refG.state).to.equal('released');
+        expect(refH.state).to.equal('released');
+        expect(refI.state).to.equal('aborted');
 
     })
 
@@ -233,60 +224,60 @@ describe('references', () => {
         it('should iterate over all references of specified entity and type', () => {
             const refZ = stage.references.components.create({ entity: entityC, type: 'a' }, { entity: entityB, type: 'b' });
 
-            assertEquals([...stage.references.components.find({ entity: entityA, type: 'a' })], [refA]);
-            assertEquals([...stage.references.components.find({ entity: entityA, type: 'b' })], [refB]);
-            assertEquals([...stage.references.components.find({ entity: entityB, type: 'b' })], [refB, refZ]);
+            expect([...stage.references.components.find({ entity: entityA, type: 'a' })]).to.deep.equal([refA]);
+            expect([...stage.references.components.find({ entity: entityA, type: 'b' })]).to.deep.equal([refB]);
+            expect([...stage.references.components.find({ entity: entityB, type: 'b' })]).to.deep.equal([refB, refZ]);
         });
         it('should iterate over all references of specified entity', () => {
-            assertEquals([...stage.references.components.find({ entity: entityA })], [refA, refB, refC, refD, refI]);
-            assertEquals([...stage.references.components.find({ entity: entityB })], [refE, refF, refG, refH]);
+            expect([...stage.references.components.find({ entity: entityA })]).to.deep.equal([refA, refB, refC, refD, refI]);
+            expect([...stage.references.components.find({ entity: entityB })]).to.deep.equal([refE, refF, refG, refH]);
         });
 
         it('should not error when iterating over a non existent entity', () => {
-            assertEquals([...stage.references.components.find({ entity: 'z' })], []);
+            expect([...stage.references.components.find({ entity: 'z' })]).to.deep.equal([]);
         });
 
         it('should not error when iterating over a non existent type', () => {
-            assertEquals([...stage.references.components.find({ entity: 'a', type: 'e' })], []);
+            expect([...stage.references.components.find({ entity: 'a', type: 'e' })]).to.deep.equal([]);
         });
 
         describe('predicate', () => {
             it('should only return the references where the predicate is true', () => {
                 const refZ = stage.references.components.create({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
-                assertEquals([...stage.references.components.find({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC })], [refZ]);
-                assertEquals([...stage.references.components.find({ entity: entityA, predicate: (c) => c.type === 'a' })], [refA]);
-                assertEquals([...stage.references.components.find({ predicate: (c) => c.type === 'a' })], [refA, refE]);
+                expect([...stage.references.components.find({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC })]).to.deep.equal([refZ]);
+                expect([...stage.references.components.find({ entity: entityA, predicate: (c) => c.type === 'a' })]).to.deep.equal([refA]);
+                expect([...stage.references.components.find({ predicate: (c) => c.type === 'a' })]).to.deep.equal([refA, refE]);
             });
         });
     });
 
     describe('count', () => {
         it('should return the number of references created for that specific entity', () => {
-            assertEquals(stage.references.components.count({ entity: entityA }), 5);
-            assertEquals(stage.references.components.count({ entity: entityB }), 4);
-            assertEquals(stage.references.components.count({ entity: entityC }), 0);
+            expect(stage.references.components.count({ entity: entityA })).to.equal(5);
+            expect(stage.references.components.count({ entity: entityB })).to.equal(4);
+            expect(stage.references.components.count({ entity: entityC })).to.equal(0);
         });
 
         it('should increment the number of references when creating a new reference', () => {
-            assertEquals(stage.references.components.count({ entity: entityA }), 5);
+            expect(stage.references.components.count({ entity: entityA })).to.equal(5);
             stage.references.components.create({ entity: entityC, type: 'a' }, { entity: entityA, type: 'b' });
-            assertEquals(stage.references.components.count({ entity: entityA }), 6);
+            expect(stage.references.components.count({ entity: entityA })).to.equal(6);
         });
 
 
         it('should decrement the number of references when releasing', async () => {
-            assertEquals(stage.references.components.count({ entity: entityA }), 5);
+            expect(stage.references.components.count({ entity: entityA })).to.equal(5);
             refA.release();
-            assertEquals(stage.references.components.count({ entity: entityA }), 4);
+            expect(stage.references.components.count({ entity: entityA })).to.equal(4);
         });
 
         it('should return the number of references created for that specific entity and component type', () => {
             stage.references.components.create({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
-            assertEquals(stage.references.components.count({ entity: entityA, type: 'a' }), 1);
-            assertEquals(stage.references.components.count({ entity: entityB, type: 'a' }), 1);
-            assertEquals(stage.references.components.count({ entity: entityB, type: 'b' }), 2);
+            expect(stage.references.components.count({ entity: entityA, type: 'a' })).to.equal(1);
+            expect(stage.references.components.count({ entity: entityB, type: 'a' })).to.equal(1);
+            expect(stage.references.components.count({ entity: entityB, type: 'b' })).to.equal(2);
 
         });
 
@@ -294,40 +285,40 @@ describe('references', () => {
             it('should only count the references where the predicate is true', () => {
                 stage.references.components.create({ entity: UUID(), type: 'a' }, { entity: entityB, type: 'b' });
 
-                assertEquals(stage.references.components.count({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC }), 1);
-                assertEquals(stage.references.components.count({ entity: entityA, predicate: (c) => c.type === 'a' }), 1);
-                assertEquals(stage.references.components.count({ predicate: (c) => c.type === 'a' }), 2);
+                expect(stage.references.components.count({ entity: entityB, type: 'b', predicate: (c) => c.referer.entity !== entityC })).to.equal(1);
+                expect(stage.references.components.count({ entity: entityA, predicate: (c) => c.type === 'a' })).to.equal(1);
+                expect(stage.references.components.count({ predicate: (c) => c.type === 'a' })).to.equal(2);
             });
         });
     });
 
     describe('has', () => {
         it('should return true if there are any references for the specified entity and type', () => {
-            assert(stage.references.components.has({ entity: entityA, type: 'a' }));
+            expect(stage.references.components.has({ entity: entityA, type: 'a' })).to.be.true;
         });
 
         it('should return false if there are not any references for the specified entity and type', () => {
-            assertFalse(stage.references.components.has({ entity: entityB, type: 'e' }));
+            expect(stage.references.components.has({ entity: entityB, type: 'e' })).to.be.false;
         });
 
         it('should return true if there are any references for the specified entity', () => {
-            assert(stage.components.has({ entity: entityA }));
+            expect(stage.components.has({ entity: entityA })).to.be.true;
         });
 
         it('should return false if there are not any references for the specified entity', () => {
-            assertFalse(stage.components.has({ entity: UUID() }));
+            expect(stage.components.has({ entity: UUID() })).to.be.false;
         });
 
         describe('predicate', () => {
             it('should only return true if the predicate is true', () => {
-                assert(stage.references.components.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity === entityC }));
-                assertFalse(stage.references.components.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity !== entityC }));
+                expect(stage.references.components.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity === entityC })).to.be.true;
+                expect(stage.references.components.has({ entity: entityA, type: 'a', predicate: (c) => c.referer.entity !== entityC })).to.be.false;
 
-                assert(stage.references.components.has({ entity: entityB, predicate: (c) => c.type === 'a' }));
-                assertFalse(stage.references.components.has({ entity: entityB, predicate: (c) => c.type === 'e' }));
+                expect(stage.references.components.has({ entity: entityB, predicate: (c) => c.type === 'a' })).to.be.true;
+                expect(stage.references.components.has({ entity: entityB, predicate: (c) => c.type === 'e' })).to.be.false;
 
-                assert(stage.references.components.has({ predicate: (c) => c.entity === entityA && c.type === 'e' }));
-                assertFalse(stage.references.components.has({ predicate: (c) => c.entity === entityB && c.type === 'e' }));
+                expect(stage.references.components.has({ predicate: (c) => c.entity === entityA && c.type === 'e' })).to.be.true;
+                expect(stage.references.components.has({ predicate: (c) => c.entity === entityB && c.type === 'e' })).to.be.false;
             });
         });
     });
@@ -336,51 +327,51 @@ describe('references', () => {
         /** @type {{ entity: string, type: string }} */
         let referer;
         beforeEach(() => {
-            handler = spy();
+            handler = sinon.spy();
             referer = { entity: UUID(), type: 'a' };
         });
 
         it('should notify reference:add when a new reference is added', () => {
             stage.references.components.watch('reference:add', handler);
-            stage.references.components.create(referer, { entity: entityC, type: 'c' });
-            assertSpyCall(handler, 0, { args: [{ referer, count: 10 }]});
+            const ref = stage.references.components.create(referer, { entity: entityC, type: 'c' });
+            expect(handler).to.have.been.calledWith({ reference: ref, count: 10 });
         });
 
         it('should notify reference:add:${entity} when a new reference is added', () => {
             stage.references.components.watch(`reference:add:${entityC}`, handler);
-            stage.references.components.create(referer, { entity: entityC, type: 'c' });
-            assertSpyCall(handler, 0, { args: [{ referer, count: 1 }]});
+            const ref = stage.references.components.create(referer, { entity: entityC, type: 'c' });
+             expect(handler).to.have.been.calledWith({ reference: ref, count: 1 });
         });
 
         it('should notify reference:add:${entity}:${type} when a new reference is added', () => {
             stage.references.components.watch(`reference:add:${entityC}:c`, handler);
-            stage.references.components.create(referer, { entity: entityC, type: 'c' });
-            assertSpyCall(handler, 0, { args: [{ referer, count: 1 }]});
+            const ref = stage.references.components.create(referer, { entity: entityC, type: 'c' });
+             expect(handler).to.have.been.calledWith({ reference: ref, count: 1 });
         });
 
 
         it('should notify reference:release when reference is released', () => {
             stage.references.components.watch('reference:release', handler);
             refA.release();
-            assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 8 }]});
+            expect(handler).to.have.been.calledWith({ reference: refA, count: 8 });
         });
 
         it('should notify reference:release:${entity} when reference is released', () => {
             stage.references.components.watch(`reference:release:${entityA}`, handler);
             refA.release();
-            assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 4 }]});
+            expect(handler).to.have.been.calledWith({ reference: refA, count: 4 });
         });
 
         it('should notify reference:release:${entity}:${type} when reference is released', () => {
             stage.references.components.watch(`reference:release:${entityA}:a`, handler);
             refA.release();
-            assertSpyCall(handler, 0, { args: [{ referer: { entity: entityC, type: 'a' }, count: 0 }]});
+             expect(handler).to.have.been.calledWith({  reference: refA, count: 0 });
         });
     });
 
     describe('[Symbol.iterator]', () => {
         it('should iterate over entire set of components', () => {
-            assertEquals([...stage.references.components], [refA, refB, refC, refD, refE, refF, refG, refH, refI]);
+            expect([...stage.references.components]).to.deep.equal([refA, refB, refC, refD, refE, refF, refG, refH, refI]);
         });
     });
 });

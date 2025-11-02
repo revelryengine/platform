@@ -1,7 +1,4 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
-
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
+import { describe, it, expect, beforeEach } from 'bdd';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';
@@ -25,9 +22,6 @@ describe('Model', () => {
         },
     })) { }
 
-    /** @type {FakeTime} */
-    let time;
-
     /** @type {Component} */
     let componentA;
     /** @type {Component} */
@@ -48,7 +42,6 @@ describe('Model', () => {
     let modelA;
 
     beforeEach(() => {
-        time   = new FakeTime();
         game   = new Game();
         stage  = new Stage(game, 'stage');
         system = new SystemA(stage);
@@ -66,27 +59,23 @@ describe('Model', () => {
         modelA = system.models.modelA;
     });
 
-    afterEach(() => {
-        time.restore();
-    });
-
     describe('components', () => {
         it('should have component property references to the components', () => {
-            assertEquals(modelA.components.a, componentA);
-            assertEquals(modelA.components.b, componentB);
-            assertEquals(modelA.components.c, componentC);
+            expect(modelA.components.a).to.equal(componentA);
+            expect(modelA.components.b).to.equal(componentB);
+            expect(modelA.components.c).to.equal(componentC);
         });
     });
 
     describe('stage', () => {
         it('should be a reference to the stage', () => {
-            assertEquals(modelA.stage, stage);
+            expect(modelA.stage).to.equal(stage);
         });
     });
 
     describe('game', () => {
         it('should be a reference to the stage game', () => {
-            assertEquals(modelA.game, game);
+            expect(modelA.game).to.equal(game);
         });
     });
 

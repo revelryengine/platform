@@ -1,27 +1,25 @@
-import { describe, it } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-
-import { assertExists } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
+import { describe, it, expect } from 'bdd';
 
 import * as ECS from '../lib/ecs.js';
 
 describe('ECS', () => {
     it('should load module', () => {
-        assertExists(ECS);
+        expect(ECS).to.exist;
     });
 
     it('should export Game', () => {
-        assertExists(ECS.Game);
+        expect(ECS.Game).to.exist;
     });
 
     it('should export Stage', () => {
-        assertExists(ECS.Stage);
+        expect(ECS.Stage).to.exist;
     });
 
     it('should export System', () => {
-        assertExists(ECS.System);
+        expect(ECS.System).to.exist;
     });
 
     it('should export Model', () => {
-        assertExists(ECS.Model);
+        expect(ECS.Model).to.exist;
     });
 });

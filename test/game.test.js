@@ -1,46 +1,33 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
-
-import { assert       } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertThrows } from 'https://deno.land/std@0.208.0/assert/assert_throws.ts';
-import { assertFalse  } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
+import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
 import { Game   } from '../lib/game.js';
 import { Stage  } from '../lib/stage.js';
 import { System } from '../lib/system.js';
 
-
-
-/**
- * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts'
- */
-
 describe('Game', () => {
     /** @type {Game} */
     let game;
-    /** @type {FakeTime} */
-    let time;
+    /** @type {sinon.SinonFakeTimers} */
+    let clock;
 
-    /** @type {Spy} */
+    /** @type {sinon.SinonSpy} */
     let loop;
-    /** @type {Spy} */
+    /** @type {sinon.SinonSpy} */
     let update;
-    /** @type {Spy} */
+    /** @type {sinon.SinonSpy} */
     let render;
 
     beforeEach(() => {
-        time = new FakeTime();
+        clock = sinon.useFakeTimers();
         game = new Game();
 
-        loop   = spy(game, 'loop');
-        update = spy(game, 'update');
-        render = spy(game, 'render');
+        loop   = sinon.spy(game, 'loop');
+        update = sinon.spy(game, 'update');
+        render = sinon.spy(game, 'render');
     });
 
     afterEach(() => {
-        time.restore();
+        clock.restore();
     });
 
     describe('start', () => {
@@ -49,11 +36,11 @@ describe('Game', () => {
         });
 
         it('should loop repeatedly', async () => {
-            await time.tickAsync();
-            await time.tickAsync(game.targetFrameRate);
-            await time.tickAsync(game.targetFrameRate);
-            await time.tickAsync(game.targetFrameRate);
-            assertSpyCalls(loop, 3);
+            await clock.tickAsync(0);
+            await clock.tickAsync(game.targetFrameRate);
+            await clock.tickAsync(game.targetFrameRate);
+            await clock.tickAsync(game.targetFrameRate);
+            expect(loop).to.have.callCount(3);
         });
     });
 
@@ -63,35 +50,35 @@ describe('Game', () => {
         });
 
         it('should cancel requestAnimationFrame and loop should not be called', async () => {
-            await time.tickAsync(game.targetFrameRate);
-            await time.tickAsync(game.targetFrameRate);
-            assertSpyCalls(loop, 2);
+            await clock.tickAsync(game.targetFrameRate);
+            await clock.tickAsync(game.targetFrameRate);
+            expect(loop).to.have.callCount(2);
             game.pause();
-            await time.tickAsync(game.targetFrameRate);
-            assertSpyCalls(loop, 2);
+            await clock.tickAsync(game.targetFrameRate);
+            expect(loop).to.have.callCount(2);
         });
     });
 
     describe('loop', () => {
         it('should call game.update with a fixed timeloop of config.targetFrameRate', async () => {
             await game.loop(game.targetFrameRate * 2);
-            assertSpyCalls(update, 2);
-            assertSpyCall(update, 0, { args: [game.targetFrameRate ]});
+            expect(update).to.have.been.calledTwice;
+            expect(update).to.have.been.calledWith(game.targetFrameRate);
         });
 
         it('should drop any frames after config.frameThreshold', async () => {
             await game.loop(game.frameThreshold * 2);
-            assertSpyCalls(update, Math.floor(game.frameThreshold / game.targetFrameRate));
+            expect(update).to.have.callCount(Math.floor(game.frameThreshold / game.targetFrameRate));
         });
 
         it('should call render exactly once', async () => {
             await game.loop(game.targetFrameRate * 2);
-            assertSpyCalls(render, 1);
+            expect(render).to.have.been.calledOnce;
         });
 
         it('should not call render if an update has not occured', async () => {
             await game.loop(game.targetFrameRate / 2);
-            assertSpyCalls(render, 0);
+            expect(render).not.to.have.been.called;
         });
     });
 
@@ -110,65 +97,111 @@ describe('Game', () => {
         });
 
         it('should return the stage by id', () => {
-            assertEquals(game.getContext('stage'), stage);
+            expect(game.getContext('stage')).to.equal(stage);
         });
 
         it('should return the system by stage:system id', () => {
-            assertEquals(game.getContext('stage:system'), system);
+            expect(game.getContext('stage:system')).to.equal(system);
         });
 
         it('should throw if stage is not found', () => {
-            assertThrows(() => {
+            expect(() => {
                 game.getContext('foo');
-            }, 'Stage with id "foo" not found');
+            }).to.throw('Stage with id "foo" not found');
         });
 
         it('should throw if system is not found', () => {
-            assertThrows(() => {
+            expect(() => {
                 game.getContext('stage:foo');
-            }, 'System with id "foo" not found');
+            }).to.throw('System with id "foo" not found');
         });
     });
 
-    describe('requestAnimationFrame', () => {
+    describe('requestAnimationFrame and cancelAnimationFrame', () => {
+        describe('polyfill', () => {
+            /**
+             * @type {Window['requestAnimationFrame']}
+             */
+            let originalRequestAnimationFrame;
+            /**
+             * @type {Window['cancelAnimationFrame']}
+             */
+            let originalCancelAnimationFrame;
 
-        it('should polyfill requestAnimationFrame with setTimeout', () => {
-            const timeout = spy(globalThis, 'setTimeout');
-            game = new Game();
-            game.requestAnimationFrame(() => {});
-            assertSpyCalls(timeout, 1);
-            timeout.restore();
+            beforeEach(() => {
+                originalRequestAnimationFrame = globalThis.requestAnimationFrame;
+                originalCancelAnimationFrame  = globalThis.cancelAnimationFrame;
+
+                // @ts-ignore polyfill for testing
+                delete globalThis.requestAnimationFrame;
+                // @ts-ignore polyfill for testing
+                delete globalThis.cancelAnimationFrame;
+            });
+
+            afterEach(() => {
+                globalThis.requestAnimationFrame = originalRequestAnimationFrame;
+                globalThis.cancelAnimationFrame  = originalCancelAnimationFrame;
+            });
+
+            it('should polyfill requestAnimationFrame with setTimeout if not defined', () => {
+                const timeout = sinon.spy(globalThis, 'setTimeout');
+                game = new Game();
+                game.requestAnimationFrame(() => {});
+                expect(timeout).to.have.been.calledOnce;
+                timeout.restore();
+            });
+
+            it('should polyfill cancelAnimationFrame with clearTimeout if not defined', () => {
+                const timeout = sinon.spy(globalThis, 'clearTimeout');
+                game = new Game();
+                game.cancelAnimationFrame(0);
+                expect(timeout).to.have.been.calledOnce;
+                timeout.restore();
+            });
         });
 
-        it('should use globalThis.requestAnimationFrame if defined', () => {
-            const raf = /** @type {import('https://deno.land/std@0.208.0/testing/mock.ts').Spy<any, any[], number>} */(spy());
-            globalThis.requestAnimationFrame = raf;
-            game = new Game();
-            game.requestAnimationFrame(() => {});
-            assertSpyCalls(raf, 1);
-            // @ts-ignore unsetting requestAnimationFrame in deno
-            delete globalThis.requestAnimationFrame;
-        });
-    });
+        describe('native', () => {
+            /**
+             * @type {Window['requestAnimationFrame']}
+             */
+            let originalRequestAnimationFrame;
+            /**
+             * @type {Window['cancelAnimationFrame']}
+             */
+            let originalCancelAnimationFrame;
+            beforeEach(() => {
+                originalRequestAnimationFrame = globalThis.requestAnimationFrame;
+                originalCancelAnimationFrame  = globalThis.cancelAnimationFrame;
 
-    describe('cancelAnimationFrame', () => {
-        it('should polyfill cancelAnimationFrame with clearTimeout', () => {
-            const timeout = spy(globalThis, 'clearTimeout');
-            game = new Game();
-            game.cancelAnimationFrame(0);
-            assertSpyCalls(timeout, 1);
-            timeout.restore();
-        });
+                globalThis.requestAnimationFrame = () => 0;
+                globalThis.cancelAnimationFrame  = () => 0;
+            });
 
-        it('should use globalThis.cancelAnimationFrame if defined', () => {
-            const caf = /** @type {Spy} */(spy());
-            globalThis.cancelAnimationFrame = caf;
-            game = new Game();
-            game.cancelAnimationFrame(0);
-            assertSpyCalls(caf, 1);
-            // @ts-ignore unsetting cancelAnimationFrame in deno
-            delete globalThis.cancelAnimationFrame;
-        });
+            afterEach(() => {
+                globalThis.requestAnimationFrame = originalRequestAnimationFrame;
+                globalThis.cancelAnimationFrame  = originalCancelAnimationFrame;
+            });
+
+            it('should use globalThis.requestAnimationFrame if defined', () => {
+                const raf = sinon.spy();
+                globalThis.requestAnimationFrame = raf;
+                game = new Game();
+                game.requestAnimationFrame(() => {});
+                expect(raf).to.have.been.calledOnce;
+                // @ts-ignore unsetting requestAnimationFrame in deno
+                delete globalThis.requestAnimationFrame;
+            });
+
+            it('should use globalThis.cancelAnimationFrame if defined', () => {
+                const caf = sinon.spy();
+                globalThis.cancelAnimationFrame = caf;
+                game = new Game();
+                game.cancelAnimationFrame(0);
+                expect(caf).to.have.been.calledOnce;
+                // @ts-ignore unsetting cancelAnimationFrame in deno
+                delete globalThis.cancelAnimationFrame;
+            });
+        })
     });
 
     describe('stages.add', () => {
@@ -191,9 +224,9 @@ describe('Game', () => {
         });
 
         it('should error if another stage with the same name is added', () => {
-            assertThrows(() => {
+            expect(() => {
                 game.stages.add(new Stage(game, stage.id));
-            }, `Stage with id ${stage.id} already exists`)
+            }).to.throw(`Stage with id ${stage.id} already exists`)
         });
     });
 
@@ -206,13 +239,13 @@ describe('Game', () => {
         });
 
         it('should add stage to stages', () => {
-            assert(game.stages.has(stage));
+            expect(game.stages.has(stage)).to.be.true;
         });
 
         it('should error if another stage with the same name is added', () => {
-            assertThrows(() => {
+            expect(() => {
                 game.createStage('stage');
-            }, `Stage with id ${stage.id} already exists`)
+            }).to.throw(`Stage with id ${stage.id} already exists`);
         });
     });
 
@@ -235,7 +268,7 @@ describe('Game', () => {
 
 
         it('should return false if stage is not present', () => {
-            assertEquals(game.stages.delete(new Stage(game, 'stageB')), false);
+            expect(game.stages.delete(new Stage(game, 'stageB'))).to.be.false;
         });
     });
 
@@ -249,11 +282,11 @@ describe('Game', () => {
         });
 
         it('should remove stage from stages', () => {
-            assertFalse(game.stages.has(stage));
+            expect(game.stages.has(stage)).to.be.false;
         });
 
         it('should return false if stage is not present', () => {
-            assertFalse(game.deleteStage('stage2'));
+            expect(game.deleteStage('stage2')).not.to.exist;
         });
     });
 
@@ -263,9 +296,9 @@ describe('Game', () => {
         /** @type {Stage} */
         let stageB;
 
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let updateA;
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let updateB;
 
         beforeEach(() => {
@@ -275,14 +308,14 @@ describe('Game', () => {
             game.stages.add(stageA);
             game.stages.add(stageB);
 
-            updateA = spy(stageA, 'update');
-            updateB = spy(stageB, 'update');
+            updateA = sinon.spy(stageA, 'update');
+            updateB = sinon.spy(stageB, 'update');
         });
 
         it('should call update on all stages', () => {
             game.update(1);
-            assertSpyCalls(updateA, 1);
-            assertSpyCalls(updateB, 1);
+            expect(updateA).to.have.been.calledOnce;
+            expect(updateB).to.have.been.calledOnce;
         });
     });
 
@@ -292,9 +325,9 @@ describe('Game', () => {
         /** @type {Stage} */
         let stageB;
 
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let renderA;
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let renderB;
 
         beforeEach(() => {
@@ -304,25 +337,25 @@ describe('Game', () => {
             game.stages.add(stageA);
             game.stages.add(stageB);
 
-            renderA = spy(stageA, 'render');
-            renderB = spy(stageB, 'render');
+            renderA = sinon.spy(stageA, 'render');
+            renderB = sinon.spy(stageB, 'render');
         });
 
         it('should call render on all stages', () => {
             game.render();
-            assertSpyCalls(renderA, 1);
-            assertSpyCalls(renderB, 1);
+            expect(renderA).to.have.been.calledOnce;
+            expect(renderB).to.have.been.calledOnce;
         });
     });
 
     describe('loadFile', () => {
         /**
-         * @type {Spy}
+         * @type {sinon.SinonSpy}
          */
         let fetchSpy;
 
         beforeEach(async () => {
-            fetchSpy = spy(globalThis, 'fetch');
+            fetchSpy = sinon.spy(globalThis, 'fetch');
 
             await game.loadFile(import.meta.resolve('./fixtures/a.revgam'));
         });
@@ -332,18 +365,18 @@ describe('Game', () => {
         });
 
         it('should create a stage for each stage in the file', () => {
-            assertEquals(game.stages.size, 2);
+            expect(game.stages.size).to.equal(2);
         });
 
         it('should call loadFile on each stage', () => {
-            assertSpyCalls(fetchSpy, 3);
+            expect(fetchSpy).to.have.callCount(3);
         })
 
         it('should clear any existing stages', async () => {
             await game.loadFile(import.meta.resolve('./fixtures/b.revgam'));
-            assertEquals(game.stages.size, 2);
-            assert(game.getContext('c'));
-            assert(game.getContext('d'));
+            expect(game.stages.size).to.equal(2);
+            expect(game.getContext('c')).to.exist;
+            expect(game.getContext('d')).to.exist;
         });
     });
 });

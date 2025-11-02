@@ -72,12 +72,13 @@ export type ComponentDataMapSerialized = {
 };
 
 export type ComponentTypeSchemaObject = {
-    type:       'object',
-    default?:   Record<string, unknown>,
-    properties: Record<string, ComponentTypeSchema>,
-    required?:  string[],
-    enum?:      Record<string, unknown>[],
-    observed?:  string[],
+    type:        'object',
+    default?:    Record<string, unknown>,
+    properties?: Record<string, ComponentTypeSchema>,
+    required?:   string[],
+    enum?:       Record<string, unknown>[],
+    observed?:   string[],
+    additionalProperties?: boolean | ComponentTypeSchema,
 }
 
 export type ComponentTypeSchemaArray = {
@@ -197,9 +198,6 @@ type RestrictedTuple<T> = Omit<T, 'splice' | 'reverse' | 'sort' | 'copyWithin' |
 type TypeFromSchemaTuple<T> = { [I in keyof T]: TypeFromSchema<T[I]> };
 type TypeFromSchemaTupleSerialized<T> = { [I in keyof T]: TypeFromSchemaSerialized<T[I]> };
 
-
-
-
 type Identity<T> = T extends object ? {} & { [P in keyof T]: T[P] } : T;
 
 type TypeFromSchema<T extends ComponentTypeSchema> = (undefined extends T['enum']
@@ -208,7 +206,7 @@ type TypeFromSchema<T extends ComponentTypeSchema> = (undefined extends T['enum'
             -readonly  [Key in keyof T['properties'] as false extends (IsRequired<Key, T> & HasDefault<T['properties'][Key]>) ? never : Key]: TypeFromSchema<T['properties'][Key]>
         } & {
             -readonly  [Key in keyof T['properties'] as false extends (IsRequired<Key, T> & HasDefault<T['properties'][Key]>) ? Key : never]?: TypeFromSchema<T['properties'][Key]>
-        }> :
+        } & (undefined|true extends T['additionalProperties'] ? { [key:string]: any } : { [key: string]: (false extends T['additionalProperties'] ? never : TypeFromSchema<T['additionalProperties']>) })> :
         T extends ComponentTypeSchemaTuple     ? IsSimpleSchema<T['items'][number]> extends true ? TypeFromSchemaTuple<T['items']> : RestrictedTuple<TypeFromSchemaTuple<T['items']>> :
         T extends ComponentTypeSchemaArray     ? IsSimpleSchema<T['items']> extends true ? TypeFromSchema<T['items']>[] : RestrictedArray<TypeFromSchema<T['items']>> :
         T extends ComponentTypeSchemaReference ? string  :
@@ -225,7 +223,7 @@ type TypeFromSchemaSerialized<T extends ComponentTypeSchema> = (undefined extend
             -readonly  [Key in keyof T['properties'] as false extends (IsRequired<Key, T>) ? never : Key]: TypeFromSchemaSerialized<T['properties'][Key]>
         } & {
             -readonly  [Key in keyof T['properties'] as false extends (IsRequired<Key, T>) ? Key : never]?: TypeFromSchemaSerialized<T['properties'][Key]>
-        }> :
+        } & (undefined|true extends T['additionalProperties'] ? { [key:string]: any } : { [key: string]: (false extends T['additionalProperties'] ? never : TypeFromSchemaSerialized<T['additionalProperties']>) })> :
         T extends ComponentTypeSchemaTuple     ? TypeFromSchemaTupleSerialized<T['items']> :
         T extends ComponentTypeSchemaArray     ? TypeFromSchemaSerialized<T['items']>[] :
         T extends ComponentTypeSchemaReference ? string  :
@@ -286,7 +284,8 @@ export type ComponentReferencePropertiesMap = {
 
 export type ComponentEventMap = {
     [K in ComponentTypeKey]: Identity<{
-        'value:change': Identity<ComponentTypeFromSchema<ComponentSchemas[K]>>,
+        'value:change': void,
+        'delete': void,
     } & {
         [Key in keyof ComponentObservedPropertiesMap[K] as `value:change:${Key}`]: ComponentObservedPropertiesMap[K][Key]
     } & {
@@ -294,7 +293,8 @@ export type ComponentEventMap = {
     }>
 } & {
     [key: string]: {
-        'value:change': any,
+        'value:change': void,
+        'delete': void,
         [key: `value:change:${string}`]:      any,
         [key: `reference:resolve:${string}`]: any,
     }
@@ -309,7 +309,7 @@ export type ComponentSchemaManagers = {
 export interface AssetLoaders {}
 
 
-export type AssetLoader    = (uri: string, signal: AbortSignal) => Promise<unknown>;
+export type AssetLoader    = ({ uri: string, signal: AbortSignal }) => Promise<unknown>;
 export type AssetLoaderKey = (keyof AssetLoaders & string);
 
 export type AssetDataMap = {
@@ -350,11 +350,10 @@ export * from './stage.js';
 export * from './system.js';
 export * from './model.js';
 export * from './component.js';
-export * from './extensions.js';
 export * from './watchable.js';
 
 export * from './reference.js';
 export * from './asset.js';
 export * from './schema.js';
 
-export { UUID } from '../deps/uuid.js';
+export { UUID } from '../deps/utils.js';

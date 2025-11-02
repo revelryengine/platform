@@ -1,18 +1,6 @@
-import { describe, it, beforeEach, afterEach } from 'https://deno.land/std@0.208.0/testing/bdd.ts';
-import { spy, assertSpyCall, assertSpyCalls  } from 'https://deno.land/std@0.208.0/testing/mock.ts';
-import { FakeTime                            } from 'https://deno.land/std@0.208.0/testing/time.ts';
-
-import { assert           } from 'https://deno.land/std@0.208.0/assert/assert.ts';
-import { assertEquals     } from 'https://deno.land/std@0.208.0/assert/assert_equals.ts';
-import { assertExists     } from 'https://deno.land/std@0.208.0/assert/assert_exists.ts';
-import { assertFalse      } from 'https://deno.land/std@0.208.0/assert/assert_false.ts';
-import { assertInstanceOf } from 'https://deno.land/std@0.208.0/assert/assert_instance_of.ts';
+import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
 import { Game, Stage, System, Model, UUID, componentSchemas, assetLoaders, unregisterSchema, unregisterLoader } from '../lib/ecs.js';
-
-/**
- * @import { Spy } from 'https://deno.land/std@0.208.0/testing/mock.ts'
- */
 
 describe('Stage', () => {
 
@@ -47,7 +35,7 @@ describe('Stage', () => {
         }
     }) { }
 
-    /** @type {FakeTime} */
+    /** @type {sinon.SinonFakeTimers} */
     let time;
     /** @type {Game} */
     let game;
@@ -62,11 +50,11 @@ describe('Stage', () => {
     let entityA;
     /** @type {string} */
     let entityB;
-    /** @type {Spy} */
+    /** @type {sinon.SinonSpy} */
     let handler;
 
     beforeEach(() => {
-        time  = new FakeTime();
+        time  = sinon.useFakeTimers();
         game  = new Game();
         stage = new Stage(game, 'stage');
 
@@ -98,30 +86,30 @@ describe('Stage', () => {
 
     describe('createComponent', () => {
         it('should add a system property for each matched Model', () => {
-            assert(Object.hasOwn(systemA.models, 'modelA'));
-            assert(Object.hasOwn(systemA.models, 'modelB'));
-            assert(Object.hasOwn(systemA.models, 'modelCs'));
+            expect(Object.hasOwn(systemA.models, 'modelA')).to.be.true;
+            expect(Object.hasOwn(systemA.models, 'modelB')).to.be.true;
+            expect(Object.hasOwn(systemA.models, 'modelCs')).to.be.true;
 
-            assert(Object.hasOwn(systemB.models, 'modelA'));
-            assert(Object.hasOwn(systemB.models, 'modelB'));
+            expect(Object.hasOwn(systemB.models, 'modelA')).to.be.true;
+            expect(Object.hasOwn(systemB.models, 'modelB')).to.be.true;
         });
 
         it('should add a system property as as Set when isSet is true', () => {
-            assertInstanceOf(systemA.models.modelCs, Set);
+            expect(systemA.models.modelCs).to.be.instanceOf(Set);
         });
 
         it('should add each entity to set when isSet is true', () => {
-            assertEquals(systemA.models.modelCs.size, 2);
-            assertEquals([...systemA.models.modelCs][0].entity, entityA);
-            assertEquals([...systemA.models.modelCs][1].entity, entityB);
+            expect(systemA.models.modelCs.size).to.equal(2);
+            expect([...systemA.models.modelCs][0].entity).to.equal(entityA);
+            expect([...systemA.models.modelCs][1].entity).to.equal(entityB);
         });
 
         it('should share component between models matching the same entity', () => {
-            assertEquals(systemA.models.modelA.components['a'], systemA.models.modelB.components['a']);
+            expect(systemA.models.modelA.components['a']).to.equal(systemA.models.modelB.components['a']);
         });
 
         it('should only create a single model across multiple systems', () => {
-            assertEquals(systemA.models.modelA, systemB.models.modelA);
+            expect(systemA.models.modelA).to.equal(systemB.models.modelA);
         });
     });
 
@@ -137,20 +125,20 @@ describe('Stage', () => {
         });
 
         it('should delete system property when model no longer matches', () => {
-            assertEquals(systemA.models.modelB, undefined);
-            assertEquals(systemB.models.modelB, undefined);
+            expect(systemA.models.modelB).not.to.exist;
+            expect(systemB.models.modelB).not.to.exist;
         });
 
         it('should remove entities from system property Set when model is removed', () => {
-            assertEquals(systemA.models.modelCs.size, 1);
+            expect(systemA.models.modelCs.size).to.equal(1);
         });
 
         it('should return false if component is not present', () => {
-            assertFalse(stage.deleteComponent({ entity: entityA, type: 'e' }));
+            expect(stage.deleteComponent({ entity: entityA, type: 'e' })).to.be.false;
         });
 
         it('should return false if entity is not present', () => {
-            assertFalse(stage.deleteComponent({ entity: UUID(), type: 'e' }));
+            expect(stage.deleteComponent({ entity: UUID(), type: 'e' })).to.be.false;
         });
     });
 
@@ -163,7 +151,7 @@ describe('Stage', () => {
         beforeEach(() => {
             entityC = UUID();
             entityD = UUID();
-            handler = spy();
+            handler = sinon.spy();
         });
 
         describe('system:add', () => {
@@ -184,7 +172,7 @@ describe('Stage', () => {
             });
 
             it('should notify system:add when a new system is added', () => {
-                assertSpyCall(handler, 0, { args: [{ system: systemC }]});
+                expect(handler).to.have.been.calledWith({ system: systemC });
             });
 
         });
@@ -196,7 +184,7 @@ describe('Stage', () => {
             });
 
             it('should notify system:delete when a system is deleted', () => {
-                assertSpyCall(handler, 0, { args: [{ system: systemA }]});
+                expect(handler).to.have.been.calledWith({ system: systemA });
             });
         });
 
@@ -218,7 +206,7 @@ describe('Stage', () => {
             });
 
             it('should notify system:registered when a new system is added', () => {
-                assertSpyCall(handler, 0, { args: [{ system: systemC }]});
+                expect(handler).to.have.been.calledWith({ system: systemC });
             });
 
         });
@@ -230,7 +218,7 @@ describe('Stage', () => {
             });
 
             it('should notify system:unregistered when a system is deleted', () => {
-                assertSpyCall(handler, 0, { args: [{ system: systemA }]});
+                expect(handler).to.have.been.calledWith({ system: systemA });
             });
         });
 
@@ -241,21 +229,21 @@ describe('Stage', () => {
             stage.createComponent({ entity: entityD, type: 'a', value: 'a' });
             stage.createComponent({ entity: entityD, type: 'b', value: 123 });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA']});
-            assertSpyCall(handler, 1, { args: [ModelA, 'modelA']});
-            assertSpyCall(handler, 2, { args: [ModelB, 'modelB']});
+            expect(handler.getCall(0).args[0]).to.equal(ModelA);
+            expect(handler.getCall(1).args[0]).to.equal(ModelA);
+            expect(handler.getCall(2).args[0]).to.equal(ModelB);
         });
 
         it('should call onModelAdd when all the components for that model are registered', () => {
-            systemA.onModelAdd = (model, key) => handler(model.constructor, key);
+            systemA.onModelAdd = (/** @type {ModelA} */model, /** @type {string} */key) => handler(model.constructor, key);
 
             stage.createComponent({ entity: entityC, type: 'a', value: 'a' });
             stage.createComponent({ entity: entityD, type: 'a', value: 'a' });
             stage.createComponent({ entity: entityD, type: 'b', value: 123 });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
-            assertSpyCall(handler, 1, { args: [ModelA, 'modelA'] });
-            assertSpyCall(handler, 2, { args: [ModelB, 'modelB'] });
+            expect(handler.getCall(0).args[0]).to.equal(ModelA);
+            expect(handler.getCall(1).args[0]).to.equal(ModelA);
+            expect(handler.getCall(2).args[0]).to.equal(ModelB);
         });
 
         it('should notify model:delete when all the components for that model are unregistered', () => {
@@ -263,17 +251,18 @@ describe('Stage', () => {
 
             stage.components.delete({ entity: entityA, type: 'a' });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
-            assertSpyCall(handler, 1, { args: [ModelB, 'modelB'] });
+            expect(handler.getCall(0).args[0]).to.equal(ModelA);
+            expect(handler.getCall(1).args[0]).to.equal(ModelB);
         });
 
         it('should call onModelDelete when all the components for that model are deleted if defined', () => {
-            systemA.onModelDelete = (model, key) => handler(model.constructor, key);
+            systemA.onModelDelete = (/** @type {ModelA} */model, /** @type {string} */key) => handler(model.constructor, key);
 
             stage.components.delete({ entity: entityA, type: 'a' });
 
-            assertSpyCall(handler, 0, { args: [ModelA, 'modelA'] });
-            assertSpyCall(handler, 1, { args: [ModelB, 'modelB'] });
+
+            expect(handler.getCall(0).args[0]).to.equal(ModelA);
+            expect(handler.getCall(1).args[0]).to.equal(ModelB);
         });
     });
 
@@ -293,7 +282,7 @@ describe('Stage', () => {
         });
 
         it('should add existing components to new system', () => {
-            assertExists(systemC.models.modelA);
+            expect(systemC.models.modelA).to.exist;
         });
     });
 
@@ -305,11 +294,11 @@ describe('Stage', () => {
         it('should no longer add models to system', () => {
             const size = systemA.models.modelCs.size;
             stage.createComponent({ entity: UUID(), type: 'c', value: true });
-            assertEquals(systemA.models.modelCs.size, size);
+            expect(systemA.models.modelCs.size).to.equal(size);
         });
 
         it('should return false if System is not present', () => {
-            assertFalse(stage.deleteSystem(SystemA));
+            expect(stage.deleteSystem(SystemA)).to.be.false;
         });
     });
 
@@ -320,14 +309,14 @@ describe('Stage', () => {
         it('should create all the components specified sharing the same entity id', () => {
             stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } });
 
-            assertEquals(stage.components.count(), 4);
-            assertEquals([...stage.components][0].entity, [...stage.components][1].entity);
-            assertEquals([...stage.components][0].entity, [...stage.components][2].entity);
-            assertEquals([...stage.components][0].entity, [...stage.components][3].entity);
+            expect(stage.components.count()).to.equal(4);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][1].entity);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][2].entity);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][3].entity);
         });
 
         it('should generate and return a new entity id if not specified', () => {
-            assert(UUID.isUUID(stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } })));
+            expect(UUID.isUUID(stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } }))).to.be.true;
         });
     });
 
@@ -342,24 +331,24 @@ describe('Stage', () => {
             entity = stage.createEntity({ a: 'a', b: 123, c: true, d: { a: 'a' } });
         })
         it('should delete all the components for the specified entity', () => {
-            assertEquals(stage.components.count(), 4);
-            assertEquals([...stage.components][0].entity, [...stage.components][1].entity);
-            assertEquals([...stage.components][0].entity, [...stage.components][2].entity);
-            assertEquals([...stage.components][0].entity, [...stage.components][3].entity);
+            expect(stage.components.count()).to.equal(4);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][1].entity);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][2].entity);
+            expect([...stage.components][0].entity).to.deep.equal([...stage.components][3].entity);
 
             stage.deleteEntity(entity);
 
-            assertEquals(stage.components.count(), 0);
+            expect(stage.components.count()).to.equal(0);
         });
 
         it('should return the number of components deleted ', () => {
-            assertEquals(stage.deleteEntity(entity), 4);
+            expect(stage.deleteEntity(entity)).to.equal(4);
         });
     });
 
     describe('getEntityModel', () => {
         it('should return an existing model for a given entity', () => {
-            assertInstanceOf(stage.getEntityModel(entityA, ModelA), ModelA);
+            expect(stage.getEntityModel(entityA, ModelA)).to.be.instanceOf(ModelA);
         });
     });
 
@@ -370,9 +359,9 @@ describe('Stage', () => {
         /** @type {SystemB} */
         let systemB;
 
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let updateA;
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let updateB;
 
         beforeEach(() => {
@@ -383,14 +372,14 @@ describe('Stage', () => {
             stage.systems.add(systemA);
             stage.systems.add(systemB);
 
-            updateA = spy(systemA, 'update');
-            updateB = spy(systemB, 'update');
+            updateA = sinon.spy(systemA, 'update');
+            updateB = sinon.spy(systemB, 'update');
         });
 
         it('should call update on all stages', () => {
             stage.update(1);
-            assertSpyCalls(updateA, 1);
-            assertSpyCalls(updateB, 1);
+            sinon.assert.callCount(updateA, 1);
+            sinon.assert.callCount(updateB, 1);
         });
     });
 
@@ -400,9 +389,9 @@ describe('Stage', () => {
         /** @type {SystemB} */
         let systemB;
 
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let renderA;
-        /** @type {Spy} */
+        /** @type {sinon.SinonSpy} */
         let renderB;
 
         beforeEach(() => {
@@ -413,14 +402,14 @@ describe('Stage', () => {
             stage.systems.add(systemA);
             stage.systems.add(systemB);
 
-            renderA = spy(systemA, 'render');
-            renderB = spy(systemB, 'render');
+            renderA = sinon.spy(systemA, 'render');
+            renderB = sinon.spy(systemB, 'render');
         });
 
         it('should call render on all stages', () => {
             stage.render();
-            assertSpyCalls(renderA, 1);
-            assertSpyCalls(renderB, 1);
+            sinon.assert.callCount(renderA, 1);
+            sinon.assert.callCount(renderB, 1);
         });
     });
 
@@ -453,31 +442,30 @@ describe('Stage', () => {
         });
 
         it('should add systems to each stage', () => {
-            assert(stageA.getContext('system-a'));
-            assert(stageA.getContext('system-b'));
+            expect(stageA.getContext('system-a')).to.exist;
+            expect(stageA.getContext('system-b')).to.exist;
 
-            assert(stageB.getContext('system-c'));
+            expect(stageB.getContext('system-c')).to.exist;
         });
 
         it('should registerSchemas from bundle', () => {
-            assert(componentSchemas['a']);
-            assert(componentSchemas['b']);
-            assert(componentSchemas['c']);
-            assert(componentSchemas['d']);
-            assert(componentSchemas['f']);
+            expect(componentSchemas['a']).to.exist;
+            expect(componentSchemas['b']).to.exist;
+            expect(componentSchemas['c']).to.exist;
+            expect(componentSchemas['d']).to.exist;
+            expect(componentSchemas['f']).to.exist;
         });
 
         it('should registerLoaders from bundle', () => {
-            assert(assetLoaders['f']);
+            expect(assetLoaders['f']).to.exist;
         });
 
         it('should call load if present in the bundle', () => {
-            // @ts-expect-error
-            assert(stageB.getContext('system-c').loadCalled);
+            expect(stageB.getContext('system-c').loadCalled).to.be.true;
         });
 
         it('should support recursive loading', async () => {
-            assert(stageB.getContext('system-b'));
+            expect(stageB.getContext('system-b')).to.exist;
         });
 
         it('should throw DOMException on abort', async () => {
@@ -486,8 +474,8 @@ describe('Stage', () => {
             let error;
             stageA.loadFile(import.meta.resolve('./fixtures/a.revstg'), abortCtrl.signal).catch(e => error = e);
             abortCtrl.abort();
-            await time.runMicrotasks();
-            assertInstanceOf(error, DOMException);
+            await time.nextAsync();
+            expect(error).to.be.instanceOf(DOMException);
         });
     });
 });

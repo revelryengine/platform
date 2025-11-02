@@ -1,16 +1,18 @@
 import { Game  } from './game.js';
 import { Stage } from './stage.js';
 import { Component } from './component.js';
-import { WatchableEventMap, Watchable } from './watchable.js';
-
-import { ComponentTypeMap } from './ecs.js';
+import { WatchableEventMap, Watchable } from './watchable.d.ts';
 
 type ModelConstructor<D extends string[] = any, E extends WatchableEventMap = any> = {
     new (stage: Stage, entity: string): Model<D, E>;
     components: string[];
 }
 
-export declare class Model<D extends string[] = string[], E extends WatchableEventMap = {}> extends Watchable<E> {
+type ModelEvents = {
+    'delete': void
+}
+
+export declare class Model<D extends string[] = string[], E extends WatchableEventMap = {}> extends Watchable<E & ModelEvents> {
     constructor(stage: Stage, entity: string);
 
     /** A reference to the Stage */

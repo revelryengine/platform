@@ -1,10 +1,10 @@
-type WatchableEventMap = Record<string, any>;
+type WatchableEventMap = Record<string, unknown>;
 
-type WatchHandler<T extends WatchableEventMap, K extends keyof T>   = (data: T[K]) => void;
-type WatchableWildCardDeferredHandler<T extends WatchableEventMap>  = (data: Map<keyof T, T[keyof T]>) => void;
-type WatchableWildCardImmediateHandler<T extends WatchableEventMap> = (type: keyof T, data: T[keyof T]) => void;
+type WatchHandler<T extends WatchableEventMap, K extends keyof T & string>   = (data: T[K]) => void;
+type WatchableWildCardDeferredHandler<T extends WatchableEventMap>  = (data: Map<keyof T & string, T[keyof T & string]>) => void;
+type WatchableWildCardImmediateHandler<T extends WatchableEventMap> = (type: keyof T & string, data: T[keyof T & string]) => void;
 
-type WatchOptions<T extends WatchableEventMap, K extends keyof T = keyof T> = {
+type WatchOptions<T extends WatchableEventMap, K extends keyof T & string = keyof T & string> = {
     handler:    WatchHandler<T, K>;
     deferred?:  boolean;
     once?:      boolean;
@@ -25,8 +25,8 @@ type WatchableWildcardDeferredOptions<T extends WatchableEventMap> = {
     signal?:    AbortSignal;
 }
 
-type WatchableAnyType<T extends WatchableEventMap = WatchableEventMap> = (keyof T) | WatchableWildCardImmediateHandler<T> | WatchableWildcardDeferredOptions<T> | WatchableWildcardImmediateOptions<T>;
-type WatchableAnyOptions<T extends WatchableEventMap = WatchableEventMap, K extends keyof T = keyof T> = WatchHandler<T, K> | WatchOptions<T, K>;
+type WatchableAnyType<T extends WatchableEventMap = WatchableEventMap> = (keyof T & string ) | WatchableWildCardImmediateHandler<T> | WatchableWildcardDeferredOptions<T> | WatchableWildcardImmediateOptions<T>;
+type WatchableAnyOptions<T extends WatchableEventMap = WatchableEventMap, K extends keyof T & string = keyof T & string> = WatchHandler<T, K> | WatchOptions<T, K>;
 type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> = {
     deferred?:  boolean;
     once?:      boolean;
@@ -38,8 +38,8 @@ type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> =
     type: undefined;
     handler: WatchableWildCardDeferredHandler<T>;
 } | {
-    type: keyof T;
-    handler: WatchHandler<T, keyof T>;
+    type: keyof T & string;
+    handler: WatchHandler<T, keyof T & string>;
 })
 
 
@@ -47,16 +47,16 @@ type WatchableOptionsResolved<T extends WatchableEventMap = WatchableEventMap> =
  * A watchable is an object that can be watched for changes events. This does not rely on property setters or dirty checking as it relies solely on
  * code that makes changes to explicitly call notify when changes are complete. Events are then batched in the microtask queue.
  */
-export class Watchable<E extends WatchableEventMap = WatchableEventMap, T = E & WatchableEventMap> {
+export class Watchable<E extends WatchableEventMap = WatchableEventMap, T extends WatchableEventMap = E & WatchableEventMap> {
     /**
      * Notifies handlers of events in the next microtask execution.
      * Subsequent calls are batched until the next microtask execution.
      *
      * Handlers added with the immediate option will be called immediately instead of batched.
      */
-    notify<K extends keyof T>(type: T[K] extends void ? K : never): void;
-    notify<K extends keyof T>(type: K, data: T[K]): void;
-    notify(type: string, data?: uknown): void;
+    notify<K extends keyof T & string>(type: T[K] extends void ? K : never): void;
+    notify<K extends keyof T & string>(type: K, data: T[K]): void;
+    notify(type: string, data?: unknown): void;
 
     /**
      * Watch for all events
@@ -73,7 +73,7 @@ export class Watchable<E extends WatchableEventMap = WatchableEventMap, T = E & 
     /**
      * Watch for events of a specific type
      */
-    watch<K extends keyof T>(type: K, options: WatchableAnyOptions<T, K>): void;
+    watch<K extends keyof T & string>(type: K, options: WatchableAnyOptions<T, K>): void;
 
     /**
      * Remove watch handler.
@@ -90,30 +90,30 @@ export class Watchable<E extends WatchableEventMap = WatchableEventMap, T = E & 
     /**
      * Remove watch handler.
      */
-    unwatch<K extends keyof T>(type: K, options: WatchableAnyOptions<T, K>): void;
+    unwatch<K extends keyof T & string>(type: K, options: WatchableAnyOptions<T, K>): void;
 
     /**
      * Async function to wait for a speficic type to be called.
      * @example ```const data = await watchable.waitFor('example');```
      */
-    waitFor<K extends keyof T>(type: K, signal?: AbortSignal ): Promise<T[K]>;
+    waitFor<K extends keyof T & string>(type: K, signal?: AbortSignal ): Promise<T[K]>;
 
     /**
      * Returns true if any watchers are watching for this specific type or a wildcard.
      */
-    isWatched<K extends keyof T>(type: K): boolean;
+    isWatched<K extends keyof T & string>(type: K): boolean;
 
     /**
      * Returns true if any notification is in the queue for this specific type.
      */
-    isQueued<K extends keyof T>(type: K): boolean;
+    isQueued<K extends keyof T & string>(type: K): boolean;
 
     /**
      * Returns true if input is a watchable object
      */
-    static isWatchable(instance: any): instance is Watchable;
+    static isWatchable(instance: unknown): instance is Watchable;
 
-    static [Symbol.hasInstance](instance: any): instance is Watchable;
+    static [Symbol.hasInstance](instance: unknown): instance is Watchable;
 
     /**
      * This is useful for things such as Float32Arrays that may be changed by gl-matrix or other libraries and we don't want to hinder the performance with proxies.
@@ -125,8 +125,8 @@ export class Watchable<E extends WatchableEventMap = WatchableEventMap, T = E & 
      * class ExtendedFloat extends Watchable.mixin(Float32Array, /\*\* \@type {{ a: string, b: number }} \*\/ ({})) { }
      * ```
      */
-    static mixin<B extends { new (...args: any[]): any }, E extends WatchableEventMap>(base: B, _ ?: E): {
-        new (...args: any[]): Watchable<E>;
+    static mixin<B extends { new (...args: unknown[]): unknown }, E extends WatchableEventMap>(base: B, _ ?: E): {
+        new (...args: unknown[]): Watchable<E>;
         prototype: Watchable<E>;
     } & B;
 }

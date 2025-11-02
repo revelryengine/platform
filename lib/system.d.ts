@@ -1,11 +1,12 @@
 import { Stage } from './stage.js';
 import { Game  } from './game.js';
-import { Watchable, WatchableEventMap } from './watchable.js';
-import { SystemContextKey, SystemContexts } from '../../core/deps/ecs.js';
+import { type ModelConstructor } from './model.d.ts';
+import { Watchable, WatchableEventMap } from './watchable.d.ts';
+import { SystemContextKey, SystemContexts } from './ecs.d.ts';
 
-type SystemModelsDefinition = Record<string, { model: import('./model.js').ModelConstructor, isSet?: boolean }>;
+type SystemModelsDefinition = Record<string, { model: ModelConstructor, isSet?: boolean }>;
 
-type SystemConstructor<D extends SystemModelsDefinition = any, E extends WatchableEventMap = any> = {
+type SystemConstructor<D extends SystemModelsDefinition = SystemModelsDefinition, E extends WatchableEventMap = SystemModelsDefinition> = {
     new (stage: Stage): System<D, E>;
     id:     string;
     models: D;
@@ -14,7 +15,7 @@ type SystemConstructor<D extends SystemModelsDefinition = any, E extends Watchab
 type ModelFromDefinition<D extends SystemModelsDefinition> = InstanceType<D[keyof D]['model']>;
 type SystemEvents<D extends SystemModelsDefinition> = { 'model:add': { model: ModelFromDefinition<D>, key: string }, 'model:delete': { model: ModelFromDefinition<D>, key: string } };
 
-export declare class System<D extends SystemModelsDefinition = any, E extends WatchableEventMap = any> extends Watchable<E & SystemEvents<D>> {
+export declare class System<D extends SystemModelsDefinition = SystemModelsDefinition, E extends WatchableEventMap = SystemModelsDefinition> extends Watchable<E & SystemEvents<D>> {
      /** The id of the system */
     static readonly id: string;
 
@@ -38,7 +39,7 @@ export declare class System<D extends SystemModelsDefinition = any, E extends Wa
     render(): void;
 
     /** A convenience wrapper to derive a Model class and ensure types are inferred correctly */
-    static Typed<D extends { id: string, models: SystemModelsDefinition, events?: WatchableEventMap }>(components: D): SystemConstructor<D['models'], D extends { events: infer E } ? E : any >;
+    static Typed<D extends { id: string, models: SystemModelsDefinition, events?: WatchableEventMap }>(components: D): SystemConstructor<D['models'], D extends { events: infer E } ? E : Record<PropertyKey, never> >;
 
     static models: SystemModelsDefinition;
 }
@@ -48,7 +49,7 @@ export declare class SystemSet extends Watchable<{ 'system:add': { system: Syste
 
     constructor(registrationHandlers: { register: (system: System) => System, unregister: (system: System) => void });
 
-    add(system: System): ThisParameterType;
+    add(system: System): ThisParameterType<this>;
 
     delete(system: System): boolean;
 
