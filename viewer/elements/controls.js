@@ -14,14 +14,19 @@ class RevGLTFViewerControls extends LitElement {
         }
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        this.viewer = this.parentNode.host;
+    get viewer() {
+        return this.parentNode?.host;
+    }
+
+    constructor() {
+        super();
         this.menu = '';
     }
 
     render() {
-        const mode = this.viewer.renderer?.mode;
+        if(!this.viewer?.renderer) return html``;
+
+        const mode = this.viewer.renderer.mode;
         const volume = `volume${this.viewer.viewport?.audio?.muted || !this.viewer.useAudio ? '-mute' : '-high'}`;
 
         return html`
@@ -228,7 +233,7 @@ class RevGLTFViewerControls extends LitElement {
             case 'lighting>exposure': {
                 content = html`
                 ${this.getBackMenuItem('Exposure')}
-                ${this.getSliderMenuItem('Exposure', 0.1, 0.1, 5, this.viewer.exposure, (e) => this.viewer.exposure = parseFloat(e.target.value))}
+                ${this.getSliderMenuItem('Exposure', 0.01, 0, 2, this.viewer.exposure, (e) => this.viewer.exposure = parseFloat(e.target.value))}
                 `;
                 break;
             }
@@ -373,7 +378,7 @@ class RevGLTFViewerControls extends LitElement {
                 ${this.getSubMenuItem('settings>alpha',       'Alpha Blend Mode', this.viewer.alphaBlendMode ?? 'ordered', this.viewer.renderPath !== 'standard')}
                 ${this.getSubMenuItem('settings>fog',         'Fog',              this.viewer.useFog ? 'On': 'Off',        this.viewer.renderPath !== 'standard')}
                 ${this.getSubMenuItem('settings>motion-blur', 'Motion Blur',      this.viewer.useMotionBlur ? 'On': 'Off', this.viewer.renderPath !== 'standard')}
-                ${this.getSubMenuItem('settings>fps',         'Show Stats',       this.viewer.showStats ? 'On': 'Off')}
+                ${this.getSubMenuItem('settings>stats',       'Show Stats',       this.viewer.showStats ? 'On': 'Off')}
                 ${this.getSubMenuItem('settings>debug',       'Debug',            this.viewer.debugPBR ?? 'None',          this.viewer.renderPath !== 'standard')}
                 `;
                 break;
@@ -485,9 +490,9 @@ class RevGLTFViewerControls extends LitElement {
                 break;
             }
 
-            case 'settings>fps': {
+            case 'settings>stats': {
                 content = html`
-                ${this.getBackMenuItem('Show FPS')}
+                ${this.getBackMenuItem('Show Stats')}
                 <div class="list">
                 ${this.getCheckMenuItem('On',  this.viewer.showStats, () => this.viewer.showStats = true )}
                 ${this.getCheckMenuItem('Off', !this.viewer.showStats, () => this.viewer.showStats = false )}
@@ -544,6 +549,7 @@ class RevGLTFViewerControls extends LitElement {
                         return this.getCheckMenuItem(name ?? 'Unnamed', this.viewer.animation === name, () => this.viewer.animation = name)
                     })}
                 </div>
+                ${this.getSliderMenuItem('Playback Speed', 0.001, 0, 2, this.viewer.playbackSpeed, (e) => this.viewer.playbackSpeed = parseFloat(e.target.value))}
                 `;
                 break;
             }

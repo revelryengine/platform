@@ -1,6 +1,7 @@
 import { html, css } from '../../deps/lit.js';
 import Stats from '../../deps/stats.js';
 
+
 import { RevParamElement } from './param.js';
 
 import { Renderer          } from '../../deps/revelry.js';
@@ -18,11 +19,10 @@ import { mat4 } from '../../deps/gl-matrix.js';
 import './controls.js';
 import './camera.js';
 import './toast.js';
+import './memory.js';
 // import './vr.js';
 
-
-
-const defaultRenderScale = Math.max(0.5, 1 / window.devicePixelRatio);
+const defaultRenderScale = Math.max(0.5, 1 / globalThis.devicePixelRatio);
 
 class RevGLTFViewerElement extends RevParamElement  {
     #abortSample = null;
@@ -85,7 +85,8 @@ class RevGLTFViewerElement extends RevParamElement  {
             debugPBR:    { type: String,  param: true, default: 'None' },
             debugAABB:   { type: Boolean, param: true, default: false  },
 
-            animation:   { type: String, param: true, default: '*'  },
+            animation:     { type: String, param: true, default: '*' },
+            playbackSpeed: { type: Number, param: true, default: 1   },
         }
     }
 
@@ -153,7 +154,7 @@ class RevGLTFViewerElement extends RevParamElement  {
         }
 
         this.#autoResizer = new CanvasAutoResizer({ canvas: this.canvas, renderScale: this.renderScale, onresize: () => {
-            this.reconfigure()
+            this.reconfigure();
         }});
     }
 
@@ -191,16 +192,15 @@ class RevGLTFViewerElement extends RevParamElement  {
     createRenderer() {
         try {
             cancelAnimationFrame(this.requestId);
-            this.renderer?.destroy();
+            // this.renderer?.destroy();
 
-            console.log('Creating Renderer');
+            console.log('Creating Renderer', this.forceWebGL2 ? 'WebGL2' : 'WebGPU');
 
             const renderer = new Renderer({ forceWebGL2 : this.forceWebGL2 });
-
             this.renderer = renderer;
 
             this.createViewport();
-            this.reconfigure();
+
 
             // this.frustum  = this.renderer.createFrustum();
 
@@ -209,26 +209,28 @@ class RevGLTFViewerElement extends RevParamElement  {
 
             // this.camera.renderer = this.renderer; //change this to set settings only
 
-            this.controls.update();
+            this.controls.requestUpdate();
 
             this.initSample();
 
             this.requestId = requestAnimationFrame(t => this.renderGLTF(t));
+
         } catch(e) {
-            console.warn(e);
+            console.warn('Failed to create renderer', e);
             this.unsupported = true;
         }
     }
 
     createViewport() {
         if(!this.renderer) throw new Error('Invalid state');
-        this.viewport = this.renderer.createViewport({ renderPath: this.renderPath, target: { type: 'canvas', canvas: this.canvas }});
+        this.viewport = this.renderer.createViewport({ renderPath: this.renderPath, target: { type: 'canvas', canvas: this.canvas }, flags: { outline: false }});
+        this.reconfigure();
     }
 
     #autoResizer;
     async connectedCallback() {
-        super.connectedCallback();
         await Renderer.requestDevice();
+        super.connectedCallback();
         this.createRenderer();
     }
 
@@ -264,13 +266,13 @@ class RevGLTFViewerElement extends RevParamElement  {
         }
 
         if(changedProperties.has('exposure')) {
-            if(this.viewport && 'exposure' in this.viewport.renderPath.settings) {
+            if(this.viewport && 'exposure' in this.viewport.renderPath.settings.values) {
                 this.viewport.renderPath.settings.values.exposure = this.exposure;
             }
         }
 
         if(changedProperties.has('skyboxBlur')) {
-            if(this.viewport && 'skybox' in this.viewport.renderPath.settings) {
+            if(this.viewport && 'skybox' in this.viewport.renderPath.settings.values) {
                 this.viewport.renderPath.settings.values.skybox.blur = this.skyboxBlur;
             }
         }
@@ -294,7 +296,7 @@ class RevGLTFViewerElement extends RevParamElement  {
 
         if(changedProperties.has('forceWebGL2')) {
             this.unsupported = false;
-            if(this.renderer) {
+            if(this.renderer && this.renderer.mode === (this.forceWebGL2 ? 'webgpu' : 'webgl2')) {
                 this.createRenderer();
             }
 
@@ -329,6 +331,10 @@ class RevGLTFViewerElement extends RevParamElement  {
 
         if('tonemap' in settings.flags) {
             settings.flags.tonemap = this.tonemap;
+        }
+
+        if('exposure' in settings.values) {
+            settings.values.exposure = this.exposure;
         }
 
         if('skybox' in settings.values) {
@@ -378,7 +384,7 @@ class RevGLTFViewerElement extends RevParamElement  {
         this.loading = !!(this.loadingSample || this.loadingEnv);
 
         return html`
-            ${this.#stats?.dom ?? ''}
+            ${this.#stats ? html`${this.#stats.dom}<rev-memory-stats .viewer="${this}"></rev-memory-stats>` : ''}
             ${this.camera}
             ${this.canvas}
             ${this.vrControl}
@@ -397,7 +403,7 @@ class RevGLTFViewerElement extends RevParamElement  {
             if(this.animation !== '!') {
                 for(const animator of this.animators) {
                     if(this.animation !== '*' && animator.animation.name !== this.animation) continue;
-                    animator.update(frameDeltaTime);
+                    animator.update(frameDeltaTime * this.playbackSpeed);
                     this.graph.updateAnimationTargets(animator.targets);
                 }
             }
@@ -411,8 +417,9 @@ class RevGLTFViewerElement extends RevParamElement  {
             const { graph, viewport } = this;
 
             viewport.render({ graph, cameraNode });
+            this.shadowRoot.querySelector('rev-memory-stats')?.updateMemory();
 
-            // this.frustum.update({ graph, cameraNode, jitter: this.settings[this.renderPath].temporal });
+            // this.frustum.update({ graph, cameraNode, jitter: this.settings[this.renderPath].flags.temporal });
             // this.renderer.render({ graph, frustum, renderPath });
             // if(!this.vrControl?.xrSession) this.renderer.render(scene, camera);
         }
@@ -618,16 +625,6 @@ class RevGLTFViewerElement extends RevParamElement  {
             right: 0;
             bottom: 20vh;
         }
-
-        .fps {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            background: rgba(0,0,0, 0.75);
-            padding: 5px;
-        }
-
-
         `;
     }
 }

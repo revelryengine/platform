@@ -1,5 +1,15 @@
-- **About**
-  - [Introduction](about/intro.md)
-  - [Features](about/features.md)
-- **Getting Started**
-  - [Editor](getting-started/editor.md)
+
+- About
+
+  - [Introduction](/about/intro)
+  - [Features](/about/features)
+
+
+- Getting Started
+
+  - [Documentation](/docs/ ":class=no-chevron")
+
+- Examples
+
+  - [Renderer](/viewer/)
+

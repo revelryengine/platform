@@ -1,16 +1,8 @@
 # Revelry Engine Documentation Site
 
-!> Project Status - This project is in a very alpha state and is not fully implemented yet.
+> [!WARNING]
+> **Under Construction:** This documentation site is under heavy construction.
+> <br> Pages and navigation subject to change.
 
-#### Install vendor type dependencies
-
-** Assumes running from site directory within platform project **
-
-```sh
-find deps/*.js | xargs deno vendor --force
-```
-
-
-#### To test before release
-
-After publishing all packages and updating the importmap versions, add a `&REVELRY_DEV_MODE=false` query parameter to the url to force it to load without the importmap to local packages.
+> [!CAUTION]
+> **Project Status:** This project is in a very alpha state and is not fully implemented yet.

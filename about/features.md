@@ -1,3 +1,5 @@
+# Revelry Engine Features
+
 ## Editor
 
 Because Revelry Engine is written with web technologies first, the editor can be fully integrated in an IDE that supports web view extensions such as VS Code and VS Codium. This allows developers to write code and create game content in the same application.
@@ -11,7 +13,8 @@ Features:
 
 ### VS Code Extension
 
-The Revelry Engine VS Code extension is available on the VS Code Marketplace and Open VSX Registry.
+> [!IMPORTANT]
+> **Coming Soon** To the VS Code Marketplace and Open VSX Registry
 
 
 ## Renderer
@@ -20,8 +23,7 @@ The Reverly Engine renderer is a WebGPU first forward renderer. It supports an a
 
 Features:
   - Physically Based Rendering as defined in the glTF 2.0 Specification
-
-    Implemented glTF Extensions:
+    - Implemented glTF Extensions:
       - KHR_animation_pointer
       - KHR_draco_mesh_compression
       - KHR_environment_map
@@ -39,7 +41,11 @@ Features:
       - KHR_texture_basisu
       - KHR_texture_transform
       - KHR_xmp_json_ld
-
+      - EXT_texture_webp
+    - Coming Soon:
+      - KHR_materials_anisotropy
+      - KHR_materials_dispersion
+      - KHR_materials_diffuse_transmission
   - Screenspace Ambient Occlusion
   - Motion Blur
   - MSAA
@@ -67,10 +73,18 @@ Revelry Engine uses the Entity Component Systems (ECS) architecture. In ECS, eve
 
 ## Web Component Based UI
 
+> [!IMPORTANT]
+> **Details Coming Soon**
+
 
 ## Controller/Gamepad Support
 
-## Steam Bundler
+> [!IMPORTANT]
+> **Details Coming Soon**
+
+## Future Plans
+
+- Steam Bundler
   - Steam Input
   - Steam Interface Overlay
   - Steam Networking

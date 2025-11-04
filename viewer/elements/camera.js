@@ -95,6 +95,13 @@ export class ViewerCamera extends LitElement {
                     znear: 0.01,
                     yfov: 45 * (Math.PI / 180),
                 },
+                // type: 'orthographic',
+                // orthographic: {
+                //     znear: 0.1,
+                //     zfar:  100,
+                //     xmag:  1.0,
+                //     ymag:  1.0,
+                // },
             }),
         });
 
@@ -262,6 +269,9 @@ export class ViewerCamera extends LitElement {
         this.position      = position;
         this.target        = target;
         this.zoom          = 0;
+
+        this.node.camera.perspective.znear = idealDistance / 100;
+        this.node.camera.perspective.zfar  = idealDistance * 10;
 
         setTimeout(() => this.focusCenter(), 100);
     }

@@ -16,6 +16,7 @@ export class RevGLTFViewerToast extends LitElement {
                 flex-direction: row;
                 justify-content: center;
                 align-items: center;
+                pointer-events: none;
             }
 
             .message {
