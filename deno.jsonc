@@ -1,0 +1,42 @@
+{
+    "lock": false,
+    "vendor": true,
+    "importMap": "./importmap.dev.json",
+    "compilerOptions": {
+        "checkJs": true,
+        "lib": ["esnext", "dom", "dom.iterable", "deno.ns"],
+        "types": [
+            "./node_modules/@types/sinonjs__fake-timers@15.0.1/index.d.ts"
+        ]
+    },
+    "tasks": {
+        "dev:serve": "deno run -A tasks/serve.js",
+
+        "test":         "deno task test:clean && deno task test:browser && deno task test:deno",
+        "test:clean":   "rm -rf coverage",
+        "test:browser": "deno run -A ./test/browser.js",
+        "test:deno":    "deno run -A ./test/deno.js",
+
+        //not yet implemented
+        // "validate":       "deno task validate:types && deno task validate:lint && deno task validate:docs",
+        // "validate:types": "deno check",
+        // "validate:lint":  "deno lint",
+
+        "validate:docs":  "deno run -A ./site/docs/generate.js --validate",
+
+        "generate:docs": "deno run -A ./site/docs/generate.js"
+    },
+    "lint": {
+        "rules": {
+            "exclude": [
+                "require-await",
+                "no-import-prefix",
+                "no-async-promise-executor"
+            ]
+        }
+    },
+    "exclude": [
+        "coverage/**",
+        "docs/**"
+    ]
+}

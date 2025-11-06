@@ -1,6 +1,9 @@
 *.bak
 vendor
-@packages
-lib.deno.d.ts
+node_modules
+coverage
+
+site/docs/packages
 editor
-scripts
+scripts/
+starters/

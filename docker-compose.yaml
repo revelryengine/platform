@@ -1,35 +1,17 @@
 ---
-version: "3"
 services:
   site:
     container_name: revelry-site
-    image: denoland/deno:1.28.2
-    command: deno run -A ../serve.js
+    image: denoland/deno:2.5.6
+    command: deno task dev:serve
     working_dir: /usr/src/app
     environment:
       - WEB_PORT=8080
     volumes:
-      - ./serve.js:/usr/src/serve.js
-      - ./packages:/usr/src/packages
-      - ./site:/usr/src/app
+      - ./:/usr/src/app
       - deno-dir:/deno-dir
     ports:
       - 8082:8080
-    restart: unless-stopped
-  editor:
-    container_name: revelry-editor
-    image: denoland/deno:1.28.2
-    command: deno run -A ../serve.js
-    working_dir: /usr/src/app
-    environment:
-      - WEB_PORT=8080
-    volumes:
-      - ./serve.js:/usr/src/serve.js
-      - ./packages:/usr/src/packages
-      - ./editor:/usr/src/app
-      - deno-dir:/deno-dir
-    ports:
-      - 8084:8080
     restart: unless-stopped
 volumes:
   deno-dir:

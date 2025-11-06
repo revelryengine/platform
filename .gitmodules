@@ -7,12 +7,6 @@
 [submodule "packages/renderer"]
 	path = packages/renderer
 	url = git@github.com:revelryengine/renderer.git
-[submodule "packages/sample-models"]
-	path = packages/sample-models
-	url = git@github.com:revelryengine/sample-models.git
-[submodule "packages/sample-environments"]
-	path = packages/sample-environments
-	url = git@github.com:revelryengine/sample-environments.git
 [submodule "packages/ecs"]
 	path = packages/ecs
 	url = git@github.com:revelryengine/ecs.git
@@ -22,3 +16,9 @@
 [submodule "packages/utils"]
 	path = packages/utils
 	url = git@github.com:revelryengine/utils.git
+[submodule "samples/models"]
+	path = samples/models
+	url = git@github.com:revelryengine/sample-models.git
+[submodule "samples/environments"]
+	path = samples/environments
+	url = git@github.com:revelryengine/sample-environments.git

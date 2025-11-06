@@ -2,28 +2,13 @@
 
 git clone --recurse-submodules git@github.com:revelryengine/platform.git
 
-# Requirements
+## Requirements
 
 docker
-deno
+deno@2.5.5+
 
-
-# To start
+## Start dev server
 
 ```powershell
-deno run -A dev.js
+docker compose up -d
 ```
-
-
-# Releasing a package
-
-1. Push changes package to GitHub
-2. List current releases
-```
-gh release list --limit 1
-```
-3. Create new release incrementing version
-```
-gh release create <version> -p
-```
-4. Replace version references in platform packages
