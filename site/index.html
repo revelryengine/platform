@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="./favicon_32.png">
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@^5.0.0-rc/dist/themes/core.min.css" />
+        <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://cdn.jsdelivr.net/npm/docsify@^5.0.0-rc/dist/themes/addons/core-dark.min.css" />
+        <style>
+            :root {
+                --color-text: rgb(24, 24, 24);
+                --color-bg: rgb(254, 254, 254);
+                --sidebar-bg: rgb(250, 250, 250);
+
+                --theme-color: #fdda0d;
+
+                --link-underline-color: inherit;
+                --link-underline-color-hover: var(--theme-color);
+
+                --content-max-width: 100ch;
+
+                --table-row-alt-bg: var(--color-bg);
+            }
+
+            button:not([type]).docsify-copy-code-button {
+                color: rgb(24, 24, 24);
+            }
+
+            @media(prefers-color-scheme: light) {
+                .app-name-link img {
+                    content: url('/assets/revelry-engine-light.svg');
+                }
+
+                :root {
+                    --sidebar-background: #ffffff;
+                }
+            }
+
+            @media(prefers-color-scheme: dark) {
+                :root {
+                    --color-text: rgb(230, 230, 230);
+                    --color-bg: rgb(24, 24, 24);
+                    --sidebar-bg: rgb(12, 12, 12);
+                }
+                .app-name-link img {
+                    content: url('/assets/revelry-engine-dark.svg');
+                }
+            }
+
+            .sidebar {
+                scrollbar-gutter: stable;
+            }
+            .sidebar-nav {
+                border-top: 1px solid var(--theme-color);
+            }
+
+
+            /* Reverse order of hardcoded sidebar items */
+            li:has(.app-sub-sidebar) {
+                display: flex;
+                flex-direction: column;
+            }
+            li:has(.app-sub-sidebar) > ul:not(.app-sub-sidebar) {
+                order: 3
+            }
+
+            /* Non-collapsible sidebar groups */
+            .collapse:has(> a.non-collapsible) ul {
+                display: block;
+            }
+
+            /** Prevent jitter when navigating sections that have interleaved sidebar and headers*/
+            .sidebar-nav .active .group {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body class="loading sidebar-chevron-right sidebar-link-clamp">
+        <div id="app"></div>
+        <script>
+            window.$docsify = {
+                name: 'Revelry Engine',
+                logo: '/assets/revelry-engine-dark.svg',
+                loadSidebar: true,
+                maxLevel: 4,
+                subMaxLevel: 4,
+                relativePath: true,
+                auto2top: true,
+                noCompileLinks: [
+                    '/viewer/',
+                ],
+                alias: {
+                    '/about/_sidebar.md': '/_sidebar.md',
+                    '/getting-started/_sidebar.md': '/_sidebar.md',
+                },
+                search: {
+                    insertAfter: '.app-name',
+                    maxAge: 1000,
+                    paths: [
+                        '/about/features',
+                        '/about/intro',
+                        '/getting-started/editor',
+                        '/docs/README',
+                    ],
+                    placeholder: 'Search documentation...',
+                    noData: 'No results found.',
+                    depth: 8,
+                },
+                pagination: {
+                    crossChapter: true,
+                }
+            };
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/docsify@^5.0.0-rc"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docsify@^5.0.0-rc/dist/plugins/search.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docsify@^5.0.0-rc/dist/plugins/zoom-image.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-javascript.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-typescript.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-bash.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-json.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script> -->
+
+        <script src="/docs/packages/utils/docsify-plugin.js"></script>
+        <script src="/docs/packages/gltf/docsify-plugin.js"></script>
+    </body>
+</html>

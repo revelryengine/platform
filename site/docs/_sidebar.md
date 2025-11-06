@@ -1,0 +1,4 @@
+- [Documentation](/docs/ ":class=no-chevron :class=non-collapsible")
+  - Packages
+    - [revelryengine/utils](packages/utils/ ":class=no-chevron")
+    - [revelryengine/gltf](packages/gltf/ ":class=no-chevron")
