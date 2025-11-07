@@ -1,18 +1,3 @@
-[submodule "packages/gltf"]
-	path = packages/gltf
-	url = git@github.com:revelryengine/gltf.git
-[submodule "packages/renderer"]
-	path = packages/renderer
-	url = git@github.com:revelryengine/renderer.git
-[submodule "packages/ecs"]
-	path = packages/ecs
-	url = git@github.com:revelryengine/ecs.git
-[submodule "packages/core"]
-	path = packages/core
-	url = git@github.com:revelryengine/core.git
-[submodule "packages/utils"]
-	path = packages/utils
-	url = git@github.com:revelryengine/utils.git
 [submodule "samples/sample-environments"]
 	path = samples/sample-environments
 	url = git@github.com:revelryengine/sample-environments.git
