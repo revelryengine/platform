@@ -2,6 +2,12 @@ import { Application, Router, send } from 'https://deno.land/x/oak@v12.1.0/mod.t
 
 const router = new Router();
 
+router.get('/importmap.js', async (ctx) => {
+    const contents = await Deno.readTextFile('./site/importmap.js');
+    ctx.response.headers.set('Content-Type', 'application/javascript');
+    ctx.response.body = `globalThis.REVELRY_IMPORT_MODE = new URL(self.location.href).searchParams?.has('FORCE_REMOTE_CDN') ? 'remote' : 'local';\n${contents}`;
+});
+
 router.get('/(.*)', async (ctx) => {
     let path = ctx.request.url.pathname;
     if(!path.startsWith('/packages') && !path.startsWith('/samples')) {

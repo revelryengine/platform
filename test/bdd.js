@@ -1,3 +1,5 @@
+/// <reference path="npm:@types/sinonjs__fake-timers@15.0.1" />
+
 // @ts-types="npm:@types/chai"
 import { expect, use } from 'https://cdn.jsdelivr.net/npm/chai@6.2.0/+esm';
 

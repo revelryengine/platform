@@ -13,9 +13,9 @@
 [submodule "packages/utils"]
 	path = packages/utils
 	url = git@github.com:revelryengine/utils.git
-[submodule "samples/environments"]
-	path = samples/environments
+[submodule "samples/sample-environments"]
+	path = samples/sample-environments
 	url = git@github.com:revelryengine/sample-environments.git
-[submodule "samples/models"]
-	path = samples/models
+[submodule "samples/sample-models"]
+	path = samples/sample-models
 	url = git@github.com:revelryengine/sample-models.git

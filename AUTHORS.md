@@ -1,8 +1,7 @@
 # This is the list of Revelry Engine's significant contributors.
-#
-# This does not necessarily list everyone who has contributed code,
-# especially since many employees of one corporation may be contributing.
-# To see the full list of contributors, see the revision history in
-# source control.
+
+> [!NOTE]
+> This does not necessarily list everyone who has contributed code. To see the full list of contributors, 
+> see the revision history in source control.
 
 @shannon (Shannon Poole)

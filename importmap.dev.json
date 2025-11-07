@@ -17,7 +17,7 @@
         "physx-js-webidl@ts-types": "npm:physx-js-webidl@2.6.2",
         "rfc6902@ts-types":         "npm:rfc6902@5.1.1",
 
-        "revelryengine-samples/":       "./samples/",
+        "revelryengine/samples/":  "./samples/",
 
         "bdd": "./test/bdd.js"
     }

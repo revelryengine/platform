@@ -10,9 +10,6 @@
         "box2d-wasm":       "https://cdn.jsdelivr.net/npm/box2d-wasm@7.0.0/dist/es/Box2D.js",
         "physx-js-webidl":  "https://cdn.jsdelivr.net/npm/physx-js-webidl@2.6.2/physx-js-webidl.js",
         "rfc6902":          "https://cdn.jsdelivr.net/npm/rfc6902@5.1.1/index.js/+esm",
-        "lit/":             "https://esm.sh/lit@3.3.1/",
-
-        "revelryengine-samples/models/":       "https://cdn.jsdelivr.net/gh/revelryengine/sample-models/",
-        "revelryengine-samples/environments/": "https://cdn.jsdelivr.net/gh/revelryengine/sample-environments/"
+        "lit/":             "https://esm.sh/lit@3.3.1/"
     }
 }

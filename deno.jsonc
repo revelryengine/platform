@@ -4,10 +4,7 @@
     "importMap": "./importmap.dev.json",
     "compilerOptions": {
         "checkJs": true,
-        "lib": ["esnext", "dom", "dom.iterable", "deno.ns"],
-        "types": [
-            "./node_modules/@types/sinonjs__fake-timers@15.0.1/index.d.ts"
-        ]
+        "lib": ["esnext", "dom", "dom.iterable", "deno.ns"]
     },
     "tasks": {
         "dev:serve": "deno run -A tasks/serve.js",

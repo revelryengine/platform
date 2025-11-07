@@ -7,8 +7,8 @@ export * from 'revelryengine/gltf/lib/gltf.js';
 export { Renderer          } from 'revelryengine/renderer/lib/renderer.js';
 export { CanvasAutoResizer } from 'revelryengine/utils/lib/canvas-auto-resizer.js';
 
-export { index as samplesIndex } from 'revelryengine-samples/models/index.js';
-export { index as envIndex     } from 'revelryengine-samples/environments/index.js';
+export { index as samplesIndex } from 'revelryengine/samples/sample-models/index.js';
+export { index as envIndex     } from 'revelryengine/samples/sample-environments/index.js';
 
 export { PBR_DEBUG_MODES } from 'revelryengine/renderer/lib/constants.js';
 

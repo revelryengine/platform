@@ -1,19 +1,14 @@
-const global = /** @type {any} */ (globalThis);
-global.REVELRY_DEV_MODE ??= new URL(self.location.href).searchParams?.get('REVELRY_DEV_MODE') === 'false' ? false: true;
+const global = /** @type {{ REVELRY_IMPORT_MODE?: 'remote' | 'local' }} */ (globalThis);
 
-const shim = document.createElement('script');
-shim.nonce = /** @type {HTMLScriptElement} */(document.querySelector('script[nonce]'))?.nonce;
-shim.async = true;
-shim.src   = 'https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js'; // Investigate why this is still needed for firefox
+global.REVELRY_IMPORT_MODE ??= 'remote';
+
+const REVELRY_PATH = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() : 'https://cdn.jsdelivr.net/gh/revelryengine/';
 
 const element = document.createElement('script');
 element.type = 'importmap';
 element.textContent = JSON.stringify({
     imports: {
-        'revelryengine/': global.REVELRY_DEV_MODE ? new URL('/packages/', location.href).toString() : 'https://cdn.jsdelivr.net/gh/revelryengine/',
-
-        'revelryengine-samples/models/': global.REVELRY_DEV_MODE ? new URL('/samples/models/', location.href).toString() : 'https://cdn.jsdelivr.net/gh/revelryengine/sample-models/',
-        'revelryengine-samples/environments/': global.REVELRY_DEV_MODE ? new URL('/samples/environments/', location.href).toString() : 'https://cdn.jsdelivr.net/gh/revelryengine/sample-environments/',
+        'revelryengine/': global.REVELRY_IMPORT_MODE === 'local' ? `${REVELRY_PATH}packages/` : REVELRY_PATH,
 
         "gl-matrix":        "https://cdn.jsdelivr.net/npm/gl-matrix@beta/dist/esm/index.js",
         "es-module-shims":  "https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js",
@@ -24,8 +19,9 @@ element.textContent = JSON.stringify({
         "physx-js-webidl":  "https://cdn.jsdelivr.net/npm/physx-js-webidl@2.6.2/physx-js-webidl.js",
         "rfc6902":          "https://cdn.jsdelivr.net/npm/rfc6902@5.1.1/index.js/+esm",
         "lit/":             "https://esm.sh/lit@3.3.1/",
+
+        'revelryengine/samples/': global.REVELRY_IMPORT_MODE === 'local' ? `${REVELRY_PATH}samples/` : REVELRY_PATH,
     }
 });
 
-document.currentScript?.after(shim);
 document.currentScript?.after(element);
