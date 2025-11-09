@@ -1,6 +1,6 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Watchable } from '../lib/watchable.js';
+import { Watchable } from '../watchable.js';
 
 describe('Watchable', () => {
 

@@ -1,10 +1,10 @@
 
-import { Game, Stage } from '../lib/ecs.js';
+import { Game, Stage } from '../ecs.js';
 
 const game  = new Game();
 const stage = new Stage(game, 'stage');
 
-await stage.loadFile(import.meta.resolve('./fixtures/a.revstg'));
+await stage.loadFile(import.meta.resolve('./__fixtures__/a.revstg'));
 
 let id = 0;
 Deno.bench('String component creation', () => {

@@ -17,8 +17,8 @@ const config = {
         {
             name: 'ecs',
             files: [
-                'packages/ecs/test/**/*.test.js',
-                `!packages/ecs/test/**/*.browser.test.js`
+                'packages/ecs/**/__tests__/**/*.test.js',
+                `!packages/ecs/**/__tests__/**/*.browser.test.js`
             ]
         }
     ],

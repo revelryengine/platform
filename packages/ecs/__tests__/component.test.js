@@ -1,6 +1,6 @@
 import { describe, it, expect, sinon, beforeEach } from 'bdd';
 
-import { Game, Stage, Component, ComponentSet, UUID } from '../lib/ecs.js';
+import { Game, Stage, Component, ComponentSet, UUID } from '../ecs.js';
 
 describe('Component', () => {
     /** @type {sinon.SinonSpy} */

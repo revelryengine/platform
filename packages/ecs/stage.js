@@ -1,4 +1,6 @@
-import { UUID, SetMap    } from '../deps/utils.js';
+import { UUID   } from '../utils/uuid.js';
+import { SetMap } from '../utils/set-map.js';
+
 
 import { Component, ComponentSet } from './component.js';
 import { Watchable } from './watchable.js';

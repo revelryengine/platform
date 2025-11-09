@@ -1,8 +1,8 @@
-import { System, Model } from '../../lib/ecs.js';
+import { System, Model } from '../../ecs.js';
 import { bundle as bundleB } from './system-b.js';
 
 /**
- * @import { SystemBundle } from '../../lib/ecs.js'
+ * @import { SystemBundle } from '../../ecs.js'
  */
 
 let loadCalled = false;

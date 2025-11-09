@@ -1,13 +1,13 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game, Stage, UUID, registerLoader, unregisterLoader } from '../lib/ecs.js';
+import { Game, Stage, UUID, registerLoader, unregisterLoader } from '../ecs.js';
 
 const JSON_DATA_URI_A ='data:application/json;charset=utf-8;base64,eyAiYSI6ICJhIiB9';
 const JSON_DATA_URI_B ='data:application/json;charset=utf-8;base64,eyAiYiI6ICJiIiB9';
 const JSON_DATA_URI_C ='data:application/json;charset=utf-8;base64,eyAiYyI6ICJjIiB9';
 
 /**
- * @import {AssetReference} from '../lib/ecs.js'
+ * @import {AssetReference} from '../ecs.js'
  */
 
 describe('assets', () => {

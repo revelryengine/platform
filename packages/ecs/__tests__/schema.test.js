@@ -1,9 +1,9 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game, Stage, ComponentReference, registerSchema, unregisterSchema, UUID, registerLoader, AssetReference, unregisterLoader } from '../lib/ecs.js';
+import { Game, Stage, ComponentReference, registerSchema, unregisterSchema, UUID, registerLoader, AssetReference, unregisterLoader } from '../ecs.js';
 
 /**
- * @import { Component } from '../lib/ecs.js';
+ * @import { Component } from '../ecs.js';
  */
 
 const JSON_DATA_URI_A ='data:application/json;charset=utf-8;base64,eyAiYSI6ICJhIiB9';

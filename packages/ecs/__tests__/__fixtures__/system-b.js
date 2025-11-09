@@ -1,7 +1,7 @@
-import { System, Model } from '../../lib/ecs.js';
+import { System, Model } from '../../ecs.js';
 
 /**
- * @import { SystemBundle } from '../../lib/ecs.js'
+ * @import { SystemBundle } from '../../ecs.js'
  */
 
 export class ModelB extends Model.Typed({

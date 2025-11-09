@@ -1,6 +1,7 @@
-import { deepEquals, SetMap } from '../deps/utils.js';
-import { Watchable          } from './watchable.js';
-import { componentSchemas     } from './schema.js';
+import { deepEquals       } from '../utils/deep-equals.js';
+import { SetMap           } from '../utils/set-map.js';
+import { Watchable        } from './watchable.js';
+import { componentSchemas } from './schema.js';
 
 /**
  * @import { Stage, ComponentTypeKey, ComponentDataMap, ComponentDataMapSerialized, ComponentEventMap } from './ecs.d.ts';

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bdd';
 
-import * as ECS from '../lib/ecs.js';
+import * as ECS from '../ecs.js';
 
 describe('ECS', () => {
     it('should load module', () => {

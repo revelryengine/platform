@@ -1,4 +1,4 @@
-import { WeakCache } from '../deps/utils.js';
+import { WeakCache } from '../utils/weak-cache.js';
 
 /**
  * @import { Watchable as WatchableClass, WatchableEventMap, WatchableAnyType, WatchableAnyOptions, WatchableOptionsResolved, WatchHandler } from './watchable.d.ts';

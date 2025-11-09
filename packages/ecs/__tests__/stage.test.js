@@ -1,6 +1,6 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game, Stage, System, Model, UUID, componentSchemas, assetLoaders, unregisterSchema, unregisterLoader } from '../lib/ecs.js';
+import { Game, Stage, System, Model, UUID, componentSchemas, assetLoaders, unregisterSchema, unregisterLoader } from '../ecs.js';
 
 describe('Stage', () => {
 
@@ -428,8 +428,8 @@ describe('Stage', () => {
             stageA = game.createStage('a');
             stageB = game.createStage('b');
 
-            await stageA.loadFile(import.meta.resolve('./fixtures/a.revstg'));
-            await stageB.loadFile(import.meta.resolve('./fixtures/b.revstg'));
+            await stageA.loadFile(import.meta.resolve('./__fixtures__/a.revstg'));
+            await stageB.loadFile(import.meta.resolve('./__fixtures__/b.revstg'));
         });
 
         afterEach(() => {
@@ -472,7 +472,7 @@ describe('Stage', () => {
             const abortCtrl = new AbortController();
 
             let error;
-            stageA.loadFile(import.meta.resolve('./fixtures/a.revstg'), abortCtrl.signal).catch(e => error = e);
+            stageA.loadFile(import.meta.resolve('./__fixtures__/a.revstg'), abortCtrl.signal).catch(e => error = e);
             abortCtrl.abort();
             await time.nextAsync();
             expect(error).to.be.instanceOf(DOMException);

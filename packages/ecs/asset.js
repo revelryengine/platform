@@ -1,5 +1,5 @@
 import { Watchable } from './watchable.js';
-import { SetMap    } from '../deps/utils.js';
+import { SetMap    } from '../utils/set-map.js';
 
 /**
  * @import { AssetLoaderKey, AssetLoaders, AssetLoader, AssetLoaderManagers, AssetDataMap, Stage } from './ecs.d.ts';

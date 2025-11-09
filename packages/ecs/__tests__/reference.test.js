@@ -1,9 +1,9 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game, Stage, Component, UUID } from '../lib/ecs.js';
+import { Game, Stage, Component, UUID } from '../ecs.js';
 
 /**
- * @import { ComponentReference } from '../lib/reference.js';
+ * @import { ComponentReference } from '../reference.js';
  */
 describe('references', () => {
     /** @type {sinon.SinonFakeTimers} */

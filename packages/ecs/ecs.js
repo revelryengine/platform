@@ -14,4 +14,4 @@ export * from './reference.js';
 export * from './asset.js';
 export * from './schema.js';
 
-export { UUID } from '../deps/utils.js';
+export { UUID } from '../utils/uuid.js';

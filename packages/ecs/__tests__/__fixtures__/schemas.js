@@ -1,5 +1,5 @@
 /**
- * @import { ComponentTypeSchema } from '../../lib/ecs.js'
+ * @import { ComponentTypeSchema } from '../../ecs.js'
  */
 
 export const a = /** @type {const} @satisfies {ComponentTypeSchema} */({ type: 'string',  default: 'a' });

@@ -1,8 +1,8 @@
 import { describe, it, expect, sinon, beforeEach, afterEach } from 'bdd';
 
-import { Game   } from '../lib/game.js';
-import { Stage  } from '../lib/stage.js';
-import { System } from '../lib/system.js';
+import { Game   } from '../game.js';
+import { Stage  } from '../stage.js';
+import { System } from '../system.js';
 
 describe('Game', () => {
     /** @type {Game} */
@@ -357,7 +357,7 @@ describe('Game', () => {
         beforeEach(async () => {
             fetchSpy = sinon.spy(globalThis, 'fetch');
 
-            await game.loadFile(import.meta.resolve('./fixtures/a.revgam'));
+            await game.loadFile(import.meta.resolve('./__fixtures__/a.revgam'));
         });
 
         afterEach(() => {
@@ -373,7 +373,7 @@ describe('Game', () => {
         })
 
         it('should clear any existing stages', async () => {
-            await game.loadFile(import.meta.resolve('./fixtures/b.revgam'));
+            await game.loadFile(import.meta.resolve('./__fixtures__/b.revgam'));
             expect(game.stages.size).to.equal(2);
             expect(game.getContext('c')).to.exist;
             expect(game.getContext('d')).to.exist;

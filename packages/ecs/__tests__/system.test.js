@@ -1,9 +1,9 @@
 import { describe, it, expect, sinon, beforeEach } from 'bdd';
 
-import { System, SystemSet } from '../lib/system.js';
-import { Model  } from '../lib/model.js';
-import { Game   } from '../lib/game.js';
-import { Stage  } from '../lib/stage.js';
+import { System, SystemSet } from '../system.js';
+import { Model  } from '../model.js';
+import { Game   } from '../game.js';
+import { Stage  } from '../stage.js';
 
 describe('System', () => {
     class ModelA extends Model.Typed({

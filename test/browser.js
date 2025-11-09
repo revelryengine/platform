@@ -36,8 +36,8 @@ const config = {
         {
             name: 'ecs',
             files: [
-                `packages/ecs/test/**/*.test.js`,
-                `!packages/ecs/test/**/*.deno.test.js`
+                `packages/ecs/**/__tests__/**/*.test.js`,
+                `!packages/ecs/**/__tests__/**/*.deno.test.js`
             ],
             browsers: [
                 playwrightLauncher({ product: 'chromium' }),

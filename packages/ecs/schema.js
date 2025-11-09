@@ -1,4 +1,5 @@
-import { deepEquals, NonNull } from '../deps/utils.js';
+import { deepEquals } from '../utils/deep-equals.js';
+import { NonNull    } from '../utils/non-null.js';
 
 /**
  * @import { Component, ComponentSchemaManagers, ComponentSchemas, ComponentTypeKey, ComponentTypeSchema, ComponentTypeSchemaArray, ComponentTypeSchemaObject, ComponentTypeSchemaTuple} from './ecs.js'
