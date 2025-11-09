@@ -25,8 +25,8 @@ const config = {
         {
             name: 'utils',
             files: [
-                `packages/utils/test/**/*.test.js`,
-                `!packages/utils/test/**/*.deno.test.js`
+                `packages/utils/**/__tests__/**/*.test.js`,
+                `!packages/utils/**/__tests__/**/*.deno.test.js`
             ],
             browsers: [
                 playwrightLauncher({ product: 'chromium' }),

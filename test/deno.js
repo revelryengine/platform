@@ -10,8 +10,8 @@ const config = {
         {
             name: 'utils',
             files: [
-                'packages/utils/test/**/*.test.js',
-                `!packages/utils/test/**/*.browser.test.js`
+                'packages/utils/**/__tests__/**/*.test.js',
+                `!packages/utils/**/__tests__/**/*.browser.test.js`
             ]
         },
         {

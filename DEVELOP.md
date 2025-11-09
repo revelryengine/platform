@@ -11,6 +11,7 @@ deno@2.5.5+
 
 ```
 deno cache --reload ./packages/**/deps/*.js
+deno cache --reload ./test/*.js
 ```
 
 ## Start dev server
