@@ -9,7 +9,7 @@
 import { NamedGLTFProperty  } from './gltf-property.js';
 import { CameraOrthographic } from './camera-orthographic.js';
 import { CameraPerspective  } from './camera-perspective.js';
-import { mat4               } from '../deps/gl-matrix.js';
+import { mat4               } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';

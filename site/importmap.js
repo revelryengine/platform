@@ -3,13 +3,15 @@ const global = /** @type {{ REVELRY_IMPORT_MODE?: 'remote' | 'local' }} */ (glob
 global.REVELRY_IMPORT_MODE ??= 'remote';
 
 const packagesBasePath = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'packages/' : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/';
-const samplesBasePath  = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'samples/' : 'https://cdn.jsdelivr.net/gh/revelryengine/';
+const depsBasePath     = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'deps/'     : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/deps/';
+const samplesBasePath  = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'samples/'  : 'https://cdn.jsdelivr.net/gh/revelryengine/';
 
 const element = document.createElement('script');
 element.type = 'importmap';
 element.textContent = JSON.stringify({
     imports: {
         'revelryengine/': packagesBasePath,
+        'revelryengine/deps/': depsBasePath,
 
         "gl-matrix":        "https://cdn.jsdelivr.net/npm/gl-matrix@beta/dist/esm/index.js",
         "es-module-shims":  "https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js",

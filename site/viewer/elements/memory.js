@@ -1,6 +1,6 @@
-import { LitElement, html, css } from '../../deps/lit.js';
+import { LitElement, html, css } from 'revelryengine/deps/lit.js';
 
-import { getWebGPUMemoryUsage } from '../../deps/memory.js';
+import { getWebGPUMemoryUsage } from 'revelryengine/deps/memory.js';
 
 /**
  * @import { RevGLTFViewerElement } from './viewer.js';

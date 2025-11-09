@@ -11,7 +11,7 @@ import { AnimationSampler  } from './animation-sampler.js';
 import { AnimationChannel  } from './animation-channel.js';
 import { Node              } from './node.js';
 import { GL                } from './constants.js';
-import { quat              } from '../deps/gl-matrix.js';
+import { quat              } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
@@ -21,7 +21,7 @@ import { quat              } from '../deps/gl-matrix.js';
 /**
  * @import { animationChannel } from './animation-channel.js';
  * @import { animationSampler } from './animation-sampler.js';
- * @import { TypedArray } from '../deps/utils.js';
+ * @import { TypedArray } from '../utils/buffers.js';
  */
 
 /**

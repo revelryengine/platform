@@ -1,7 +1,7 @@
-import { LitElement, html, css } from '../../deps/lit.js';
+import { LitElement, html, css } from 'revelryengine/deps/lit.js';
+import { vec3, mat4, quat      } from 'revelryengine/deps/gl-matrix.js';
+import { Camera, Node          } from 'revelryengine/gltf/gltf.js';
 
-import { Camera, Node     } from '../../deps/revelry.js';
-import { vec3, mat4, quat } from '../../deps/gl-matrix.js';
 
 const tmpV = vec3.create();
 

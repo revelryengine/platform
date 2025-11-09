@@ -1,4 +1,4 @@
-import { LitElement, html, css } from '../../deps/lit.js';
+import { LitElement, html, css } from 'revelryengine/deps/lit.js';
 
 import './icon.js';
 

@@ -3,11 +3,11 @@
  */
 
 const config = {
-    entryPoints: ['./lib/**/*.js', './lib/**/*.d.ts'],
+    entryPoints: ['./**/*.js', './**/*.d.ts'],
     intentionallyNotDocumented: [
-        'lib/extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.@context',
-        'lib/extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.packets',
-        'lib/extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.extensions',
+        'extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.@context',
+        'extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.packets',
+        'extensions/KHR/archived/KHR_xmp.glTFKHRXMP.__type.extensions',
     ],
 
     externalSymbolLinkMappings: {

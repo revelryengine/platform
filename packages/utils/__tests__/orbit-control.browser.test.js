@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, sinon } from 'bdd';
 
 import { OrbitControl } from '../orbit-control.js';
-import { Vec3, Quat } from '../../../../deps/gl-matrix.js';
+import { Vec3, Quat } from 'revelryengine/deps/gl-matrix.js';
 
 /**
- * @import { Vec3Like, QuatLike } from '../../../../deps/gl-matrix.js';
+ * @import { Vec3Like, QuatLike } from 'revelryengine/deps/gl-matrix.js';
  */
 
 /**

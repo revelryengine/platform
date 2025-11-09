@@ -1,1 +1,1 @@
-export * from 'revelryengine/gltf/lib/gltf.js';
+export * from 'revelryengine/gltf/gltf.js';

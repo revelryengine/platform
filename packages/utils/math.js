@@ -1,5 +1,5 @@
 /**
- * @import { Vec2Like } from '../../deps/gl-matrix.js';
+ * @import { Vec2Like } from "revelryengine/deps/gl-matrix.js";
  */
 
 /**

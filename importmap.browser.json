@@ -1,6 +1,7 @@
 {
     "imports": {
-        "revelryengine/": "https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/",
+        "revelryengine/":      "https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/",
+        "revelryengine/deps/": "https://cdn.jsdelivr.net/gh/revelryengine/platform/deps/",
 
         "gl-matrix":        "https://cdn.jsdelivr.net/npm/gl-matrix@beta/dist/esm/index.js",
         "es-module-shims":  "https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js",

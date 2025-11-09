@@ -1,7 +1,7 @@
-import { LitElement, html, css, repeat } from '../../deps/lit.js';
+import { LitElement, html, css, repeat } from 'revelryengine/deps/lit.js';
 
 /**
- * @import { TemplateResult } from '../../deps/lit.js';
+ * @import { TemplateResult } from 'revelryengine/deps/lit.js';
  */
 
 export class RevGLTFViewerToast extends LitElement {

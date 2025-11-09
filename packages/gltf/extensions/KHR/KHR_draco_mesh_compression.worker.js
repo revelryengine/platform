@@ -3,12 +3,12 @@
  * @module
  */
 
-import { Draco3dFactory } from '../../../deps/draco3d.js';
+import { Draco3dFactory } from "revelryengine/deps/draco3d.js";
 
 const draco = await Draco3dFactory();
 
 /**
- * @import { TypedArray, TypedArrayConstructor } from '../../../deps/utils.js';
+ * @import { TypedArray, TypedArrayConstructor } from '../../../utils/buffers.js';
  */
 
 /**

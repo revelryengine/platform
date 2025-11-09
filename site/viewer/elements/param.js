@@ -1,7 +1,7 @@
-import { LitElement } from '../../deps/lit.js';
+import { LitElement } from 'revelryengine/deps/lit.js';
 
 /**
- * @import { PropertyValues } from '../../deps/lit.js';
+ * @import { PropertyValues } from 'revelryengine/deps/lit.js';
  */
 
 export function getParams() {

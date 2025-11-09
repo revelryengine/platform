@@ -9,7 +9,7 @@
 
 import { NamedGLTFProperty } from './gltf-property.js';
 import { BufferView        } from './buffer-view.js';
-import { read as readKTX   } from '../deps/ktx-parse.js';
+import { read as readKTX   } from "revelryengine/deps/ktx-parse.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
@@ -34,7 +34,7 @@ export class Image extends NamedGLTFProperty {
     #imageData;
 
     /**
-     * @type {import('../deps/ktx-parse.js').KTX2Container|undefined}
+     * @type {import("revelryengine/deps/ktx-parse.js").KTX2Container|undefined}
      */
     #imageDataKTX;
 

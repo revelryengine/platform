@@ -5,10 +5,6 @@
  */
 
 /**
- * @import { TypedArrayConstructor } from '../deps/utils.js';
- */
-
-/**
  * GLTF supported version 2.0
  */
 export const GLTF_SUPPORTED_VERSION = /** @type {const} */({

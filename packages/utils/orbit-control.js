@@ -3,10 +3,10 @@
  *
  * @module
  */
-import { Vec3, Mat4, Quat } from '../../deps/gl-matrix.js';
+import { Vec3, Mat4, Quat } from "revelryengine/deps/gl-matrix.js";
 
 /**
- * @import { Vec3Like, Mat4Like, QuatLike } from '../../deps/gl-matrix.js';
+ * @import { Vec3Like, Mat4Like, QuatLike } from "revelryengine/deps/gl-matrix.js";
  */
 
 const { PI, abs } = Math;

@@ -10,7 +10,7 @@
 
 import { GLTFProperty } from '../../gltf-property.js';
 import { registry     } from '../registry.js';
-import { mat3         } from '../../../deps/gl-matrix.js';
+import { mat3         } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';

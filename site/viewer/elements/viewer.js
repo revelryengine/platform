@@ -1,20 +1,20 @@
-import { html, css } from '../../deps/lit.js';
-import Stats from '../../deps/stats.js';
+import { html, css } from 'revelryengine/deps/lit.js';
+import Stats from 'revelryengine/deps/stats.js';
 
 
 import { RevParamElement } from './param.js';
 
-import { Renderer          } from '../../deps/revelry.js';
-import { CanvasAutoResizer } from '../../deps/revelry.js';
+import { Renderer          } from 'revelryengine/renderer/lib/renderer.js';
+import { CanvasAutoResizer } from 'revelryengine/utils/canvas-auto-resizer.js';
 
-import { GLTF, Node                 } from '../../deps/revelry.js';
-import { GLTFKHRLightsPunctualLight } from '../../deps/revelry.js';
-import { SceneKHREnvironmentMap     } from '../../deps/revelry.js';
+import { GLTF, Node                 } from 'revelryengine/gltf/gltf.js';
+import { GLTFKHRLightsPunctualLight } from 'revelryengine/gltf/gltf.js';
+import { SceneKHREnvironmentMap     } from 'revelryengine/gltf/gltf.js';
 
-import { samplesIndex } from '../../deps/revelry.js';
-import { envIndex     } from '../../deps/revelry.js';
+import { index as samplesIndex } from 'revelryengine/samples/sample-models/index.js';
+import { index as envIndex     } from 'revelryengine/samples/sample-environments/index.js';
 
-import { mat4 } from '../../deps/gl-matrix.js';
+import { mat4 } from 'revelryengine/deps/gl-matrix.js';
 
 import './controls.js';
 import './camera.js';

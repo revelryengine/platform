@@ -1,8 +1,8 @@
-import { LitElement, html, css } from '../../deps/lit.js';
+import { LitElement, html, css } from 'revelryengine/deps/lit.js';
 
 import './fab.js';
 
-import { PBR_DEBUG_MODES } from '../../deps/revelry.js';
+import { PBR_DEBUG_MODES } from 'revelryengine/renderer/lib/constants.js';
 
 export class RevGLTFViewerControls extends LitElement {
     static get properties() {

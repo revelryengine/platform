@@ -11,7 +11,7 @@
 import { GLTFProperty     } from '../../gltf-property.js';
 import { Image            } from '../../image.js';
 import { registry         } from '../registry.js';
-import { WorkerHelperPool } from '../../../deps/utils.js';
+import { WorkerHelperPool } from '../../../utils/worker-helper.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
