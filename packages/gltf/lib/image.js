@@ -1,21 +1,31 @@
 
+/**
+ * Image data used to create a texture.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-image
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { BufferView        } from './buffer-view.js';
 import { read as readKTX   } from '../deps/ktx-parse.js';
 
 /**
- * @typedef {{
- *  uri?:        string,
- *  mimeType?:   string,
- *  bufferView?: string,
- *  extensions?: Revelry.GLTF.Extensions.image,
- * } & import('./gltf-property.js').namedGLTFPropertyData} image
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { imageExtensions, ImageExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * Image data used to create a texture.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-image
+ * @typedef {object} image - Image JSON representation.
+ * @property {string} [uri] - The uri of the image.
+ * @property {string} [mimeType] - The image's MIME type.
+ * @property {number} [bufferView] - The index of the BufferView that contains the image. Use this instead of the image's uri property.
+ * @property {imageExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Image class representation.
  */
 export class Image extends NamedGLTFProperty {
     /**
@@ -29,17 +39,18 @@ export class Image extends NamedGLTFProperty {
     #imageDataKTX;
 
     /**
+     * Creates an Image instance.
      * @param {{
      *  uri?:        URL,
      *  mimeType?:   string,
      *  bufferView?: BufferView,
-     *  extensions?: Revelry.GLTF.Extensions.Image,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} image
+     *  extensions?: ImageExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled image object
      */
-    constructor(image) {
-        super(image);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { uri, mimeType, bufferView, extensions } = image;
+        const { uri, mimeType, bufferView, extensions } = unmarshalled;
 
         /**
          * The uri of the image.
@@ -56,25 +67,28 @@ export class Image extends NamedGLTFProperty {
          */
         this.bufferView = bufferView;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates an Image instance from a JSON representation.
-     * @param {image} image
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {image & namedGLTFPropertyData} image - The image JSON representation.
+     * @param {import('./gltf-property.js').FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(image, options) {
-        return new this(this.unmarshall(image, options, {
+    static fromJSON(image, graph) {
+        return this.unmarshall(graph, image, {
             bufferView: { factory: BufferView, collection: 'bufferViews' },
             uri:        { factory: URL },
-        }, 'Image'));
+        }, this);
     }
 
     /**
      * Loads the image data as a Uint8Array.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
      */
     async loadBufferAsUint8Array(signal) {
         if(!this.bufferView) throw new Error('Invalid State');
@@ -86,7 +100,7 @@ export class Image extends NamedGLTFProperty {
 
     /**
      * Loads the image data as a Blob.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
      */
     async loadBufferAsBlob(signal) {
         const uint8Array = await this.loadBufferAsUint8Array(signal)
@@ -95,7 +109,7 @@ export class Image extends NamedGLTFProperty {
 
     /**
      * Loads the image data.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
      * @override
      */
     async load(signal) {
@@ -134,7 +148,7 @@ export class Image extends NamedGLTFProperty {
 
     /**
      * Sets the image data directly.
-     * @param {ImageBitmap} imageBitmap
+     * @param {ImageBitmap} imageBitmap - The image bitmap data.
      */
     setImageData(imageBitmap) {
         this.#imageData = imageBitmap;

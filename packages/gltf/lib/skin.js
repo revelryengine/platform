@@ -1,34 +1,46 @@
+/**
+ * Joints and matrices defining a skin.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-skin
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { Node              } from './node.js';
 import { Accessor          } from './accessor.js';
 
 /**
- * @typedef {{
- *  joints:               number[]
- *  inverseBindMatrices?: number,
- *  skeleton?:            number,
- *  extensions?:          Revelry.GLTF.Extensions.skin,
- * } & import('./gltf-property.js').namedGLTFPropertyData} skin
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { skinExtensions, SkinExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * Joints and matrices defining a skin.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-skin
+ * @typedef {object} skin - Skin JSON representation.
+ * @property {number[]} joints - The indices of the nodes used as joints in this skin.
+ * @property {number} [inverseBindMatrices] - The index of the accessor containing the floating-point 4x4 inverse-bind matrices.
+ * @property {number} [skeleton] - The index of the node used as a skeleton root.
+ * @property {skinExtensions} [extensions] - The extension properties.
+ */
+
+/**
+ * Skin class representation.
  */
 export class Skin extends NamedGLTFProperty {
     /**
+     * Creates an instance of Skin.
      * @param {{
      *  joints:               Node[]
      *  inverseBindMatrices?: Accessor,
      *  skeleton?:            Node,
-     *  extensions?:          Revelry.GLTF.Extensions.Skin,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} skin
+     *  extensions?:          SkinExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled skin object
      */
-    constructor(skin) {
-        super(skin);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { joints, inverseBindMatrices, skeleton, extensions } = skin;
+        const { joints, inverseBindMatrices, skeleton, extensions } = unmarshalled;
 
         /**
          * Skeleton Nodes, used as joints in this skin.
@@ -46,20 +58,23 @@ export class Skin extends NamedGLTFProperty {
          */
         this.skeleton = skeleton;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a Skin instance from a JSON representation.
-     * @param {skin} skin
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {skin & namedGLTFPropertyData} skin - The skin JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(skin, options) {
-        return new this(this.unmarshall(skin, options, {
+    static fromJSON(skin, graph) {
+        return this.unmarshall(graph, skin, {
             joints:              { factory: Node,     collection: 'nodes'     },
             inverseBindMatrices: { factory: Accessor, collection: 'accessors' },
             skeleton:            { factory: Node,     collection: 'nodes'     },
-        }, 'Skin'));
+        }, this);
     }
 }

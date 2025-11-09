@@ -15,7 +15,7 @@
  * @param {Object} options - The pad options
  * @param {ArrayBufferView} options.data - The 3 channel source data
  * @param {TypedArrayConstructor} options.TypedArray - The typed array constructor (Float32Array, Uint8Array, etc.) for the data
- * @returns {TypedArray} - The 4 channel padded data
+ * @return {TypedArray} - The 4 channel padded data
  */
 export function pad3ChannelFormat({ data, TypedArray }) {
     const texels = data.byteLength / (3 * TypedArray.BYTES_PER_ELEMENT);
@@ -55,7 +55,7 @@ export function pad3ChannelFormat({ data, TypedArray }) {
  * @param {ArrayBuffer} buffer - The source buffer
  * @param {number} bytesPerRow - The number of bytes per row
  * @param {number} rowsPerImage - The number of rows per image
- * @returns {ArrayBuffer} - The flipped buffer
+ * @return {ArrayBuffer} - The flipped buffer
  */
 export function flipY(buffer, bytesPerRow, rowsPerImage) {
     const result = new Uint8Array(buffer.byteLength);

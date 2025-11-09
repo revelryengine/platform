@@ -82,7 +82,7 @@ class FocusRing extends LitElement {
 
 customElements.define('rev-gltf-viewer-camera-focus-ring', FocusRing);
 
-export class ViewerCamera extends LitElement {
+export class RevGLTFViewerCamera extends LitElement {
     constructor() {
         super();
 
@@ -311,6 +311,4 @@ export class ViewerCamera extends LitElement {
     }
 }
 
-customElements.define('rev-gltf-viewer-camera', ViewerCamera);
-
-export default ViewerCamera;
+customElements.define('rev-gltf-viewer-camera', RevGLTFViewerCamera);

@@ -42,7 +42,7 @@ export class Graph {
         meshes:      /** @type {WeakMap<import('../deps/gltf.js').Mesh, MeshState>} */(new WeakMap()),
         skins:       /** @type {WeakMap<import('../deps/gltf.js').Skin, SkinState> } */(new WeakMap()),
         morphs:      /** @type {WeakMap<number[], MorphState> } */(new WeakMap()),
-        gameObjects: /** @type {WeakMap<import('../deps/gltf.js').REVGameObjectNode, GameObjectState> } */(new WeakMap()),
+        gameObjects: /** @type {WeakMap<import('../deps/gltf.js').NodeREVGameObject, GameObjectState> } */(new WeakMap()),
     }
 
     #centroids = new WeakMap();
@@ -368,7 +368,7 @@ export class Graph {
 
     #gameObjectsByIndex = /** @type {Map<number, string>} */(new Map());
     /**
-     * @param {import('../deps/gltf.js').REVGameObjectNode} REV_game_object
+     * @param {import('../deps/gltf.js').NodeREVGameObject} REV_game_object
      */
     getGameObjectState(REV_game_object) {
         let state = this.state.gameObjects.get(REV_game_object);
@@ -403,7 +403,7 @@ export class Graph {
     /**
      * Returns the local transform matrix.
      * @param {import('../deps/gltf.js').Node} node
-     * @returns {mat4}
+     * @return {mat4}
      */
     getLocalTransform(node) {
         return this.getNodeState(node).localTransform;
@@ -412,7 +412,7 @@ export class Graph {
     /**
      * Returns the world transform matrix based on last update.
      * @param {import('../deps/gltf.js').Node} node
-     * @returns {mat4}
+     * @return {mat4}
      */
     getWorldTransform(node) {
         return this.getNodeState(node).worldTransform;
@@ -960,7 +960,7 @@ export class Graph {
  * @typedef {import('../deps/gltf.js').Node & { skin: import('../deps/gltf.js').Skin }} SkinNode
  * @typedef {import('../deps/gltf.js').Node & { mesh: import('../deps/gltf.js').MeshPrimitive }} MeshNode
  * @typedef {import('../deps/gltf.js').Node & { extensions: { KHR_lights_punctual: { light: import('../deps/gltf.js').KHRLightsPunctualNode } } }} LightNode
- * @typedef {import('../deps/gltf.js').Node & { extensions: { KHR_audio: { emitter: import('../deps/gltf.js').KHRAudioEmitter } } }} EmitterNode
+ * @typedef {import('../deps/gltf.js').Node & { extensions: { KHR_audio: { emitter: import('../deps/gltf.js').GLTFKHRAudioEmitter } } }} EmitterNode
  *
  * @typedef {{
 *  index:          number,

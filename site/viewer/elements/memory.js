@@ -2,20 +2,27 @@ import { LitElement, html, css } from '../../deps/lit.js';
 
 import { getWebGPUMemoryUsage } from '../../deps/memory.js';
 
+/**
+ * @import { RevGLTFViewerElement } from './viewer.js';
+ */
+
 class RevGLTFMemoryStats extends LitElement {
-    static get properties() {
-        return {
-            viewer:        { type: Object },
-            total:         { type: Number, reflect: true },
-            texture:       { type: Number, reflect: true },
-            buffer:        { type: Number, reflect: true },
-            renderBbuffer: { type: Number, reflect: true },
-            drawingbuffer: { type: Number, reflect: true },
-        }
+    /**
+     * @override
+     */
+    static properties = {
+        viewer:        { type: Object },
+        total:         { type: Number, reflect: true },
+        texture:       { type: Number, reflect: true },
+        buffer:        { type: Number, reflect: true },
+        renderBbuffer: { type: Number, reflect: true },
+        drawingbuffer: { type: Number, reflect: true },
     }
 
-    static get styles() {
-        return css`
+    /**
+     * @override
+     */
+    static styles = [css`
         :host {
             position: absolute;
             background: rgba(0, 0, 0, 0.75);;
@@ -38,11 +45,12 @@ class RevGLTFMemoryStats extends LitElement {
         div.mb {
             text-align: right;
         }
-        `;
-    }
+    `];
 
     updateMemory() {
-        const { memory = {} } = (this.viewer.renderer?.mode === 'webgpu' ? getWebGPUMemoryUsage() : this.viewer.renderer?.gal.context.getExtension('GMAN_webgl_memory').getMemoryInfo()) ?? {};
+        const viewer = /** @type {RevGLTFViewerElement} */(this.parentElement);
+
+        const { memory = {} } = (viewer.renderer?.mode === 'webgpu' ? getWebGPUMemoryUsage() : viewer.renderer?.gal.context.getExtension('GMAN_webgl_memory').getMemoryInfo()) ?? {};
         this.total         = memory.total ?? 0;
         this.texture       = memory.texture ?? 0;
         this.buffer        = memory.buffer ?? 0;
@@ -51,13 +59,18 @@ class RevGLTFMemoryStats extends LitElement {
         this.drawingbuffer = memory.drawingbuffer ?? 0;
     }
 
+    /**
+     * @override
+     */
     render(){
+        const viewer = /** @type {RevGLTFViewerElement} */(this.parentElement);
+
         return html`
             <h4>Memory</h4>
             <hr>
             <div>Texture:</div><div class="mb">${(this.texture / 1000000).toFixed(3)} Mb</div>
             <div>Buffer:</div><div class="mb">${(this.buffer / 1000000).toFixed(3)} Mb</div>
-            ${this.viewer.renderer.mode === 'webgpu' ? html`
+            ${viewer.renderer?.mode === 'webgpu' ? html`
                 <div>Canvas:</div><div class="mb">${(this.canvas / 1000000).toFixed(3)} Mb</div>
             ` : html`
                 <div>Render Buffer:</div><div class="mb">${(this.renderbuffer / 1000000).toFixed(3)} Mb</div>

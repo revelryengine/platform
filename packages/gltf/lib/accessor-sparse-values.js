@@ -1,15 +1,4 @@
 
-import { GLTFProperty } from './gltf-property.js';
-import { BufferView   } from './buffer-view.js';
-
-/**
- * @typedef {{
- *  bufferView:  number,
- *  byteOffset?: number,
- *  extensions?: Revelry.GLTF.Extensions.accessorSparseValues,
- * } & import('./gltf-property.js').glTFPropertyData} accessorSparseValues
- */
-
 /**
  * An object pointing to a buffer view containing the deviating accessor values.
  * The number of elements is equal to accessor.sparse.count times number of components.
@@ -17,6 +6,27 @@ import { BufferView   } from './buffer-view.js';
  * The elements are tightly packed. Data MUST be aligned following the same rules as the base accessor.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-values
+ *
+ * @module
+ */
+
+import { GLTFProperty } from './gltf-property.js';
+import { BufferView   } from './buffer-view.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { accessorSparseValuesExtensions, AccessorSparseValuesExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} accessorSparseValues - Accessor sparse values JSON representation.
+ * @property {number} bufferView - The bufferView with sparse value. Referenced bufferView can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target.
+ * @property {number} [byteOffset] - The offset relative to the start of the bufferView in bytes. Must be aligned.
+ * @property {accessorSparseValuesExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * AccessorSparseValues class representation.
  */
 export class AccessorSparseValues extends GLTFProperty {
     /**
@@ -25,16 +35,17 @@ export class AccessorSparseValues extends GLTFProperty {
     #arrayBuffer;
 
     /**
+     * Creates an instance of AccessorSparseValues.
      * @param {{
      *  bufferView:  BufferView,
      *  byteOffset?: number,
-     *  extensions?: Revelry.GLTF.Extensions.AccessorSparseValues,
-     * } & import('./gltf-property.js').GLTFPropertyData} accessorSparseValues
+     *  extensions?: AccessorSparseValuesExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled accessor sparse values object
      */
-    constructor(accessorSparseValues) {
-        super(accessorSparseValues);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { bufferView, byteOffset = 0, extensions } = accessorSparseValues;
+        const { bufferView, byteOffset = 0, extensions } = unmarshalled;
 
         /**
          * The BufferView with sparse value. Referenced bufferView can't have ARRAY_BUFFER
@@ -47,24 +58,27 @@ export class AccessorSparseValues extends GLTFProperty {
          */
         this.byteOffset = byteOffset;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
      * Creates an instance from JSON data.
-     * @param {accessorSparseValues} accessorSparseValues
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * @param {accessorSparseValues & glTFPropertyData} accessorSparseValues - The accessor sparse values JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(accessorSparseValues, options) {
-        return new this(this.unmarshall(accessorSparseValues, options, {
+    static fromJSON(accessorSparseValues, graph) {
+        return this.unmarshall(graph, accessorSparseValues, {
             bufferView: { factory: BufferView, collection: 'bufferViews' },
-        }));
+        }, this);
     }
 
     /**
      * Loads the sparse values data.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the load.
      * @override
      */
     async load(signal) {

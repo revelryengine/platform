@@ -1,25 +1,35 @@
 
+/**
+ * An object pointing to a buffer view containing the indices of deviating accessor values.
+ * The number of indices is equal to accessor.sparse.count. Indices MUST strictly increase.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-indices
+ *
+ * @module
+ */
+
 import { GLTFProperty } from './gltf-property.js';
 import { BufferView   } from './buffer-view.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { accessorSparseIndicesExtensions, AccessorSparseIndicesExtensions } from 'virtual-rev-gltf-extensions';
+ */
 
 /**
  * @import {GL} from './constants.js';
  */
 
 /**
- * @typedef {{
- *  bufferView:    number,
- *  componentType: typeof GL.UNSIGNED_BYTE | typeof GL.UNSIGNED_SHORT | typeof GL.UNSIGNED_INT,
- *  byteOffset?:   number,
- *  extensions?:   Revelry.GLTF.Extensions.accessorSparseIndices,
- * } & import('./gltf-property.js').glTFPropertyData} accessorSparseIndices - A accessor sparse indices object.
+ * @typedef {object} accessorSparseIndices - Accessor sparse indices JSON representation.
+ * @property {number} bufferView - The bufferView with sparse indices. Referenced bufferView can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target.
+ * @property {number} componentType - The indices data type. Valid values correspond to WebGL enums: `5121` (UNSIGNED_BYTE), `5123` (UNSIGNED_SHORT), `5125` (UNSIGNED_INT).
+ * @property {number} [byteOffset] - The offset relative to the start of the bufferView in bytes. Must be aligned.
+ * @property {accessorSparseIndicesExtensions} [extensions] - Extension-specific data.
  */
 
 /**
- * An object pointing to a buffer view containing the indices of deviating accessor values.
- * The number of indices is equal to accessor.sparse.count. Indices MUST strictly increase.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-indices
+ * AccessorSparseIndices class representation.
  */
 export class AccessorSparseIndices extends GLTFProperty {
     /**
@@ -33,13 +43,13 @@ export class AccessorSparseIndices extends GLTFProperty {
      *  bufferView:    BufferView,
      *  componentType: typeof GL.UNSIGNED_BYTE | typeof GL.UNSIGNED_SHORT | typeof GL.UNSIGNED_INT,
      *  byteOffset?:   number,
-     *  extensions?:   Revelry.GLTF.Extensions.AccessorSparseIndices,
-     * } & import('./gltf-property.js').GLTFPropertyData} accessorSparseIndices - A accessor sparse indices object.
+     *  extensions?:   AccessorSparseIndicesExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled accessor sparse indices object
      */
-    constructor(accessorSparseIndices) {
-        super(accessorSparseIndices);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { bufferView, byteOffset = 0, componentType, extensions } = accessorSparseIndices;
+        const { bufferView, byteOffset = 0, componentType, extensions } = unmarshalled;
 
         /**
          * The BufferView with sparse indices. Referenced bufferView can't have ARRAY_BUFFER
@@ -57,24 +67,27 @@ export class AccessorSparseIndices extends GLTFProperty {
          */
         this.componentType = componentType;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
      * Creates an instance from JSON data.
-     * @param {accessorSparseIndices} accessorSparseIndices
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * @param {accessorSparseIndices & glTFPropertyData} accessorSparseIndices - The accessor sparse indices JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(accessorSparseIndices, options) {
-        return new this(this.unmarshall(accessorSparseIndices, options, {
+    static fromJSON(accessorSparseIndices, graph) {
+        return this.unmarshall(graph, accessorSparseIndices, {
             bufferView: { factory: BufferView, collection: 'bufferViews' },
-        }, 'AccessorSparseIndices'));
+        }, this);
     }
 
     /**
      * Loads the sparse indices data.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the load.
      * @override
      */
     async load(signal) {

@@ -1,19 +1,29 @@
+/**
+ * A texture and its sampler.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-texture
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { Image             } from './image.js';
 import { Sampler           } from './sampler.js';
 
 /**
- * @typedef {{
- *  sampler?:    number,
- *  source?:     number,
- *  extensions?: Revelry.GLTF.Extensions.texture,
- * } & import('./gltf-property.js').namedGLTFPropertyData} texture
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { textureExtensions, TextureExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * A texture and its sampler.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-texture
+ * @typedef {object} texture - Texture JSON representation.
+ * @property {number} [sampler] - The index of the sampler used by this texture.
+ * @property {number} [source] - The index of the image used by this texture.
+ * @property {textureExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Texture class representation.
  */
 export class Texture extends NamedGLTFProperty {
     /**
@@ -22,18 +32,18 @@ export class Texture extends NamedGLTFProperty {
      */
     #sRGB = false;
 
-
     /**
+     * Creates an instance of Texture.
      * @param {{
      *  sampler?:    Sampler,
      *  source?:     Image,
-     *  extensions?: Revelry.GLTF.Extensions.Texture,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} texture
+     *  extensions?: TextureExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled texture object
      */
-    constructor(texture) {
-        super(texture);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { sampler, source, extensions } = texture;
+        const { sampler, source, extensions } = unmarshalled;
 
         /**
          * The Sampler used by this texture. When undefined, a sampler with repeat wrapping and
@@ -46,6 +56,9 @@ export class Texture extends NamedGLTFProperty {
          */
         this.source = source;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
@@ -57,26 +70,31 @@ export class Texture extends NamedGLTFProperty {
     }
 
     /**
-     * Creates a Texture instance from a JSON representation.
-     * @param {texture} texture
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {texture & namedGLTFPropertyData} texture - The texture JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(texture, options) {
-        return new this(this.unmarshall(texture, options, {
+    static fromJSON(texture, graph) {
+        return this.unmarshall(graph, texture, {
             sampler: { factory: Sampler, collection: 'samplers' },
             source:  { factory: Image,   collection: 'images'   },
-        }, 'Texture'));
+        }, this);
     }
 
     /**
      * Set this to true indicate that texture uses sRGB transfer function
      * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#metallic-roughness-material
+     *
+     * @param {boolean} v - Whether this texture uses sRGB transfer function.
      */
     set sRGB(v) {
         this.#sRGB = v;
     }
 
+    /**
+     * Returns whether this texture uses sRGB transfer function.
+     */
     get sRGB() {
         return this.#sRGB;
     }

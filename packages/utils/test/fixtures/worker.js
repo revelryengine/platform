@@ -11,7 +11,6 @@ export async function methodError() {
 /**
  * Reverse the bytes in the provided ArrayBuffer.
  * @param {ArrayBuffer} buffer
- * @returns
  */
 export async function methodTransfer(buffer) {
     const view = new Uint8Array(buffer);

@@ -1,3 +1,4 @@
-# Revelry Engine glTF library
+# Revelry Engine glTF
 
-!> Project Status - This project is in a very alpha state and is not fully implemented yet.
+This glTF library facalitates loading glTF/glb files and preparing them for the rendering pipeline.
+

@@ -1,33 +1,43 @@
-import { NamedGLTFProperty } from './gltf-property.js';
-
-/**
- *
- * @typedef {{
- *  uri?:        string,
- *  byteLength:  number,
- *  extensions?: Revelry.GLTF.Extensions.buffer,
- * } & import('./gltf-property.js').namedGLTFPropertyData} buffer
- */
-
 /**
  * A buffer points to binary geometry, animation, or skins.
  *
  * @see https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffer
+ *
+ * @module
+ */
+
+import { NamedGLTFProperty } from './gltf-property.js';
+
+/**
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { bufferExtensions, BufferExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} buffer - Buffer JSON representation.
+ * @property {string} [uri] - The URI of the buffer.
+ * @property {number} byteLength - The length of the buffer in bytes.
+ * @property {bufferExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Buffer class representation.
  */
 export class Buffer extends NamedGLTFProperty {
     #arrayBuffer;
 
     /**
+     * Creates an instance of Buffer.
      * @param {{
      *  uri?:        URL,
      *  byteLength:  number,
-     *  extensions?: Revelry.GLTF.Extensions.Buffer,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} buffer - The properties of the buffer.
+     *  extensions?: BufferExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled buffer object
      */
-    constructor(buffer) {
-        super(buffer);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { uri, byteLength, extensions } = buffer;
+        const { uri, byteLength, extensions } = unmarshalled;
 
         /**
          * The uri of the buffer. Relative paths are relative to the .gltf file. Instead of referencing an external
@@ -42,24 +52,27 @@ export class Buffer extends NamedGLTFProperty {
 
         this.#arrayBuffer = new ArrayBuffer(this.byteLength);
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a new Buffer instance from a JSON representation.
-     * @param {buffer} buffer
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {buffer & namedGLTFPropertyData} buffer - The buffer JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(buffer, options) {
-        return new this(this.unmarshall(buffer, options, {
+    static fromJSON(buffer, graph) {
+        return this.unmarshall(graph, buffer, {
             uri: { factory: URL }
-        }, 'Buffer'));
+        }, this);
     }
 
     /**
      * Fetches the binary data into an array buffer.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the fetch.
      * @override
      */
     async load(signal) {

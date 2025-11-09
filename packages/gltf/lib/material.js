@@ -1,3 +1,11 @@
+/**
+ * The material appearance of a primitive.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty            } from './gltf-property.js';
 import { MaterialPBRMetallicRoughness } from './material-pbr-metallic-roughness.js';
 import { MaterialNormalTextureInfo    } from './material-normal-texture-info.js';
@@ -5,26 +13,36 @@ import { MaterialOcclusionTextureInfo } from './material-occlusion-texture-info.
 import { TextureInfo                  } from './texture-info.js';
 
 /**
- * @typedef {{
- *  pbrMetallicRoughness?: import('./material-pbr-metallic-roughness.js').materialPBRMetallicRoughness,
- *  normalTexture?:        import('./material-normal-texture-info.js').materialNormalTextureInfo,
- *  occlusionTexture?:     import('./material-occlusion-texture-info.js').materialOcclusionTextureInfo,
- *  emissiveTexture?:      import('./texture-info.js').textureInfo,
- *  emissiveFactor?:       [number, number, number],
- *  alphaMode?:            'OPAQUE' | 'MASK' | 'BLEND',
- *  alphaCutoff?:          number,
- *  doubleSided?:          boolean,
- *  extensions?:           Revelry.GLTF.Extensions.material,
- * } & import('./gltf-property.js').namedGLTFPropertyData} material
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { materialExtensions, MaterialExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * The material appearance of a primitive.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material
+ * @import { materialPBRMetallicRoughness } from './material-pbr-metallic-roughness.js';
+ * @import { materialNormalTextureInfo    } from './material-normal-texture-info.js';
+ * @import { materialOcclusionTextureInfo } from './material-occlusion-texture-info.js';
+ * @import { textureInfo                  } from './texture-info.js';
+ */
+
+/**
+ * @typedef {object} material - Material JSON representation.
+ * @property {materialPBRMetallicRoughness} [pbrMetallicRoughness] - A set of parameter values that are used to define the metallic-roughness material model from Physically-Based Rendering (PBR) methodology.
+ * @property {materialNormalTextureInfo} [normalTexture] - The normal map texture.
+ * @property {materialOcclusionTextureInfo} [occlusionTexture] - The occlusion map texture.
+ * @property {textureInfo} [emissiveTexture] - The emissive map texture.
+ * @property {[number, number, number]} [emissiveFactor] - The emissive color of the material.
+ * @property {'OPAQUE' | 'MASK' | 'BLEND'} [alphaMode] - The alpha rendering mode of the material.
+ * @property {number} [alphaCutoff] - The alpha cutoff value of the material.
+ * @property {boolean} [doubleSided] - Specifies whether the material is double sided.
+ * @property {materialExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Material class representation.
  */
 export class Material extends NamedGLTFProperty {
     /**
+     * Creates an instance of Material.
      * @param {{
      *  pbrMetallicRoughness?: MaterialPBRMetallicRoughness,
      *  normalTexture?:        MaterialNormalTextureInfo,
@@ -34,16 +52,16 @@ export class Material extends NamedGLTFProperty {
      *  alphaMode?:            'OPAQUE' | 'MASK' | 'BLEND',
      *  alphaCutoff?:          number,
      *  doubleSided?:          boolean,
-     *  extensions?:           Revelry.GLTF.Extensions.Material,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} material
+     *  extensions?:           MaterialExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled material object
      */
-    constructor(material) {
-        super(material);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
         const {
             pbrMetallicRoughness, normalTexture, occlusionTexture, emissiveTexture, emissiveFactor = [0, 0, 0],
             alphaMode = 'OPAQUE', alphaCutoff = 0.5, doubleSided = false, extensions
-        } = material;
+        } = unmarshalled;
 
         /**
          * A set of parameter values that are used to define the
@@ -87,21 +105,24 @@ export class Material extends NamedGLTFProperty {
          */
         this.doubleSided = doubleSided;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a Material instance from a JSON representation.
-     * @param {material} material
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {material & namedGLTFPropertyData} material - The material JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(material, options) {
-        return new this(this.unmarshall( material, options, {
+    static fromJSON(material, graph) {
+        return this.unmarshall(graph, material, {
             pbrMetallicRoughness: { factory: MaterialPBRMetallicRoughness        },
             normalTexture:        { factory: MaterialNormalTextureInfo           },
             occlusionTexture:     { factory: MaterialOcclusionTextureInfo        },
             emissiveTexture:      { factory: TextureInfo, assign: { sRGB: true } },
-        }, 'Material'));
+        }, this);
     }
 }

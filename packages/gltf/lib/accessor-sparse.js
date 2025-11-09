@@ -1,33 +1,45 @@
+/**
+ * Sparse storage of attributes that deviate from their initialization value.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse
+ *
+ * @module
+ */
+
 import { GLTFProperty } from './gltf-property.js';
 import { AccessorSparseIndices } from './accessor-sparse-indices.js';
 import { AccessorSparseValues  } from './accessor-sparse-values.js';
 
 /**
- * @typedef {{
- *  count:       number,
- *  indices:     import('./accessor-sparse-indices.js').accessorSparseIndices,
- *  values:      import('./accessor-sparse-values.js').accessorSparseValues,
- *  extensions?: Revelry.GLTF.Extensions.accessorSparse,
- * } & import('./gltf-property.js').glTFPropertyData} accessorSparse
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { accessorSparseExtensions, AccessorSparseExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * Sparse storage of attributes that deviate from their initialization value.
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse
+ * @typedef {object} accessorSparse - Accessor sparse JSON representation.
+ * @property {number} count - Number of entries stored in the sparse array.
+ * @property {import('./accessor-sparse-indices.js').accessorSparseIndices} indices - Index array of size count that points to those accessor attributes that deviate from their initialization value.
+ * @property {import('./accessor-sparse-values.js').accessorSparseValues} values - Array of size count times number of components, storing the displaced accessor attributes pointed by indices.
+ * @property {accessorSparseExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * AccessorSparse class representation.
  */
 export class AccessorSparse extends GLTFProperty {
     /**
+     * Creates an instance of AccessorSparse.
      * @param {{
      *  count:       number,
      *  indices:     AccessorSparseIndices,
      *  values:      AccessorSparseValues,
-     *  extensions?: Revelry.GLTF.Extensions.AccessorSparse,
-     * } & import('./gltf-property.js').GLTFPropertyData} accessorSparse
+     *  extensions?: AccessorSparseExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled accessor sparse object
      */
-    constructor(accessorSparse) {
-        super(accessorSparse);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { count, indices, values, extensions } = accessorSparse;
+        const { count, indices, values, extensions } = unmarshalled;
 
         /**
          * Number of entries stored in the sparse array.
@@ -46,25 +58,28 @@ export class AccessorSparse extends GLTFProperty {
          */
         this.values = values;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
      * Creates an instance from JSON data.
-     * @param {accessorSparse} accessorSparse
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * @param {accessorSparse & glTFPropertyData} accessorSparse - The accessor sparse JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(accessorSparse, options) {
-        return new this(this.unmarshall(accessorSparse, options, {
+    static fromJSON(accessorSparse, graph) {
+        return this.unmarshall(graph, accessorSparse, {
             indices: { factory: AccessorSparseIndices },
             values:  { factory: AccessorSparseValues  },
-        }, 'AccessorSparse'));
+        }, this);
     }
 
     /**
      * Loads the sparse data.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the load.
      * @override
      */
     async load(signal) {

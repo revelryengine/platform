@@ -1,3 +1,10 @@
+/**
+ * A camera's projection. A node can reference a camera to apply a transform to place the camera in the scene.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera
+ *
+ * @module
+ */
 
 import { NamedGLTFProperty  } from './gltf-property.js';
 import { CameraOrthographic } from './camera-orthographic.js';
@@ -5,32 +12,48 @@ import { CameraPerspective  } from './camera-perspective.js';
 import { mat4               } from '../deps/gl-matrix.js';
 
 /**
- * @typedef {({
- *  type:          'orthographic'|'perspective',
- *  orthographic?: import('./camera-orthographic.js').cameraOrthographic,
- *  perspective?:  import('./camera-perspective.js').cameraPerspective,
- *  extensions?:   Revelry.GLTF.Extensions.camera,
- * }) & import('./gltf-property.js').namedGLTFPropertyData} camera
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { cameraExtensions, CameraExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * A camera's projection. A node can reference a camera to apply a transform to place the camera in the scene.
+ * @import { cameraOrthographic } from './camera-orthographic.js';
+ * @import { cameraPerspective  } from './camera-perspective.js';
+ */
+
+/**
+ * @typedef {object} camera - Camera JSON representation.
+ * @property {'orthographic'|'perspective'} type - Specifies if the camera uses a perspective or orthographic projection.
+ * @property {cameraOrthographic} [orthographic] - An orthographic camera containing properties to create an orthographic projection matrix.
+ * @property {cameraPerspective} [perspective] - A perspective camera containing properties to create a perspective projection matrix.
+ * @property {cameraExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * @typedef {object} HasOrthographiCameraDetails - Predicate for cameras with perspective details.
+ * @property {cameraOrthographic} orthographic - The type of the camera.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera
+ * @typedef {object} HasPerspectiveCameraDetails - Predicate for cameras with perspective details.
+ * @property {cameraPerspective} perspective - The type of the camera.
+ */
+
+/**
+ * Camera class representation.
  */
 export class Camera extends NamedGLTFProperty {
     /**
+     * Creates an instance of Camera.
      * @param {({
      *  type:          'orthographic'|'perspective',
      *  orthographic?: CameraOrthographic,
      *  perspective?:  CameraPerspective,
-     *  extensions?:   Revelry.GLTF.Extensions.Camera,
-     * }) & import('./gltf-property.js').NamedGLTFPropertyData} camera
+     *  extensions?:   CameraExtensions,
+     * }) & NamedGLTFPropertyData} unmarshalled - Unmarshalled camera object
      */
-    constructor(camera) {
-        super(camera);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { type, extensions } = camera;
+        const { type, extensions } = unmarshalled;
 
         /**
          * Specifies if the camera uses a perspective or orthographic projection.
@@ -42,33 +65,36 @@ export class Camera extends NamedGLTFProperty {
          * An orthographic camera containing properties to create an orthographic
          * projection matrix.
          */
-        this.orthographic = camera.orthographic;
+        this.orthographic = unmarshalled.orthographic;
 
         /**
          * A perspective camera containing properties to create a perspective
          * projection matrix.
          */
-        this.perspective = camera.perspective;
+        this.perspective = unmarshalled.perspective;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a Camera instance from a JSON representation.
-     * @param {camera} camera
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {camera & namedGLTFPropertyData} camera - The camera JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(camera, options) {
-        return new this(this.unmarshall(camera, options, {
+    static fromJSON(camera, graph) {
+        return this.unmarshall(graph, camera, {
             orthographic: { factory: CameraOrthographic },
             perspective:  { factory: CameraPerspective  },
-        }, 'Camera'));
+        }, this);
     }
 
     /**
      * Checks if the camera is a perspective camera.
-     * @return {this is { perspective: CameraPerspective }}
+     * @return {this is HasPerspectiveCameraDetails}
      */
     isPerspective() {
         return this.type === 'perspective';
@@ -76,7 +102,7 @@ export class Camera extends NamedGLTFProperty {
 
     /**
      * Checks if the camera is an orthographic camera.
-     * @return {this is { orthographic: CameraOrthographic }}
+     * @return {this is HasOrthographiCameraDetails}
      */
     isOrthographic() {
         return this.type === 'orthographic';
@@ -95,7 +121,7 @@ export class Camera extends NamedGLTFProperty {
 
     /**
      * Sets the aspect ratio of the camera.
-     * @param {number} aspectRatio
+     * @param {number} aspectRatio - The new aspect ratio.
      */
     setAspectRatio(aspectRatio) {
         if(this.isPerspective()) {
@@ -134,8 +160,8 @@ export class Camera extends NamedGLTFProperty {
      *   width?: number,
      *   height?: number,
      *   ndcZO?: boolean,
-     *   override?: Partial<import('./camera-orthographic.js').cameraOrthographic | import('./camera-perspective.js').cameraPerspective>
-     * }} options
+     *   override?: Partial<cameraOrthographic | cameraPerspective>
+     * }} options - Options for generating the projection matrix.
      */
     getProjectionMatrix({ width = 1, height = 1, ndcZO, override = {} }) {
         const matrix = mat4.create();

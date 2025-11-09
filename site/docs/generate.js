@@ -2,6 +2,7 @@ import { parseArgs } from "jsr:@std/cli@1.0.23/parse-args";
 import * as typedoc from 'npm:typedoc@0.28.14';
 import { MarkdownPageEvent } from 'npm:typedoc-plugin-markdown@4.9.0';
 import 'npm:typedoc-plugin-mdn-links@3.0.1';
+import 'npm:typedoc-plugin-merge-modules@7.0.0';
 
 const { pkg, validate } = parseArgs(Deno.args, {
     string: ["pkg"],
@@ -60,6 +61,7 @@ for(const pkg of packages) {
         treatValidationWarningsAsErrors: true,
         out:    root,
         plugin: [
+            'typedoc-plugin-merge-modules',
             'typedoc-plugin-markdown',
             'typedoc-plugin-mdn-links',
         ],
@@ -79,6 +81,7 @@ for(const pkg of packages) {
             "TypeParameter",
             "TypeAlias",
         ],
+        mergeModulesMergeMode: 'module',
         mergeReadme: true,
         enumMembersFormat: 'htmlTable',
         parametersFormat: 'htmlTable',
@@ -87,11 +90,12 @@ for(const pkg of packages) {
         classPropertiesFormat: 'htmlTable',
         propertyMembersFormat: 'htmlTable',
         typeDeclarationFormat: 'htmlTable',
-        indexFormat: 'htmlTable',
+        indexFormat: 'table',
         expandParameters: true,
         expandObjects: true,
         hidePageHeader: true,
         navigationJson: `${root}/_navigation.json`,
+        useFirstParagraphOfCommentAsSummary: true,
 
         externalSymbolLinkMappings: {
             "gl-matrix": {
@@ -106,14 +110,16 @@ for(const pkg of packages) {
                 Vec3Like: 'https://glmatrix.net/docs/v4/types/Vec3Like.html',
                 Vec4Like: 'https://glmatrix.net/docs/v4/types/Vec4Like.html',
             }
-        },
+        }
     });
 
     app.renderer.on(MarkdownPageEvent.BEGIN, output => {
         if(output.model.name === name) { // Add extension to module file names
             // @ts-expect-error - Markdown plugin types are incorrect
             for (const child of output.model.children ?? []) {
-                child.name = `${child.name}.js`;
+                // Detect extension from source file
+                const ext = child.sources?.[0]?.fileName?.endsWith('.d.ts') ? '.d.ts' : '.js';
+                child.name = `${child.name}${ext}`;
             }
         }
 
@@ -140,7 +146,7 @@ for(const pkg of packages) {
         // @ts-expect-error - Markdown plugin types are incorrect
         if(output.model.kind !== typedoc.ReflectionKind.Project && output.model.kind !== typedoc.ReflectionKind.Module) {
             // @ts-expect-error - Markdown plugin types are incorrect
-            if(output.model.kind === typedoc.ReflectionKind.TypeAlias) {
+            if(output.model.kind === typedoc.ReflectionKind.TypeAlias || output.model.kind === typedoc.ReflectionKind.Interface) {
                 // @ts-expect-error - Markdown plugin types are incorrect
                 output.contents = output.contents?.replace(/\n\n/, `\n\n\`\`\`js\n\/\*\* @import { ${output.model.name} } from 'revelryengine/${pkg}/${output.model.parent.name}'; \*\/\n\`\`\`\n`);
             } else {
@@ -180,9 +186,10 @@ for(const pkg of packages) {
          */
 
         const navigation = /** @type {NavigationEntry[]} */(JSON.parse(await Deno.readTextFile(`${root}/_navigation.json`)));
-        const modules = [];
-        const search = [...navigation];
-        const paths = [];
+        const modules    = [];
+        const search     = [...navigation];
+        const paths      = [];
+
         while (search.length > 0) {
             const entry = search.shift();
             if(entry?.children) {
@@ -219,14 +226,25 @@ for(const pkg of packages) {
             }, ...($docsify.plugins ?? [])]
         `);
 
+        // Break modules down by sub folders
+        const moduleGroups = Object.groupBy(modules, mod => {
+            return mod.path.split('/').slice(0, -2).join('/');
+        });
+
         // Generate _sidebar.md for pkg
         const content = [
             '- [Documentation](/docs/ ":class=no-chevron :class=non-collapsible")',
             `  - [revelryengine/${pkg}](/docs/packages/${pkg}/ ":class=no-chevron :class=non-collapsible")`,
             `    - [Modules](/docs/packages/${pkg}/?id=modules ":class=no-chevron :class=non-collapsible")`,
-            ...modules.map(entry => {
-                return `      - [${entry.path.replace('/README.md', '.js')}](/docs/packages/${pkg}/${entry.path.replace('.md', '')})`;
-            }),
+            ...Object.entries(moduleGroups).map(([folder, modules]) => {
+                return [
+                    `      - **${folder}**`,
+                    ...modules?.map(entry => {
+                        return `        - [${entry.path.split('/').at(-2)}](/docs/packages/${pkg}/${entry.path.replace('.md', '')})`;
+                    }) ?? [],
+                ]
+            }).flat(),
+            ,
         ].join('\n');
         await Deno.writeTextFile(`${root}/_sidebar.md`, content);
 
@@ -238,7 +256,7 @@ for(const pkg of packages) {
                 '- [Documentation](/docs/ ":class=no-chevron :class=non-collapsible")',
                 `  - [revelryengine/${pkg}](/docs/packages/${pkg}/ ":class=no-chevron :class=non-collapsible")`,
                 `    - [Modules](/docs/packages/${pkg}/?id=modules ":class=no-chevron :class=non-collapsible")`,
-                `      - [${entry.path.replace('/README.md', '.js')}](${entryPath} ":class=no-chevron :class=non-collapsible")`,
+                `      - [${entry.path.replace('/README.md', '')}](${entryPath} ":class=no-chevron :class=non-collapsible")`,
                 ...entry.children?.map(child => {
                     return [
                         `        - [${child.title}](${entryPath}?id=${child.title.replace(/ /g, '-').toLowerCase()} ":class=no-chevron :class=non-collapsible")`,

@@ -160,7 +160,7 @@ export class RevGAL {
     }
 
     /**
-     * @param {import('../deps/gltf.js').KHRTextureBasisuTexture} basisuInfo
+     * @param {import('../deps/gltf.js').TextureKHRTextureBasisu} basisuInfo
      * @param {boolean} sRGB
      */
     #createTextureFromGLTFBasisU(basisuInfo, sRGB) {
@@ -267,7 +267,7 @@ export class RevGAL {
 
     /**
      * @param {any} target
-     * @returns {target is WebGL2RenderingContext|GPUCanvasContext}
+     * @return {target is WebGL2RenderingContext|GPUCanvasContext}
      */
     static isRenderingContext(target) {
         return this.isGL2Context(target) || this.isGPUContext(target);
@@ -275,7 +275,7 @@ export class RevGAL {
 
     /**
      * @param {any} target
-     * @returns {target is (HTMLCanvasElement | OffscreenCanvas)}
+     * @return {target is (HTMLCanvasElement | OffscreenCanvas)}
      */
     static isCanvas(target) {
         //OffscreenCanvas may not be defined if browser does not support it
@@ -284,7 +284,7 @@ export class RevGAL {
 
     /**
      * @param {any} target
-     * @returns {target is WebGL2RenderingContext}
+     * @return {target is WebGL2RenderingContext}
      */
     static isGL2Context(target) {
         //WebGL2RenderingContext may not be defined if browser does not support it
@@ -293,7 +293,7 @@ export class RevGAL {
 
     /**
      * @param {any} target
-     * @returns {target is GPUCanvasContext}
+     * @return {target is GPUCanvasContext}
      */
     static isGPUContext(target) {
         //GPUCanvasContext may not be defined if browser does not support it

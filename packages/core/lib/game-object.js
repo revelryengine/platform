@@ -2,7 +2,7 @@
 
 import { Model, System    } from '../deps/ecs.js';
 import { vec3, quat, mat4 } from '../deps/gl-matrix.js';
-import { Node as GLTFNode, REVGameObjectNode  } from '../deps/gltf.js';
+import { Node as GLTFNode, NodeREVGameObject  } from '../deps/gltf.js';
 import { NonNull } from '../deps/utils.js';
 import { TransformUtils } from './transform.js';
 
@@ -34,7 +34,7 @@ export class GameObjectNode extends GLTFNode {
         });
 
         this.extensions = {
-            REV_game_object: new REVGameObjectNode({ id: model.entity }),
+            REV_game_object: new NodeREVGameObject({ id: model.entity }),
         };
 
         this.model = model;

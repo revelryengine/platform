@@ -9,7 +9,7 @@
 
   - [Documentation](/docs/ ":class=no-chevron")
 
-- Examples
+- Samples
 
   - [Renderer](/viewer/)
 

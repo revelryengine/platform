@@ -10,7 +10,7 @@
  *
  * @template {{ [key: string]: any }[]} T - Array of object types to merge
  * @param {T} sources The source object from which to copy properties.
- * @returns {(T[number] extends any ? (k: T[number]) => void : never) extends ((k: infer I) => void) ? I : never} - The merged object.
+ * @return {(T[number] extends any ? (k: T[number]) => void : never) extends ((k: infer I) => void) ? I : never} - The merged object.
  */
 export function merge(...sources) {
     const [target, ...rest] = sources;

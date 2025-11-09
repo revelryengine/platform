@@ -102,7 +102,7 @@ export class Shader {
     }
 
     /**
-     * @returns {asserts this is ShaderCompiled<this>}
+     * @return {asserts this is ShaderCompiled<this>}
      */
     #compile() {
         this.#init();

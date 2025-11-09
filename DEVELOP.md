@@ -7,8 +7,16 @@ git clone --recurse-submodules git@github.com:revelryengine/platform.git
 docker
 deno@2.5.5+
 
+## Download vendor types
+
+```
+deno cache --reload ./packages/**/deps/*.js
+```
+
 ## Start dev server
 
 ```powershell
 docker compose up -d
 ```
+
+

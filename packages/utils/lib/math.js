@@ -75,7 +75,7 @@ export function float16(h) {
  * @see https://www.w3.org/TR/WGSL/#roundup
  * @param {number} k - The increment to round up to
  * @param {number} n - The number to round up
- * @returns {number}
+ * @return {number}
  */
 export function roundUp(k, n) {
     return Math.ceil(n / k) * k;

@@ -1,31 +1,42 @@
-import { GLTFProperty } from './gltf-property.js';
-import { Texture      } from './texture.js';
-
-/**
- * @typedef {{
- *  index:       number,
- *  texCoord?:   number,
- *  extensions?: Revelry.GLTF.Extensions.textureInfo,
- * } & import('./gltf-property.js').glTFPropertyData} textureInfo
- */
-
 /**
  * Reference to a texture.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-textureinfo
+ *
+ * @module
+ */
+
+import { GLTFProperty } from './gltf-property.js';
+import { Texture      } from './texture.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { textureInfoExtensions, TextureInfoExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} textureInfo - TextureInfo JSON representation.
+ * @property {number} index - The index of the texture.
+ * @property {number} [texCoord] - The set index of texture's TEXCOORD attribute used for texture coordinate mapping.
+ * @property {textureInfoExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * TextureInfo class representation.
  */
 export class TextureInfo extends GLTFProperty {
     /**
+     * Creates an instance of TextureInfo.
      * @param {{
      *  texture:     Texture,
      *  texCoord?:   number,
-     *  extensions?: Revelry.GLTF.Extensions.TextureInfo,
-     * } & import('./gltf-property.js').GLTFPropertyData} textureInfo
+     *  extensions?: TextureInfoExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled textureInfo object
      */
-    constructor(textureInfo) {
-        super(textureInfo);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { texture, texCoord = 0, extensions } = textureInfo;
+        const { texture, texCoord = 0, extensions } = unmarshalled;
 
         /**
          * The Texture.
@@ -37,24 +48,22 @@ export class TextureInfo extends GLTFProperty {
          */
         this.texCoord = texCoord;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a TextureInfo instance from a JSON representation.
-     * @param {textureInfo} textureInfo
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {textureInfo & glTFPropertyData} textureInfo - The textureInfo JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(textureInfo, options) {
-        const unmarshalled = this.unmarshall(textureInfo, options, {
-            index: { factory: Texture, collection: 'textures' },
-        }, 'TextureInfo');
-
-        return new this({
-            ...unmarshalled,
-            texture: unmarshalled.index,
-        });
+    static fromJSON(textureInfo, graph) {
+        return this.unmarshall(graph, textureInfo, {
+            index: { factory: Texture, collection: 'textures', alias: 'texture' },
+        }, this);
     }
 
     /**
@@ -62,7 +71,7 @@ export class TextureInfo extends GLTFProperty {
      *
      * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
      *
-     * @param {boolean} v
+     * @param {boolean} v - Whether this texture uses sRGB transfer function.
      */
     set sRGB(v) {
         this.texture.sRGB = v;

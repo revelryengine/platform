@@ -1,3 +1,13 @@
+/**
+ * A typed view into a bufferView. A bufferView contains raw binary data.
+ * An accessor provides a typed view into a bufferView or a subset of a bufferView similar
+ * to how WebGL's vertexAttribPointer() defines an attribute in a buffer.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { BufferView        } from './buffer-view.js';
 import { AccessorSparse    } from './accessor-sparse.js';
@@ -8,39 +18,41 @@ import {
 } from './constants.js';
 
 /**
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { accessorExtensions, AccessorExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
  * @import { GL } from './constants.js';
+ * @import { accessorSparse } from './accessor-sparse.js';
  */
 
 /**
- * @typedef {{
- *  type:          'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4',
- *  componentType: typeof GL.BYTE | typeof GL.UNSIGNED_BYTE | typeof GL.SHORT | typeof GL.UNSIGNED_SHORT | typeof GL.UNSIGNED_INT | typeof GL.FLOAT,
- *  count:         number,
- *  bufferView?:   number,
- *  byteOffset?:   number,
- *  normalized?:   boolean,
- *  max?:          number[],
- *  min?:          number[],
- *  sparse?:       import('./accessor-sparse.js').accessorSparse,
- *  extensions?:   Revelry.GLTF.Extensions.accessor,
- * } & import('./gltf-property.js').namedGLTFPropertyData} accessor
+ * @typedef {object} accessor - Accessor JSON representation.
+ * @property {'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4'} type - Specifies if the attribute is a scalar, vector, or matrix.
+ * @property {typeof GL.BYTE | typeof GL.UNSIGNED_BYTE | typeof GL.SHORT | typeof GL.UNSIGNED_SHORT | typeof GL.UNSIGNED_INT | typeof GL.FLOAT} componentType - The datatype of components in the attribute. All valid values correspond to WebGL enums.
+ * @property {number} count - The number of attributes referenced by this accessor, not to be confused with the number of bytes or number of components.
+ * @property {number} [bufferView] - The index of the bufferView.
+ * @property {number} [byteOffset] - The offset relative to the start of the bufferView in bytes.
+ * @property {boolean} [normalized] - Specifies whether integer data values should be normalized.
+ * @property {number[]} [max] - Maximum value of each component in this attribute.
+ * @property {number[]} [min] - Minimum value of each component in this attribute.
+ * @property {accessorSparse} [sparse] - Sparse storage of attributes that deviate from their initialization value.
+ * @property {accessorExtensions} [extensions] - Extension-specific data.
  */
 
 /**
- * A typed view into a bufferView. A bufferView contains raw binary data.
- * An accessor provides a typed view into a bufferView or a subset of a bufferView similar
- * to how WebGL's vertexAttribPointer() defines an attribute in a buffer.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor
+ * Accessor class representation.
  */
 export class Accessor extends NamedGLTFProperty {
-    /** @type {SharedArrayBuffer|undefined} */
+    /** @type {SharedArrayBuffer|ArrayBuffer|undefined} */
     #arrayBuffer;
 
     /** @type {Int8Array|Uint8Array|Int16Array|Uint16Array|Uint32Array|Float32Array|undefined} */
     #typedArray;
 
     /**
+     * Creates an instance of Accessor.
      * @param {{
      *  type:          accessor['type'],
      *  componentType: accessor['componentType'],
@@ -51,11 +63,11 @@ export class Accessor extends NamedGLTFProperty {
      *  max?:          number[],
      *  min?:          number[],
      *  sparse?:       AccessorSparse,
-     *  extensions?:   Revelry.GLTF.Extensions.Accessor,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} accessor - The properties of the accessor.
+     *  extensions?:   AccessorExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled accessor object
      */
-    constructor(accessor) {
-        super(accessor);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
         const {
             type,
@@ -68,7 +80,7 @@ export class Accessor extends NamedGLTFProperty {
             min,
             sparse,
             extensions,
-        } = accessor;
+        } = unmarshalled;
 
         /**
          * The BufferView. When not defined, accessor must be initialized with zeros;
@@ -152,25 +164,28 @@ export class Accessor extends NamedGLTFProperty {
          */
         this.sparse = sparse;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
      * Creates an instance from JSON data.
-     * @param {accessor} accessor
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * @param {accessor & namedGLTFPropertyData} accessor - The accessor JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(accessor, options) {
-        return new this(this.unmarshall(accessor, options, {
+    static fromJSON(accessor, graph) {
+        return this.unmarshall(graph, accessor, {
             bufferView: { factory: BufferView, collection: 'bufferViews' },
             sparse:     { factory: AccessorSparse }
-        }, 'Accessor'));
+        }, this);
     }
 
     /**
      * Loads the accessor data.
-     * @param {AbortSignal} [signal]
+     * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the load.
      * @override
      */
     async load(signal) {
@@ -197,7 +212,9 @@ export class Accessor extends NamedGLTFProperty {
             this.#arrayBuffer = new SharedArrayBuffer(
                 count * numberOfComponents * numberOfBytes,
             );
+
             this.#typedArray = new TYPEDARRAYS[componentType](
+                // @ts-ignore - SharedArrayBuffer is compatible
                 this.#arrayBuffer,
                 byteOffset,
                 count * numberOfComponents,
@@ -213,7 +230,7 @@ export class Accessor extends NamedGLTFProperty {
             );
         }
 
-        if (this.sparse) {
+        if (this.sparse && this.#typedArray) {
             const { indices, values, count } = this.sparse;
 
             const indicesBuffer = indices.getArrayBuffer();
@@ -300,6 +317,8 @@ export class Accessor extends NamedGLTFProperty {
 
     /**
      * Creates a typed ArrayBuffer from the accessor with offset and count.
+     * @param {number} [offset] - The offset in number of elements.
+     * @param {number} [count] - The number of elements.
      */
     createTypedView(offset = 0, count = this.count) {
         if(!this.#arrayBuffer) throw new Error('Array Buffer does not exist');
@@ -308,6 +327,7 @@ export class Accessor extends NamedGLTFProperty {
         const numberOfComponents = this.getNumberOfComponents();
         const start = (offset * this.getNumberOfBytes()) + byteOffset + (bufferView?.byteOffset ?? 0);
         return new TYPEDARRAYS[componentType](
+            // @ts-ignore - SharedArrayBuffer is compatible
             this.#arrayBuffer,
             start,
             count * numberOfComponents,

@@ -1,31 +1,42 @@
+/**
+ * A node in the node hierarchy.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-node
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { Camera            } from './camera.js';
 import { Mesh              } from './mesh.js';
 import { Skin              } from './skin.js';
 
 /**
- * @typedef {{
- *  camera?:      number,
- *  children?:    number[],
- *  skin?:        number,
- *  matrix?:      mat4,
- *  mesh?:        number,
- *  rotation?:    quat,
- *  scale?:       vec3,
- *  translation?: vec3,
- *  weights?:     number[],
- *  extensions?:  Revelry.GLTF.Extensions.node,
- * } & import('./gltf-property.js').namedGLTFPropertyData} node
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { nodeExtensions, NodeExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} node - Node JSON representation.
+ * @property {number} [camera] - The index of the camera referenced by this node.
+ * @property {number[]} [children] - The indices of this node's children.
+ * @property {number} [skin] - The index of the skin referenced by this node.
+ * @property {number[]} [matrix] - A floating-point 4x4 transformation matrix stored in column-major order.
+ * @property {number} [mesh] - The index of the mesh in this node.
+ * @property {number[]} [rotation] - The node's unit quaternion rotation in the order (x, y, z, w), where w is the scalar.
+ * @property {number[]} [scale] - The node's non-uniform scale, given as the scaling factors along the x, y, and z axes.
+ * @property {number[]} [translation] - The node's translation along the x, y, and z axes.
+ * @property {number[]} [weights] - The weights of the instantiated Morph Target. Number of elements must match number of Morph Targets of used mesh.
+ * @property {nodeExtensions} [extensions] - Extension-specific data.
  */
 
 let ids = 1;
 /**
- * A node in the node hierarchy.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-node
+ * Node class representation.
  */
 export class Node extends NamedGLTFProperty {
     /**
+     * Creates an instance of Node.
      * @param {{
      *  camera?:      Camera,
      *  children?:    Node[],
@@ -36,17 +47,17 @@ export class Node extends NamedGLTFProperty {
      *  scale?:       node['scale'],
      *  translation?: node['translation'],
      *  weights?:     number[],
-     *  extensions?:  Revelry.GLTF.Extensions.Node,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} node
+     *  extensions?:  NodeExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled node object
      */
-    constructor(node) {
-        super(node);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
         Object.defineProperty(this, '$id', { value: ids++ });
 
         const {
             camera, children = [], skin, matrix, scale, rotation, translation, mesh, weights, extensions
-        } = node;
+        } = unmarshalled;
 
         /**
          * The Camera referenced by this node.
@@ -93,28 +104,30 @@ export class Node extends NamedGLTFProperty {
          */
         this.weights = weights;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a Node instance from a JSON representation.
-     * @param {node} node
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {node & namedGLTFPropertyData} node - The node JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(node, options) {
-        return new this(this.unmarshall(node, options, {
+    static fromJSON(node, graph) {
+        return this.unmarshall(graph, node, {
             camera:   { factory: Camera, collection: 'cameras' },
             skin:     { factory: Skin,   collection: 'skins'   },
             mesh:     { factory: Mesh,   collection: 'meshes'  },
             children: { factory: Node,   collection: 'nodes'   },
-        }, 'Node'));
+        }, this);
     }
 
     /**
      * Returns the number of morph targets in the first primitive of the node's mesh. If mesh or targets is not defined
      * 0 is returned.
-     * @returns {Number}
      */
     getNumberOfMorphTargets() {
         return this.mesh && this.mesh.primitives[0].targets ? this.mesh.primitives[0].targets.length : 0;

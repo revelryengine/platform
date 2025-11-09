@@ -64,29 +64,29 @@ export class AudioNode extends RenderNode {
     }
 
     /**
-     * @type {WeakMap<import('../../../../deps/gltf.js').KHRAudioEmitter|import('../../../../deps/gltf.js').KHRAudioSource, GainNode>}
+     * @type {WeakMap<import('../../../../deps/gltf.js').GLTFKHRAudioEmitter|import('../../../../deps/gltf.js').GLTFKHRAudioSource, GainNode>}
      */
     #gainNodes = new WeakMap();
     /**
-     * @param {import('../../../../deps/gltf.js').KHRAudioEmitter|import('../../../../deps/gltf.js').KHRAudioSource} emitter
+     * @param {import('../../../../deps/gltf.js').GLTFKHRAudioEmitter|import('../../../../deps/gltf.js').GLTFKHRAudioSource} emitter
      */
     getGainNode(emitter) {
         return this.#gainNodes.get(emitter) ?? NonNull(this.#gainNodes.set(emitter, new GainNode(NonNull(this.audio.context), { gain: emitter.gain })).get(emitter));
     }
 
     /**
-     * @type {Map<import('../../../../deps/gltf.js').KHRAudioEmitter, GainNode>}
+     * @type {Map<import('../../../../deps/gltf.js').GLTFKHRAudioEmitter, GainNode>}
      */
     #sceneEmitters = new Map();
     /**
-     * @param {import('../../../../deps/gltf.js').KHRAudioEmitter} emitter
+     * @param {import('../../../../deps/gltf.js').GLTFKHRAudioEmitter} emitter
      */
     getSceneEmitter(emitter) {
         return this.#sceneEmitters.get(emitter) ?? NonNull(this.#sceneEmitters.set(emitter, this.createSceneEmitter(emitter)).get(emitter));
     }
 
     /**
-     * @param {import('../../../../deps/gltf.js').KHRAudioEmitter} emitter
+     * @param {import('../../../../deps/gltf.js').GLTFKHRAudioEmitter} emitter
      */
     createSceneEmitter(emitter) {
         const emitterGain = this.getGainNode(emitter);
@@ -198,14 +198,14 @@ export class AudioNode extends RenderNode {
 
     #sourceNodes = new WeakMap();
     /**
-     * @param {import('../../../../deps/gltf.js').KHRAudioSource} source
+     * @param {import('../../../../deps/gltf.js').GLTFKHRAudioSource} source
      */
     getSourceNode(source) {
         return this.#sourceNodes.get(source) ?? NonNull(this.#sourceNodes.set(source, this.createSourceNode(source)).get(source));
     }
 
     /**
-     * @param {import('../../../../deps/gltf.js').KHRAudioSource} source
+     * @param {import('../../../../deps/gltf.js').GLTFKHRAudioSource} source
      */
     createSourceNode(source) {
         const gain         = this.getGainNode(source);

@@ -1,3 +1,11 @@
+/**
+ * A keyframe animation.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation
+ *
+ * @module
+ */
+
 import { NamedGLTFProperty } from './gltf-property.js';
 import { AnimationSampler  } from './animation-sampler.js';
 import { AnimationChannel  } from './animation-channel.js';
@@ -6,33 +14,39 @@ import { GL                } from './constants.js';
 import { quat              } from '../deps/gl-matrix.js';
 
 /**
- * @typedef {{
- *  channels: import('./animation-channel.js').animationChannel[],
- *  samplers: import('./animation-sampler.js').animationSampler[],
- *  extensions?: Revelry.GLTF.Extensions.animation,
- * } & import('./gltf-property.js').namedGLTFPropertyData} animation
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { animationExtensions, AnimationExtensions } from 'virtual-rev-gltf-extensions';
  */
 
-/** @typedef {Float32Array | Uint32Array | Uint16Array | Int16Array | Uint8Array | Int8Array} TypedArray */
+/**
+ * @import { animationChannel } from './animation-channel.js';
+ * @import { animationSampler } from './animation-sampler.js';
+ * @import { TypedArray } from '../deps/utils.js';
+ */
 
 /**
- * A keyframe animation.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation
- *
+ * @typedef {object} animation - Animation JSON representation.
+ * @property {animationChannel[]} channels - An array of channels, each of which targets an animation's sampler at a node's property. Different channels of the same animation can't have equal targets.
+ * @property {animationSampler[]} samplers - An array of samplers that combines input and output accessors with an interpolation algorithm to define a keyframe graph (but not its target).
+ * @property {animationExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Animation class representation.
  */
 export class Animation extends NamedGLTFProperty {
     /**
-     *  @param {{
+     * Creates an instance of Animation.
+     * @param {{
      *  channels: AnimationChannel[],
      *  samplers: AnimationSampler[],
-     *  extensions?: Revelry.GLTF.Extensions.Animation,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} animation
+     *  extensions?: AnimationExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled animation object
      */
-    constructor(animation) {
-        super(animation);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { channels, samplers, extensions } = animation;
+        const { channels, samplers, extensions } = unmarshalled;
 
         /**
          * An array of samplers that combines input and output accessors with an interpolation algorithm to define a
@@ -46,41 +60,51 @@ export class Animation extends NamedGLTFProperty {
          */
         this.channels = channels;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Create an animation from a JSON representation.
-     * @param {animation} animation
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {animation & namedGLTFPropertyData} animation - The animation JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(animation, options) {
-        return new this(this.unmarshall(animation, options, {
+    static fromJSON(animation, graph) {
+        return this.unmarshall(graph, animation, {
             samplers: { factory: AnimationSampler },
             channels: { factory: AnimationChannel },
-        }, 'Animation'));
+        }, this);
     }
 
     /**
      * Create an animator for the animation.
-     * @param {boolean} loop
+     * @param {boolean} loop - Whether the animation should loop.
      */
     createAnimator(loop = true) {
         return new Animator(this, loop);
     }
 }
 
-/** @typedef {typeof GL.FLOAT|typeof GL.BYTE|typeof GL.UNSIGNED_BYTE|typeof GL.SHORT|typeof GL.UNSIGNED_SHORT} NormalizerType */
-/** @typedef {(v: number) => number} Normalizer */
+/**
+ * @typedef {(
+ *  typeof GL.FLOAT | typeof GL.BYTE | typeof GL.UNSIGNED_BYTE | typeof GL.SHORT | typeof GL.UNSIGNED_SHORT
+ * )} NormalizerType - The type of normalizer.
+ *
+ * @callback Normalizer - A function that normalizes a value.
+ * @param {number} v - The value to normalize
+ * @return {number}
+ */
 
-const normalizers = {
+const normalizers = /** @type {const} */({
     [GL.FLOAT]          : /** @type {Normalizer} */v => v,
     [GL.BYTE]           : /** @type {Normalizer} */v => Math.max(v / 127.0, -1.0),
     [GL.UNSIGNED_BYTE]  : /** @type {Normalizer} */v => v / 255.0,
     [GL.SHORT]          : /** @type {Normalizer} */v => Math.max(v / 32767.0, -1.0),
     [GL.UNSIGNED_SHORT] : /** @type {Normalizer} */v => v / 65535.0,
-};
+});
 
 const q1 = quat.create();
 const q2 = quat.create();
@@ -190,26 +214,41 @@ const interpolators = {
 };
 
 /**
+ * Finds the next key frame based on time t.
  * @todo use a binary search algorithm
- * @param {TypedArray} input
- * @param {number} t
+ * @param {TypedArray} input - The input keyframe times.
+ * @param {number} t - The time to find the next keyframe for.
  */
 function findNextKeyFrame(input, t) {
     const i = input.findIndex(v => v > t);
     return i > 0 ? i : input.length - 1;
 }
 
+/**
+ * Animates a glTF Animation.
+ */
 export class Animator {
     /**
-     * @param {Animation} animation
-     * @param {boolean} loop
+     * Creates an instance of Animator.
+     * @param {Animation} animation - The animation to animate.
+     * @param {boolean} loop - Whether the animation should loop.
      */
     constructor(animation, loop = true) {
+        /**
+         * Current time of the animation in seconds.
+         */
         this.time  = 0;
+        /**
+         * Whether the animation should loop.
+         */
         this.loop  = loop;
+        /**
+         * The current animation being animated.
+         */
         this.animation = animation;
 
         /**
+         * Targets affected by this animation.
          * @type {Record<string, Set<unknown>>}
          */
         this.targets = {};
@@ -233,13 +272,16 @@ export class Animator {
             }
         }
 
+        /**
+         * Duration of the animation in seconds.
+         */
         this.duration = animation.channels.reduce((duration, { sampler: { input: { max = [0] } } }) => Math.max(max[0], duration), 0);
     }
 
     /**
      * Updates the animation state.
-     * @param {number} deltaTime
-     * @param {boolean} [loop]
+     * @param {number} deltaTime - Time elapsed since last update in milliseconds.
+     * @param {boolean} [loop] - Whether the animation should loop. If undefined, the animator's loop property is used.
      */
     update(deltaTime, loop) {
         this.time += deltaTime / 1000;

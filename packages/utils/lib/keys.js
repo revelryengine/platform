@@ -9,7 +9,7 @@
  *
  * @template {{}} T - The type of the object.
  * @param {T} obj - The object to get the keys from.
- * @returns {Array<keyof T>}
+ * @return {Array<keyof T>}
  */
 export function keys(obj) {
     return /** @type {Array<keyof T>} */(Object.keys(obj));

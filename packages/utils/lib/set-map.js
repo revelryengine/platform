@@ -32,7 +32,7 @@ export class SetMap extends Map {
      * @override
      * @param {K} key - The key of the Set to remove the item from.
      * @param {T} [item] - The item to remove from the Set.
-     * @returns {boolean} Returns true if the item was present and successfully deleted.
+     * @return {boolean} Returns true if the item was present and successfully deleted.
      */
     delete(key, item) {
         const s = this.get(key);

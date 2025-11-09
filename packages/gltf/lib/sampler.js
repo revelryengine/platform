@@ -1,35 +1,46 @@
-import { NamedGLTFProperty } from './gltf-property.js';
-import { GL } from './constants.js';
-
-/**
- * @typedef {{
- *  magFilter?:  typeof GL.NEAREST | typeof GL.LINEAR,
- *  minFilter?:  typeof GL.NEAREST | typeof GL.LINEAR | typeof GL.NEAREST_MIPMAP_NEAREST | typeof GL.LINEAR_MIPMAP_NEAREST | typeof GL.NEAREST_MIPMAP_LINEAR | typeof GL.LINEAR_MIPMAP_LINEAR,
- *  wrapS?:      typeof GL.CLAMP_TO_EDGE | typeof GL.MIRRORED_REPEAT | typeof GL.REPEAT
- *  wrapT?:      typeof GL.CLAMP_TO_EDGE | typeof GL.MIRRORED_REPEAT | typeof GL.REPEAT,
- *  extensions?: Revelry.GLTF.Extensions.sampler,
- * } & import('./gltf-property.js').namedGLTFPropertyData} sampler
- */
-
 /**
  * Texture sampler properties for filtering and wrapping modes.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-sampler
+ *
+ * @module
+ */
+
+import { NamedGLTFProperty } from './gltf-property.js';
+import { GL } from './constants.js';
+
+/**
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { samplerExtensions, SamplerExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} sampler - Sampler JSON representation.
+ * @property {typeof GL.NEAREST | typeof GL.LINEAR} [magFilter] - Magnification filter.
+ * @property {typeof GL.NEAREST | typeof GL.LINEAR | typeof GL.NEAREST_MIPMAP_NEAREST | typeof GL.LINEAR_MIPMAP_NEAREST | typeof GL.NEAREST_MIPMAP_LINEAR | typeof GL.LINEAR_MIPMAP_LINEAR} [minFilter] - Minification filter.
+ * @property {typeof GL.CLAMP_TO_EDGE | typeof GL.MIRRORED_REPEAT | typeof GL.REPEAT} [wrapS] - s wrapping mode.
+ * @property {typeof GL.CLAMP_TO_EDGE | typeof GL.MIRRORED_REPEAT | typeof GL.REPEAT} [wrapT] - t wrapping mode.
+ * @property {samplerExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Sampler class representation.
  */
 export class Sampler extends NamedGLTFProperty {
     /**
+     * Creates an instance of Sampler.
      * @param {{
      *  magFilter?:  sampler['magFilter'],
      *  minFilter?:  sampler['minFilter'],
      *  wrapS?:      sampler['wrapS'],
      *  wrapT?:      sampler['wrapT'],
-     *  extensions?: Revelry.GLTF.Extensions.Sampler,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} sampler
+     *  extensions?: SamplerExtensions,
+     * } & NamedGLTFPropertyData} unmarshall - Unmarshalled sampler object
      */
-    constructor(sampler) {
-        super(sampler);
+    constructor(unmarshall) {
+        super(unmarshall);
 
-        const { magFilter, minFilter, wrapS = GL.REPEAT, wrapT = GL.REPEAT, extensions } = sampler;
+        const { magFilter, minFilter, wrapS = GL.REPEAT, wrapT = GL.REPEAT, extensions } = unmarshall;
 
         /**
          * Magnification filter.
@@ -51,16 +62,21 @@ export class Sampler extends NamedGLTFProperty {
          */
         this.wrapT = wrapT;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * @param {sampler} sampler
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {sampler & namedGLTFPropertyData} sampler - The sampler JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(sampler, options) {
-        return new this(this.unmarshall(sampler, options, {
-        }, 'Sampler'));
+    static fromJSON(sampler, graph) {
+        return this.unmarshall(graph, sampler, {
+            // No reference fields
+        }, this);
     }
 }

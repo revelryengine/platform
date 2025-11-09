@@ -1,48 +1,62 @@
-import { NamedGLTFProperty } from './gltf-property.js';
-import { Node              } from './node.js';
-
-/**
- * @typedef {{
- *  nodes:       number[],
- *  extensions?: Revelry.GLTF.Extensions.scene,
- * } & import('./gltf-property.js').namedGLTFPropertyData} scene
- */
-
 /**
  * The root nodes of a scene.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-scene
+ *
+ * @module
+ */
+
+import { NamedGLTFProperty } from './gltf-property.js';
+import { Node              } from './node.js';
+
+/**
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { sceneExtensions, SceneExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} scene - Scene JSON representation.
+ * @property {number[]} nodes - The indices of each root node of the scene.
+ * @property {sceneExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * Scene class representation.
  */
 export class Scene extends NamedGLTFProperty {
     /**
+     * Creates an instance of Scene.
      * @param {{
      *  nodes:       Node[],
-     *  extensions?: Revelry.GLTF.Extensions.Scene,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} scene
+     *  extensions?: SceneExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled scene object
      */
-    constructor(scene) {
-        super(scene);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { nodes = [], extensions } = scene;
+        const { nodes = [], extensions } = unmarshalled;
 
         /**
          * Each root Node.
          */
         this.nodes = nodes;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a Scene instance from a JSON representation.
-     * @param {scene} scene
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {scene & namedGLTFPropertyData} scene - The scene JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(scene, options) {
-        return new this(this.unmarshall(scene, options, {
+    static fromJSON(scene, graph) {
+        return this.unmarshall(graph, scene, {
             nodes: { factory: Node, collection: 'nodes' },
-        }, 'Scene'));
+        }, this);
     }
 
     /**

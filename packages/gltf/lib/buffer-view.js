@@ -1,41 +1,52 @@
+/**
+ * A view into a buffer generally representing a subset of the buffer.
+ *
+ * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-bufferview
+ *
+ * @module
+ */
 
 import { NamedGLTFProperty } from './gltf-property.js';
 import { Buffer            } from './buffer.js';
 
 /**
- * @import { GL } from './constants.js';
- */
-/**
- * @typedef {{
- *  buffer:      number,
- *  byteLength:  number,
- *  byteOffset?: number,
- *  byteStride?: number,
- *  target?:     typeof GL.ARRAY_BUFFER | typeof GL.ELEMENT_ARRAY_BUFFER,
- *  extensions?: Revelry.GLTF.Extensions.bufferView,
- * } & import('./gltf-property.js').namedGLTFPropertyData} bufferView
+ * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { bufferViewExtensions, BufferViewExtensions } from 'virtual-rev-gltf-extensions';
  */
 
 /**
- * A view into a buffer generally representing a subset of the buffer.
- *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-bufferview
+ * @import { GL } from './constants.js';
+ */
+
+/**
+ * @typedef {object} bufferView - BufferView JSON representation.
+ * @property {number} buffer - The index of the buffer.
+ * @property {number} byteLength - The length of the bufferView in bytes.
+ * @property {number} [byteOffset] - The offset into the buffer in bytes.
+ * @property {number} [byteStride] - The stride, in bytes, between vertex attributes.
+ * @property {typeof GL.ARRAY_BUFFER | typeof GL.ELEMENT_ARRAY_BUFFER} [target] - The target that the GPU buffer should be bound to.
+ * @property {bufferViewExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * BufferView class representation.
  */
 export class BufferView extends NamedGLTFProperty {
     /**
+     * Creates an instance of BufferView.
      * @param {{
      *  buffer:      Buffer,
      *  byteLength:  number,
      *  byteOffset?: number,
      *  byteStride?: number,
      *  target?:     bufferView['target'],
-     *  extensions?: Revelry.GLTF.Extensions.BufferView,
-     * } & import('./gltf-property.js').NamedGLTFPropertyData} bufferView
+     *  extensions?: BufferViewExtensions,
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled buffer view object
      */
-    constructor(bufferView) {
-        super(bufferView);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { buffer, byteOffset = 0, byteLength, byteStride, target, extensions } = bufferView;
+        const { buffer, byteOffset = 0, byteLength, byteStride, target, extensions } = unmarshalled;
 
         /**
          * The Buffer.
@@ -67,18 +78,21 @@ export class BufferView extends NamedGLTFProperty {
          */
         this.target = target;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a new BufferView instance from a JSON representation.
-     * @param {bufferView} bufferView
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {bufferView & namedGLTFPropertyData} bufferView - The bufferView JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(bufferView, options) {
-        return new this(this.unmarshall(bufferView, options, {
+    static fromJSON(bufferView, graph) {
+        return this.unmarshall(graph, bufferView, {
             buffer: { factory: Buffer, collection: 'buffers' },
-        }, 'BufferView'));
+        }, this);
     }
 }

@@ -1,0 +1,528 @@
+/// <reference path="./KHR_audio.types.d.ts" />
+
+/**
+ * This extension allows for the addition of spatialized and non-spatialized audio to glTF scenes.
+ *
+ * @see https://github.com/KhronosGroup/glTF/blob/3bed830e001187246d75186b83f5b2469d416f36/extensions/2.0/Khronos/KHR_audio/README.md
+ *
+ * @module
+ */
+
+import { GLTFProperty } from '../../gltf-property.js';
+import { BufferView   } from '../../buffer-view.js';
+import { registry     } from '../registry.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData,FromJSONGraph } from '../../gltf-property.js';
+ * @import {
+ *  glTFKHRAudioExtensions, GLTFKHRAudioExtensions,
+ *  glTFKHRAudioAudioExtensions, GLTFKHRAudioAudioExtensions,
+ *  glTFKHRAudioSourceExtensions, GLTFKHRAudioSourceExtensions,
+ *  glTFKHRAudioEmitterExtensions, GLTFKHRAudioEmitterExtensions,
+ *  glTFKHRAudioEmitterPositionalExtensions, GLTFKHRAudioEmitterPositionalExtensions,
+ *  nodeKHRAudioExtensions, NodeKHRAudioExtensions,
+ *  sceneKHRAudioExtensions, SceneKHRAudioExtensions
+ * } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} glTFKHRAudioEmitterPositional - KHR_audio positional audio emitter JSON representation.
+ * @property {number} [coneInnerAngle] - The angle, in radians, of a cone inside of which there will be no volume reduction.
+ * @property {number} [coneOuterAngle] - The angle, in radians, of a cone outside of which the volume will be reduced to a constant value of `coneOuterGain`.
+ * @property {number} [coneOuterGain] - The gain of the audio emitter set when outside the cone defined by the `coneOuterAngle` property. It is a linear value (not dB).
+ * @property {'inverse' | 'linear' | 'exponential'} [distanceModel] - Specifies the distance model for the audio emitter.
+ * @property {number} [maxDistance] - The maximum distance between the emitter and listener, after which the volume will not be reduced any further.
+ * @property {number} [refDistance] - A reference distance for reducing volume as the emitter moves further from the listener.
+ * @property {number} [rolloffFactor] - Describes how quickly the volume is reduced as the emitter moves away from listener.
+ * @property {glTFKHRAudioEmitterPositionalExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio positional audio emitter class representation.
+ */
+ export class GLTFKHRAudioEmitterPositional extends GLTFProperty {
+    /**
+     * Creates a new instance of GLTFKHRAudioEmitterPositional.
+     * @param {{
+     *  coneInnerAngle?: number,
+     *  coneOuterAngle?: number,
+     *  coneOuterGain?:  number,
+     *  distanceModel?:  'inverse' | 'linear' | 'exponential',
+     *  maxDistance?:    number,
+     *  refDistance?:    number,
+     *  rolloffFactor?:  number,
+     *  extensions?:     GLTFKHRAudioEmitterPositionalExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio positional audio emitter object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const {
+            coneInnerAngle = 2 * Math.PI, coneOuterAngle = 2 * Math.PI, coneOuterGain = 0.0, distanceModel = 'inverse',
+            maxDistance = 10000.0, refDistance = 1.0, rolloffFactor = 1.0, extensions
+        } = unmarshalled;
+
+        /**
+         * The angle, in radians, of a cone inside of which there will be no volume reduction.
+         */
+        this.coneInnerAngle = coneInnerAngle;
+
+        /**
+         * The angle, in radians, of a cone outside of which the volume will be reduced to a constant value of `coneOuterGain`.
+         */
+        this.coneOuterAngle = coneOuterAngle;
+
+        /**
+         * The gain of the audio emitter set when outside the cone defined by the `coneOuterAngle` property. It is a linear value (not dB).
+         */
+        this.coneOuterGain = coneOuterGain;
+
+        /**
+         * Specifies the distance model for the audio emitter.
+         *
+         * Allowed Values:
+         * * "linear"
+         * * "inverse"
+         * * "exponential"
+         */
+        this.distanceModel = distanceModel;
+
+        /**
+         * The maximum distance between the emitter and listener, after which the volume will not be reduced any further. `maximumDistance` may only be applied when the distanceModel is set to linear. Otherwise, it should be ignored.
+         */
+        this.maxDistance = maxDistance;
+
+        /**
+          * A reference distance for reducing volume as the emitter moves further from the listener. For distances less than this, the volume is not reduced.
+          */
+        this.refDistance = refDistance;
+
+        /**
+          * Describes how quickly the volume is reduced as the emitter moves away from listener. When distanceModel is set to linear, the maximum value is 1 otherwise there is no upper limit.
+          */
+        this.rolloffFactor = rolloffFactor;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {glTFKHRAudioEmitterPositional & glTFPropertyData} glTFKHRAudioEmitterPositional - The KHR_audio positional audio emitter JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(glTFKHRAudioEmitterPositional, graph) {
+        return this.unmarshall(graph, glTFKHRAudioEmitterPositional, {
+            // No reference fields
+        }, this);
+    }
+}
+
+
+/**
+ * @typedef {object} glTFKHRAudioAudio - KHR_audio audio data JSON representation.
+ * @property {string} [uri] - The uri of the audio file. Relative paths are relative to the .gltf file.
+ * @property {string} [mimeType] - The audio's MIME type. Required if `bufferView` is defined. Unless specified by another extension, the only supported mimeType is `audio/mpeg`.
+ * @property {number} [bufferView] - The bufferview that contains the audio data. Use this instead of the audio source's uri property.
+ * @property {glTFKHRAudioAudioExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio audio data class representation.
+ */
+export class GLTFKHRAudioAudio extends GLTFProperty {
+    /**
+     * @type {ArrayBuffer|Uint8Array|undefined}
+     */
+    #arrayBuffer;
+
+    /**
+     * Creates a new instance of GLTFKHRAudioAudio.
+     * @param {{
+     *  uri?:        URL,
+     *  mimeType?:   string,
+     *  bufferView?: BufferView,
+     *  extensions?: GLTFKHRAudioAudioExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio audio data object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { uri, mimeType, bufferView, extensions } = unmarshalled;
+
+        /**
+         * The uri of the audio file. Relative paths are relative to the .gltf file.
+         */
+        this.uri = uri;
+
+        /**
+         * The audio's MIME type. Required if `bufferView` is defined. Unless specified by another extension, the only supported mimeType is `audio/mpeg`.
+         */
+        this.mimeType = mimeType;
+
+        /**
+         * The bufferview that contains the audio data. Use this instead of the audio source's uri property.
+         */
+        this.bufferView = bufferView;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {glTFKHRAudioAudio & glTFPropertyData} glTFKHRAudioAudio - The KHR_audio audio data JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(glTFKHRAudioAudio, graph) {
+        return this.unmarshall(graph, glTFKHRAudioAudio, {
+            bufferView: { factory: BufferView, collection: 'bufferViews' },
+            uri:        { factory: URL                                   },
+        }, this);
+    }
+
+    /**
+     * Loads the audio data as a Uint8Array.
+     * @param {AbortSignal} [signal] - An optional AbortSignal to abort the loading process.
+     */
+    async loadBufferAsUint8Array(signal) {
+        if(!this.bufferView) throw new Error('Invalid State');
+
+        const { buffer, byteOffset, byteLength } = this.bufferView;
+        await buffer.loadOnce(signal);
+        return new Uint8Array(buffer.getArrayBuffer(), byteOffset, byteLength);
+    }
+
+    /**
+     * Loads the audio data.
+     * @param {AbortSignal} [signal] - An optional AbortSignal to abort the loading process.
+     * @override
+     */
+    async load(signal) {
+        await (async () => {
+            if(this.uri) {
+                this.#arrayBuffer = await fetch(this.uri.href, { signal }).then(res => res.arrayBuffer());
+            } else if(this.bufferView) {
+                this.#arrayBuffer = await this.loadBufferAsUint8Array(signal);
+            }
+        })();
+
+        return super.load(signal);
+    }
+
+    /**
+     * Gets the audio data as an ArrayBuffer.
+     */
+    getArrayBuffer() {
+        if(!this.#arrayBuffer) throw new Error('Invalid State');
+        return this.#arrayBuffer;
+    }
+}
+
+/**
+ * @typedef {object} glTFKHRAudioSource - KHR_audio source JSON representation.
+ * @property {boolean} [autoPlay] - Whether or not to play the specified audio when the glTF is loaded.
+ * @property {number} [gain] - Unitless multiplier against original audio file volume for determining audio source loudness.
+ * @property {boolean} [loop] - Whether or not to loop the specified audio when finished.
+ * @property {number} audio - The index of the audio data assigned to this clip.
+ * @property {glTFKHRAudioSourceExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio source class representation.
+ */
+export class GLTFKHRAudioSource extends GLTFProperty {
+    /**
+     * Creates a new instance of GLTFKHRAudioSource.
+     * @param {{
+     *  autoPlay?:    boolean,
+     *  gain?:        number,
+     *  loop?:        boolean,
+     *  audio:        GLTFKHRAudioAudio,
+     *  extensions?:  GLTFKHRAudioSourceExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio source object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { autoPlay = false, gain = 1.0, loop = false, audio, extensions } = unmarshalled;
+
+        /**
+         * Whether or not to play the specified audio when the glTF is loaded.
+         */
+        this.autoPlay = autoPlay;
+
+        /**
+         * Unitless multiplier against original audio file volume for determining audio source loudness.
+         */
+        this.gain = gain;
+
+        /**
+         * Whether or not to loop the specified audio when finished.
+         */
+        this.loop = loop;
+
+        /**
+         * The audio data assigned to this clip.
+         */
+        this.audio = audio;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {glTFKHRAudioSource & glTFPropertyData} glTFKHRAudioSource - The KHR_audio source JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(glTFKHRAudioSource, graph) {
+        return this.unmarshall(graph, glTFKHRAudioSource, {
+            audio: { factory: GLTFKHRAudioAudio, collection: ['extensions', 'KHR_audio', 'audio'] }
+        }, this);
+    }
+}
+
+/**
+ * @typedef {object} glTFKHRAudioEmitter - KHR_audio emitter JSON representation.
+ * @property {'positional' | 'global'} type - Specifies the audio emitter type.
+ * @property {number} [gain] - Unitless multiplier against original audio file volume for determining audio source loudness.
+ * @property {number[]} [sources] - An array of audio sources or indices used by the audio emitter. This array may be empty.
+ * @property {glTFKHRAudioEmitterPositional} [positional] - An object containing the positional audio emitter properties. This may only be defined if `type` is set to `positional`.
+ * @property {glTFKHRAudioEmitterExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio emitter class representation.
+ */
+export class GLTFKHRAudioEmitter extends GLTFProperty {
+    /**
+     * Creates a new instance of GLTFKHRAudioEmitter.
+     * @param {{
+     *  type:        'positional' | 'global'
+     *  gain?:       number,
+     *  sources?:    GLTFKHRAudioSource[],
+     *  positional?: GLTFKHRAudioEmitterPositional,
+     *  extensions?: GLTFKHRAudioEmitterExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio emitter object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { type, gain = 1.0, sources = [], positional, extensions } = unmarshalled;
+
+        /**
+         * Specifies the audio emitter type.
+         */
+        this.type = type;
+
+        /**
+         * Unitless multiplier against original audio file volume for determining audio source loudness.
+         */
+        this.gain = gain;
+
+        /**
+         * An array of audio sources or indices used by the audio emitter. This array may be empty.
+         */
+        this.sources = sources;
+
+        /**
+         * An object containing the positional audio emitter properties. This may only be defined if `type` is set to `positional`.
+         */
+        this.positional = positional;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {glTFKHRAudioEmitter & glTFPropertyData} glTFKHRAudioEmitter - The KHR_audio emitter JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(glTFKHRAudioEmitter, graph) {
+        return this.unmarshall(graph, glTFKHRAudioEmitter, {
+            sources:    { factory: GLTFKHRAudioSource, collection: ['extensions', 'KHR_audio', 'sources'] },
+            positional: { factory: GLTFKHRAudioEmitterPositional                                                 },
+        }, this);
+    }
+}
+
+/**
+ * @typedef {object} glTFKHRAudio - KHR_audio JSON representation.
+ * @property {glTFKHRAudioSource[]} sources - An array of audio sources to be used in audio emitters.
+ * @property {glTFKHRAudioEmitter[]} emitters - An array of positional or global audio emitters that can be referenced by nodes or scenes.
+ * @property {glTFKHRAudioAudio[]} audio - An array of audio that can be referenced by nodes.
+ * @property {glTFKHRAudioExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio class representation.
+ */
+ export class GLTFKHRAudio extends GLTFProperty {
+    /**
+     * Creates a new instance of GLTFKHRAudio.
+     * @param {{
+     *  sources:     GLTFKHRAudioSource[],
+     *  emitters:    GLTFKHRAudioEmitter[],
+     *  audio:       GLTFKHRAudioAudio[],
+     *  extensions?: GLTFKHRAudioExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { sources, emitters, audio, extensions } = unmarshalled;
+
+        /**
+         * An array of audio sources to be used in audio emitters.
+         */
+        this.sources = sources;
+
+        /**
+         * An array of positional or global audio emitters that can be referenced by nodes or scenes.
+         */
+        this.emitters = emitters;
+
+        /**
+         * An array of audio that can be referenced by nodes.
+         */
+        this.audio = audio;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {glTFKHRAudio & glTFPropertyData} glTFKHRAudio - The KHR_audio JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(glTFKHRAudio, graph) {
+        return this.unmarshall(graph, glTFKHRAudio, {
+            sources:  { factory: GLTFKHRAudioSource  },
+            emitters: { factory: GLTFKHRAudioEmitter },
+            audio:    { factory: GLTFKHRAudioAudio   },
+        }, this);
+    }
+
+    /**
+     * Loads the audio data.
+     * @param {AbortSignal} [signal] - An optional AbortSignal to abort the loading process.
+     * @override
+     */
+    async load(signal) {
+        await Promise.all(this.audio.map(audio => {
+            return audio.loadOnce(signal);
+        }));
+        return this;
+    }
+}
+
+/**
+ * @typedef {object} nodeKHRAudio - KHR_audio Node JSON representation.
+ * @property {number} emitter - The index of the emitter in the emitters array.
+ * @property {nodeKHRAudioExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio Node class representation.
+ */
+export class NodeKHRAudio extends GLTFProperty {
+    /**
+     * Creates a new instance of NodeKHRAudio.
+     * @param {{
+     *  emitter: GLTFKHRAudioEmitter,
+     *  extensions?: NodeKHRAudioExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio Node object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { emitter, extensions } = unmarshalled;
+
+        /**
+         * The positional audio emitter referenced by this node. Global audio emitters may not be added to nodes.
+         */
+        this.emitter = emitter
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {nodeKHRAudio & glTFPropertyData} nodeKHRAudio - The KHR_audio node JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(nodeKHRAudio, graph) {
+        return this.unmarshall(graph, nodeKHRAudio, {
+            emitter: { factory: GLTFKHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
+        }, this);
+    }
+}
+
+/**
+ * @typedef {object} sceneKHRAudio - KHR_audio scene JSON representation.
+ * @property {number[]} emitters - An array of indices of the emitters in the emitters array.
+ * @property {sceneKHRAudioExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * KHR_audio Scene class representation.
+ */
+export class SceneKHRAudio extends GLTFProperty {
+    /**
+     * Creates a new instance of SceneKHRAudio.
+     * @param {{
+     *  emitters:    GLTFKHRAudioEmitter[],
+     *  extensions?: SceneKHRAudioExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio Scene object
+     */
+    constructor(unmarshalled) {
+        super(unmarshalled);
+        const { emitters, extensions } = unmarshalled;
+
+        /**
+         * The positional audio emitter referenced by this node. Global audio emitters may not be added to nodes.
+         */
+        this.emitters = emitters;
+
+        /**
+         * Extension-specific data.
+         */
+        this.extensions = extensions;
+    }
+
+    /**
+     * Creates an instance from JSON data.
+     * @param {sceneKHRAudio & glTFPropertyData} sceneKHRAudio - The KHR_audio scene JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * @override
+     */
+    static fromJSON(sceneKHRAudio, graph) {
+        return this.unmarshall(graph, sceneKHRAudio, {
+            emitters: { factory: GLTFKHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
+        }, this);
+    }
+}
+
+registry.add('KHR_audio', {
+    schema: {
+        GLTF:  GLTFKHRAudio,
+        Node:  NodeKHRAudio,
+        Scene: SceneKHRAudio,
+    },
+});

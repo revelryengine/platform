@@ -1,31 +1,42 @@
-import { GLTFProperty } from './gltf-property.js';
-import { Node         } from './node.js';
-
-/**
- * @typedef {{
- *  path: 'weights'|'translation'|'rotation'|'scale'|'pointer',
- *  node?: number,
- *  extensions?: Revelry.GLTF.Extensions.animationChannelTarget
- * } & import('./gltf-property.js').glTFPropertyData} animationChannelTarget
- */
-
 /**
  * The descriptor of the animated property.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-channel-target
+ *
+ * @module
+ */
+
+import { GLTFProperty } from './gltf-property.js';
+import { Node         } from './node.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { animationChannelTargetExtensions, AnimationChannelTargetExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} animationChannelTarget - Animation channel target JSON representation.
+ * @property {('weights'|'translation'|'rotation'|'scale'|'pointer')} path - The name of the node's TRS property to modify.
+ * @property {number} [node] - The index of the node to target.
+ * @property {animationChannelTargetExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * AnimationChannelTarget class representation.
  */
 export class AnimationChannelTarget extends GLTFProperty {
     /**
+     * Creates an instance of AnimationChannelTarget.
      * @param {{
      *  path: 'weights'|'translation'|'rotation'|'scale'|'pointer',
      *  node?: Node
-     *  extensions?: Revelry.GLTF.Extensions.AnimationChannelTarget
-     * } & import('./gltf-property.js').GLTFPropertyData} animationChannelTarget
+     *  extensions?: AnimationChannelTargetExtensions
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled animation channel target object
      */
-    constructor(animationChannelTarget) {
-        super(animationChannelTarget);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { node, path, extensions } = animationChannelTarget;
+        const { node, path, extensions } = unmarshalled;
 
         /**
          * The Node to target.
@@ -40,18 +51,21 @@ export class AnimationChannelTarget extends GLTFProperty {
          */
         this.path = path;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Create an animation channel target from a JSON representation.
-     * @param {animationChannelTarget} animationChannelTarget
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {animationChannelTarget & glTFPropertyData} animationChannelTarget - The animation channel target JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(animationChannelTarget, options) {
-        return new this(this.unmarshall(animationChannelTarget, options, {
+    static fromJSON(animationChannelTarget, graph) {
+        return this.unmarshall(graph, animationChannelTarget, {
             node: { factory: Node, collection: 'nodes' },
-        }, 'AnimationChannelTarget'));
+        }, this);
     }
 }

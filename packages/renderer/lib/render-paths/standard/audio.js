@@ -79,7 +79,7 @@ export class AudioController {
 
     #decoded = new WeakMap();
     /**
-     * @param {import('../../../deps/gltf.js').KHRAudioData} audio
+     * @param {import('../../../deps/gltf.js').GLTFKHRAudioAudio} audio
      */
     async decode(audio) {
         await this.contextPromise;

@@ -1,35 +1,45 @@
-import { GLTFProperty } from './gltf-property.js';
-
-/**
- * An orthographic camera containing properties to create an orthographic projection matrix.
- * @typedef {{
- *  xmag:        number,
- *  ymag:        number,
- *  zfar:        number,
- *  znear:       number,
- *  extensions?: Revelry.GLTF.Extensions.cameraOrthographic,
- * } & import('./gltf-property.js').glTFPropertyData} cameraOrthographic
- */
-
 /**
  * An orthographic camera containing properties to create an orthographic projection matrix.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera-orthographic
+ *
+ * @module
+ */
+
+import { GLTFProperty } from './gltf-property.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { cameraOrthographicExtensions, CameraOrthographicExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} cameraOrthographic - CameraOrthographic JSON representation.
+ * @property {number} xmag - The floating-point horizontal magnification of the view.
+ * @property {number} ymag - The floating-point vertical magnification of the view.
+ * @property {number} zfar - The floating-point distance to the far clipping plane. zfar must be greater than znear.
+ * @property {number} znear - The floating-point distance to the near clipping plane.
+ * @property {cameraOrthographicExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * CameraOrthographic class representation.
  */
 export class CameraOrthographic extends GLTFProperty {
     /**
+     * Creates a new instance of CameraOrthographic.
      * @param {{
      *  xmag:        number,
      *  ymag:        number,
      *  zfar:        number,
      *  znear:       number,
-     *  extensions?: Revelry.GLTF.Extensions.CameraOrthographic,
-     * } & import('./gltf-property.js').GLTFPropertyData} cameraOrthographic
+     *  extensions?: CameraOrthographicExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled camera orthographic object
      */
-    constructor(cameraOrthographic) {
-        super(cameraOrthographic);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { xmag, ymag, zfar, znear, extensions } = cameraOrthographic;
+        const { xmag, ymag, zfar, znear, extensions } = unmarshalled;
 
         /**
          * The floating-point horizontal magnification of the view.
@@ -51,17 +61,21 @@ export class CameraOrthographic extends GLTFProperty {
          */
         this.znear = znear;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a CameraOrthographic instance from a JSON representation.
-     * @param {cameraOrthographic} cameraOrthographic
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {cameraOrthographic & glTFPropertyData} cameraOrthographic - The camera orthographic JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(cameraOrthographic, options) {
-        return new this(this.unmarshall(cameraOrthographic, options, {
-        }, 'CameraOrthographic'));
+    static fromJSON(cameraOrthographic, graph) {
+        return this.unmarshall(graph, cameraOrthographic, {
+            // No reference fields
+        }, this);
     }
 }

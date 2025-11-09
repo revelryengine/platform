@@ -1,33 +1,44 @@
-import { TextureInfo } from './texture-info.js';
-import { Texture     } from './texture.js';
-
-/**
- * @typedef {{
- *  index:       number,
- *  texCoord?:   number,
- *  scale?:      number,
- *  extensions?: Revelry.GLTF.Extensions.materialNormalTextureInfo,
- * } & import('./gltf-property.js').glTFPropertyData} materialNormalTextureInfo
- */
-
 /**
  * Reference to a texture.
  *
  * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-normaltextureinfo
+ *
+ * @module
+ */
+
+import { TextureInfo } from './texture-info.js';
+import { Texture     } from './texture.js';
+
+/**
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { materialNormalTextureInfoExtensions, MaterialNormalTextureInfoExtensions } from 'virtual-rev-gltf-extensions';
+ */
+
+/**
+ * @typedef {object} materialNormalTextureInfo - MaterialNormalTextureInfo JSON representation.
+ * @property {number} index - The index of the texture.
+ * @property {number} [texCoord] - The set index of texture's TEXCOORD attribute used for texture coordinate mapping.
+ * @property {number} [scale] - The scalar multiplier applied to each normal vector of the normal texture.
+ * @property {materialNormalTextureInfoExtensions} [extensions] - Extension-specific data.
+ */
+
+/**
+ * MaterialNormalTextureInfo class representation.
  */
 export class MaterialNormalTextureInfo extends TextureInfo {
     /**
+     * Creates an instance of MaterialNormalTextureInfo.
      * @param {{
      *  texture:     Texture,
      *  texCoord?:   number,
      *  scale?:      number,
-     *  extensions?: Revelry.GLTF.Extensions.MaterialNormalTextureInfo,
-     * } & import('./gltf-property.js').GLTFPropertyData} materialNormalTextureInfo
+     *  extensions?: MaterialNormalTextureInfoExtensions,
+     * } & GLTFPropertyData} unmarshalled - Unmarshalled material normal texture info object
      */
-    constructor(materialNormalTextureInfo) {
-        super(materialNormalTextureInfo);
+    constructor(unmarshalled) {
+        super(unmarshalled);
 
-        const { scale = 1, extensions } = materialNormalTextureInfo;
+        const { scale = 1, extensions } = unmarshalled;
 
         /**
          * The scalar multiplier applied to each normal vector of the normal texture.
@@ -35,23 +46,21 @@ export class MaterialNormalTextureInfo extends TextureInfo {
          */
         this.scale = scale;
 
+        /**
+         * Extension-specific data.
+         */
         this.extensions = extensions;
     }
 
     /**
-     * Creates a MaterialNormalTextureInfo instance from a JSON representation.
-     * @param {materialNormalTextureInfo} materialNormalTextureInfo
-     * @param {import('./gltf-property.js').FromJSONOptions} options
+     * Creates an instance from JSON data.
+     * @param {materialNormalTextureInfo & glTFPropertyData} materialNormalTextureInfo - The material normal texture info JSON representation.
+     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(materialNormalTextureInfo, options) {
-        const unmarshalled = this.unmarshall(materialNormalTextureInfo, options, {
-            index: { factory: Texture, collection: 'textures' },
-        }, 'MaterialNormalTextureInfo');
-
-        return new this({
-            ...unmarshalled,
-            texture: unmarshalled.index,
-        });
+    static fromJSON(materialNormalTextureInfo, graph) {
+        return this.unmarshall(graph, materialNormalTextureInfo, {
+            index: { factory: Texture, collection: 'textures', alias: 'texture' },
+        }, this);
     }
 }

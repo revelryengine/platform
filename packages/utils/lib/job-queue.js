@@ -69,7 +69,7 @@ export class Queue {
      * If a job is aborted before or during processing, it will be skipped.
      * If the queue is disposed, no jobs will be processed.
      *
-     * @returns {Promise<number>} - A promise resolving to the number of jobs processed
+     * @return {Promise<number>} - A promise resolving to the number of jobs processed
      */
     async process(){
         if (this.#disposed) return 0;

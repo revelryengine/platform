@@ -4,7 +4,7 @@ import './fab.js';
 
 import { PBR_DEBUG_MODES } from '../../deps/revelry.js';
 
-class RevGLTFViewerControls extends LitElement {
+export class RevGLTFViewerControls extends LitElement {
     static get properties() {
         return {
             hidden:     { type: Boolean, reflect: true },
@@ -26,17 +26,11 @@ class RevGLTFViewerControls extends LitElement {
     render() {
         if(!this.viewer?.renderer) return html``;
 
-        const mode = this.viewer.renderer.mode;
         const volume = `volume${this.viewer.viewport?.audio?.muted || !this.viewer.useAudio ? '-mute' : '-high'}`;
 
         return html`
         ${this.getMenu()}
-        <div class="status">
-        ${mode ? `${mode}`: ''}
-        </div>
         <div class="buttons">
-        <rev-gltf-viewer-icon name="question-circle" type="far" @click="${() => this.closeMenu()}"></rev-gltf-viewer-icon>
-
         <rev-gltf-viewer-icon name="cog"       @click="${() => this.openMenu('settings')}"></rev-gltf-viewer-icon>
         <rev-gltf-viewer-icon name="lightbulb" @click="${() => this.openMenu('lighting')}" ?disabled="${this.viewer.renderPath !== 'standard'}"></rev-gltf-viewer-icon>
         <rev-gltf-viewer-icon name="camera"    @click="${() => this.openMenu('camera')}"></rev-gltf-viewer-icon>
@@ -608,6 +602,7 @@ class RevGLTFViewerControls extends LitElement {
 
             display: flex;
             flex-direction: row;
+            justify-content: flex-end;
             padding: 12px;
         }
 

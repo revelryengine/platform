@@ -1,15 +1,21 @@
 import { LitElement, html, css, repeat } from '../../deps/lit.js';
 
-export class RevGLTFViewerToast extends LitElement {
+/**
+ * @import { TemplateResult } from '../../deps/lit.js';
+ */
 
-    static get properties() {
-        return {
-            messages: { type: Array },
-        }
+export class RevGLTFViewerToast extends LitElement {
+    /**
+     * @override
+     */
+    static properties = {
+        messages: { type: Array },
     }
 
-    static get styles() {
-        return css`
+    /**
+     * @override
+     */
+    static styles = [css`
             :host {
                 position: absolute;
                 display: flex;
@@ -58,17 +64,27 @@ export class RevGLTFViewerToast extends LitElement {
                 text-decoration: none;
                 color: var(--theme-color);
             }
-        `;
-    }
+        `
+    ];
 
+    /**
+     * @type { Array<{ label: string, content: TemplateResult, time: number }> }
+     */
     messages = [];
 
+    /**
+     * @override
+     */
     render() {
-        return html`${repeat(this.messages, ({ id }) => id, ({ content, time }) => {
-            return html`<div class="message" @animationend="${(e) => this.handleAnimationEnd(e)}" style="--time: ${time}ms;">${content ?? ''}</div>`
+        return html`${repeat(this.messages, ({ label }) => label, ({ content, time }) => {
+            return html`<div class="message" @animationend="${(/** @type {AnimationEvent} */e) => this.handleAnimationEnd(e)}" style="--time: ${time}ms;">${content ?? ''}</div>`
         })}`;
     }
 
+    /**
+     *
+     * @param {AnimationEvent} e
+     */
     handleAnimationEnd(e) {
         if(e.animationName === 'fadeOut') {
             this.messages.shift();
@@ -76,16 +92,22 @@ export class RevGLTFViewerToast extends LitElement {
         }
     }
 
-    #ids = 0;
-    addMessage(content, time) {
-        const id = ++this.#ids;
-        this.messages.push({ content, time, id });
+    /**
+     * @param {string} label
+     * @param {TemplateResult} content
+     * @param {number} time
+     */
+    addMessage(label, content, time) {
+        this.dismissMessage(label);
+        this.messages.push({ label, content, time });
         this.requestUpdate();
-        return id;
     }
 
-    dismissMessage(id) {
-        this.messages.splice(this.messages.findIndex(m => m.id === id), 1);
+    /**
+     * @param {string} label
+     */
+    dismissMessage(label) {
+        this.messages = this.messages.filter(m => m.label !== label);
         this.requestUpdate();
     }
 

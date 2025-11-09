@@ -1,6 +1,6 @@
 import { Model, Stage, System } from '../deps/ecs.js';
 
-import { GLTF, Node as GLTFNode, Camera as GLTFCamera, REVGameObjectNode, KHRLightsPunctualSpot       } from '../deps/gltf.js';
+import { GLTF, Node as GLTFNode, Camera as GLTFCamera, NodeREVGameObject, KHRLightsPunctualSpot       } from '../deps/gltf.js';
 import { KHRLightsPunctualLight, KHRLightsPunctualNode, KHREnvironmentMapScene } from '../deps/gltf.js';
 import { CameraOrthographic, CameraPerspective } from '../deps/gltf.js';
 
@@ -340,7 +340,7 @@ export class RendererSystem extends System.Typed(/** @type {const} */({
     graph    = this.renderer.getSceneGraph(this.gltf.scene);
 
     /**
-     * @type {Map<string, GLTFNode & { extensions: { REV_game_object: REVGameObjectNode } }>}
+     * @type {Map<string, GLTFNode & { extensions: { REV_game_object: NodeREVGameObject } }>}
      */
     nodesByGameObjectId = new Map();
 
