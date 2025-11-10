@@ -1,10 +1,10 @@
-import { Model, System         } from '../deps/ecs.js';
-import { vec3, mat4            } from '../deps/gl-matrix.js';
-import { NonNull, OrbitControl } from '../deps/utils.js';
+import { Model, System         } from 'revelryengine/ecs/ecs.js';
+import { vec3, mat4            } from 'revelryengine/deps/gl-matrix.js';
+import { NonNull, OrbitControl } from 'revelryengine/utils/utils.js';
 import { CameraModel           } from './renderer.js';
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  */
 
 export const OrbitControlSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/({

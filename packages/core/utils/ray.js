@@ -1,4 +1,4 @@
-import { vec3 } from '../../deps/gl-matrix.js';
+import { vec3 } from 'revelryengine/deps/gl-matrix.js';
 
 /**
  * Most of this logic is ported from ThreeJS: https://github.com/mrdoob/three.js/blob/47b28bc564b438bf2b80d6e5baf90235292fcbd7/src/math/Ray.js

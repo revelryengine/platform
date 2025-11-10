@@ -1,4 +1,4 @@
-import { vec2 } from '../../deps/gl-matrix.js';
+import { vec2 } from 'revelryengine/deps/gl-matrix.js';
 
 /**
  * @typedef LineStyle

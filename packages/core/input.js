@@ -1,10 +1,10 @@
-import { Model, System } from '../deps/ecs.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
 import { GamepadState  } from './input/gamepad.js';
 import { PointerState  } from './input/pointer.js';
 import { KeyboardState } from './input/keyboard.js';
 
 /**
- * @import { SystemBundle } from '../deps/ecs.js';
+ * @import { SystemBundle } from 'revelryengine/ecs/ecs.js';
  */
 
 export class WorldInputModel extends Model.Typed({

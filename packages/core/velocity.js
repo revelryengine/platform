@@ -1,5 +1,5 @@
-import { Model, System, Watchable } from '../deps/ecs.js';
-import { vec3 } from '../deps/gl-matrix.js';
+import { Model, System, Watchable } from 'revelryengine/ecs/ecs.js';
+import { vec3 } from 'revelryengine/deps/gl-matrix.js';
 
 const EPSILON = 0.01;
 

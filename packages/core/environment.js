@@ -1,9 +1,9 @@
-import { Model, System } from '../deps/ecs.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
 
-import { GLTF } from '../deps/gltf.js';
+import { GLTF } from 'revelryengine/gltf/gltf.js';
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  */
 
 export const EnvironmentSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/({

@@ -1,10 +1,10 @@
-import { Model, System } from '../deps/ecs.js';
-import { Animation, AnimationChannel, AnimationChannelTarget, AnimationSampler } from '../deps/gltf.js';
-import { NonNull } from '../deps/utils.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
+import { Animation, AnimationChannel, AnimationChannelTarget, AnimationSampler } from 'revelryengine/gltf/gltf.js';
+import { NonNull } from 'revelryengine/utils/utils.js';
 import { MeshModel } from './mesh.js';
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  */
 
 export const AnimationsSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/({
@@ -22,7 +22,7 @@ export const AnimationsSchema = /** @type {const} @satisfies {ComponentTypeSchem
 export class AnimatedModel extends Model.Typed(/** @type {const} */({
     components: ['transform', 'meta', 'mesh', 'animations'],
 })) {
-    /** @type {Record<string, import('../deps/gltf.js').Animator>} */
+    /** @type {Record<string, import('revelryengine/gltf/gltf.js').Animator>} */
     animators = {};
 }
 

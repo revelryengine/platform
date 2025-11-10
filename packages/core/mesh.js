@@ -1,12 +1,12 @@
-import { Model, System } from '../deps/ecs.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
 
-import { GLTF, Node as GLTFNode, Skin } from '../deps/gltf.js';
-import { NonNull } from '../deps/utils.js';
+import { GLTF, Node as GLTFNode, Skin } from 'revelryengine/gltf/gltf.js';
+import { NonNull } from 'revelryengine/utils/utils.js';
 
 import { GameObjectModel } from './game-object.js';
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  */
 
 export const MeshSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/({

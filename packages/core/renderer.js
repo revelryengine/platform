@@ -1,12 +1,12 @@
-import { Model, Stage, System } from '../deps/ecs.js';
+import { Model, Stage, System } from 'revelryengine/ecs/ecs.js';
 
-import { GLTF, Node as GLTFNode, Camera as GLTFCamera, NodeREVGameObject, KHRLightsPunctualSpot       } from '../deps/gltf.js';
-import { KHRLightsPunctualLight, KHRLightsPunctualNode, KHREnvironmentMapScene } from '../deps/gltf.js';
-import { CameraOrthographic, CameraPerspective } from '../deps/gltf.js';
+import { GLTF, Node as GLTFNode, Camera as GLTFCamera, NodeREVGameObject, GLTFKHRLightsPunctualLightSpot       } from 'revelryengine/gltf/gltf.js';
+import { GLTFKHRLightsPunctualLight, NodeKHRLightsPunctual, SceneKHREnvironmentMap } from 'revelryengine/gltf/gltf.js';
+import { CameraOrthographic, CameraPerspective } from 'revelryengine/gltf/gltf.js';
 
-import { PBR_DEBUG_MODES, PBR_TONEMAPS, Renderer, Viewport         } from '../deps/renderer.js';
-import { CanvasAutoResizer, keys, NonNull } from '../deps/utils.js';
-import { quat, vec3                 } from '../deps/gl-matrix.js';
+import { PBR_DEBUG_MODES, PBR_TONEMAPS, Renderer, Viewport         } from 'revelryengine/renderer/renderer.js';
+import { CanvasAutoResizer, keys, NonNull } from 'revelryengine/utils/utils.js';
+import { quat, vec3                 } from 'revelryengine/deps/gl-matrix.js';
 
 import { bundle as OrbitBundle } from './orbit-controls.js';
 import { GameObjectModel } from './game-object.js';
@@ -14,8 +14,8 @@ import { GameObjectModel } from './game-object.js';
 const FORWARD = vec3.fromValues(0, 0, -1);
 
 /**
- * @import { SystemBundle, ComponentTypeSchema     } from '../deps/ecs.js'
- * @import { ViewportCameraNode, GameObjectFilterOptions } from '../deps/renderer.js'
+ * @import { SystemBundle, ComponentTypeSchema     } from 'revelryengine/ecs/ecs.js
+ * @import { ViewportCameraNode, GameObjectFilterOptions } from 'revelryengine/renderer/renderer.js
  *
  * @typedef {Viewport<Revelry.Renderer.RenderPaths[Exclude<Revelry.Renderer.RenderPathKeys, 'query'>]>} NonQueryViewport
  * @typedef {Viewport<Revelry.Renderer.RenderPaths['query']>} QueryViewport
@@ -288,7 +288,7 @@ export const LightSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/(
     required: ['type'],
 });
 
-export class LightProperty extends KHRLightsPunctualLight {
+export class LightProperty extends GLTFKHRLightsPunctualLight {
     /**
      * @param {LightModel} model
      */
@@ -316,7 +316,7 @@ export class LightProperty extends KHRLightsPunctualLight {
 export class LightModel extends Model.Typed(/** @type {const} */({
     components: ['transform', 'meta', 'light'],
 })) {
-    node = new GLTFNode({ extensions: { KHR_lights_punctual: new KHRLightsPunctualNode({ light: new LightProperty(this) }) } });
+    node = new GLTFNode({ extensions: { KHR_lights_punctual: new NodeKHRLightsPunctual({ light: new LightProperty(this) }) } });
 }
 
 export class RendererSystem extends System.Typed(/** @type {const} */({
@@ -408,11 +408,11 @@ export class RendererSystem extends System.Typed(/** @type {const} */({
     }
 
     /**
-     * @param {import('../deps/gltf.js').KHREnvironmentMapData|null} map
+     * @param {import('revelryengine/gltf/gltf.js').KHREnvironmentMapData|null} map
      */
     setEnvironmentMap(map) {
         this.gltf.scene.extensions ??= {};
-        this.gltf.scene.extensions.KHR_environment_map = map ? new KHREnvironmentMapScene({
+        this.gltf.scene.extensions.KHR_environment_map = map ? new SceneKHREnvironmentMap({
             environment_map: map
         }) : undefined
     }

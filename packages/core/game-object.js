@@ -1,15 +1,15 @@
 /// <reference path="./lib.revelry.d.ts" />
 
-import { Model, System    } from '../deps/ecs.js';
-import { vec3, quat, mat4 } from '../deps/gl-matrix.js';
-import { Node as GLTFNode, NodeREVGameObject  } from '../deps/gltf.js';
-import { NonNull } from '../deps/utils.js';
+import { Model, System    } from 'revelryengine/ecs/ecs.js';
+import { vec3, quat, mat4 } from 'revelryengine/deps/gl-matrix.js';
+import { Node as GLTFNode, NodeREVGameObject  } from 'revelryengine/gltf/gltf.js';
+import { NonNull } from 'revelryengine/utils/utils.js';
 import { TransformUtils } from './transform.js';
 
 const _matrix = mat4.create();
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  * @import { EULER_ORDER, ROTATION_MODE } from './transform.js';
  */
 

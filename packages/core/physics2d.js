@@ -1,11 +1,11 @@
-import { Model, System } from '../deps/ecs.js';
-import { WeakCache } from '../deps/utils.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
+import { WeakCache } from 'revelryengine/utils/utils.js';
 
-import { vec2, vec3, vec4, mat4, quat } from '../deps/gl-matrix.js';
-import box2dWasm from '../deps/box2d-wasm.js';
+import { vec2, vec3, vec4, mat4, quat } from 'revelryengine/deps/gl-matrix.js';
+import box2dWasm from 'revelryengine/deps/box2d-wasm.js';
 
 /**
- * @import { SystemBundle, ComponentReference } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentReference } from 'revelryengine/ecs/ecs.js';
  */
 
 const Box2DPromise = box2dWasm();
@@ -70,7 +70,7 @@ export class JointConstraint2dModel extends Model.Typed({
 }) {
 
     /**
-    * @param {import('../deps/ecs.js').Stage} stage
+    * @param {import('revelryengine/ecs/ecs.js').Stage} stage
     * @param {string} entity
     */
     constructor(stage, entity) {
@@ -673,7 +673,7 @@ export class Physics2dSystem extends System.Typed({
     #projected = vec3.create();
 
     /**
-     * @param {import('../deps/renderer.js').Frustum} frustum
+     * @param {import('revelryengine/renderer/renderer.js').Frustum} frustum
      * @param {Box2D} Box2D
      * @param {number} vertPtr
      */
@@ -683,7 +683,7 @@ export class Physics2dSystem extends System.Typed({
     }
 
     /**
-     * @param {import('../deps/renderer.js').Frustum} frustum
+     * @param {import('revelryengine/renderer/renderer.js').Frustum} frustum
      * @param {number} x
      * @param {number} y
      */

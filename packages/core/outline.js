@@ -1,11 +1,11 @@
 /// <reference path="./lib.revelry.d.ts" />
 
-import { Model, System   } from '../deps/ecs.js';
-import { NonNull         } from '../deps/utils.js';
+import { Model, System   } from 'revelryengine/ecs/ecs.js';
+import { NonNull         } from 'revelryengine/utils/utils.js';
 import { GameObjectModel } from './game-object.js';
 
 /**
- * @import { SystemBundle, ComponentTypeSchema } from '../deps/ecs.js';
+ * @import { SystemBundle, ComponentTypeSchema } from 'revelryengine/ecs/ecs.js';
  */
 
 export const OutlineSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/({

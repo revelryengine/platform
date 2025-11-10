@@ -1,11 +1,11 @@
-import { Model, System } from '../deps/ecs.js';
-import { GLTF, Mesh, MeshPrimitive, Material, Node as GLTFNode, Sampler, Texture, Image, TextureInfo, MaterialPBRMetallicRoughness } from '../deps/gltf.js';
-import { SAMPLER_PARAMS } from '../deps/renderer.js';
-import { NonNull, WeakCache } from '../deps/utils.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
+import { GLTF, Mesh, MeshPrimitive, Material, Node as GLTFNode, Sampler, Texture, Image, TextureInfo, MaterialPBRMetallicRoughness } from 'revelryengine/gltf/gltf.js';
+import { SAMPLER_PARAMS } from 'revelryengine/renderer/renderer.js';
+import { NonNull, WeakCache } from 'revelryengine/utils/utils.js';
 import { GameObjectModel } from './game-object.js';
 
 /**
- * @import { ComponentTypeSchema, SystemBundle } from '../deps/ecs.js';
+ * @import { ComponentTypeSchema, SystemBundle } from 'revelryengine/ecs/ecs.js';
  */
 
 const GL = WebGL2RenderingContext;

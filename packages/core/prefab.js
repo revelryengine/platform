@@ -1,14 +1,14 @@
 
-import { System, Model, Component, componentSchemas } from '../deps/ecs.js';
-import { applyPatch, createPatch } from '../deps/rfc6902.js';
-import { NonNull } from '../deps/utils.js';
+import { System, Model, Component, componentSchemas } from 'revelryengine/ecs/ecs.js';
+import { applyPatch, createPatch } from 'revelryengine/deps/rfc6902.js';
+import { NonNull } from 'revelryengine/utils/utils.js';
 import { PREFAB_DELIM } from './constants.js';
 
 import { GameObjectModel } from './game-object.js';
 
 /**
- * @import { ComponentTypeKey, SystemBundle, ComponentTypeSchema, ComponentDataMap, ComponentDataMapSerialized, Stage } from '../deps/ecs.js';
- * @import { Operation } from '../deps/rfc6902.js';
+ * @import { ComponentTypeKey, SystemBundle, ComponentTypeSchema, ComponentDataMap, ComponentDataMapSerialized, Stage } from 'revelryengine/ecs/ecs.js';
+ * @import { Operation } from 'revelryengine/deps/rfc6902.js';
  */
 
 /**

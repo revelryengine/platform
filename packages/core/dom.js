@@ -1,12 +1,12 @@
-import { html, css, repeat, LitElement } from '../deps/lit.js';
-import { Game, Stage, System           } from '../deps/ecs.js';
+import { html, css, repeat, LitElement } from 'revelryengine/deps/lit.js';
+import { Game, Stage, System           } from 'revelryengine/ecs/ecs.js';
 
 /**
  * @import { SystemBundle,
  *  Watchable, WatchableEventMap, WatchableWildCardImmediateHandler, WatchableWildcardDeferredOptions, WatchableWildcardImmediateOptions, WatchableAnyOptions, WatchableAnyType,
- * } from '../deps/ecs.js';
+ * } from 'revelryengine/ecs/ecs.js';
  *
- * @import { CSSResultOrNative, PropertyValues } from '../deps/lit.js';
+ * @import { CSSResultOrNative, PropertyValues } from 'revelryengine/deps/lit.js';
  */
 
 /**
@@ -372,4 +372,4 @@ export const bundle = {
     systems: [DOMSystem],
 }
 
-export * from '../deps/lit.js';
+export * from 'revelryengine/deps/lit.js';

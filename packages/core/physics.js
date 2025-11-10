@@ -2,7 +2,7 @@ import { System    } from 'revelryengine/ecs/lib/system.js';
 import { Model     } from 'revelryengine/ecs/lib/model.js';
 import { WeakCache } from 'revelryengine/ecs/lib/utils/weak-cache.js';
 import { importUMD } from './utils/import-umd.js';
-import { vec2, vec3, vec4, mat4, quat } from '../deps/gl-matrix.js';
+import { vec2, vec3, vec4, mat4, quat } from 'revelryengine/deps/gl-matrix.js';
 
 const PhysXFactory = async () => {
     const url = import.meta.resolve('physx-js-webidl');

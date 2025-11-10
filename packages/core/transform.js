@@ -1,15 +1,15 @@
 /// <reference path="./lib.revelry.d.ts" />
 
-import { Model, System } from '../deps/ecs.js';
+import { Model, System } from 'revelryengine/ecs/ecs.js';
 
-import { vec3, quat, mat4, glMatrix } from '../deps/gl-matrix.js';
+import { vec3, quat, mat4, glMatrix } from 'revelryengine/deps/gl-matrix.js';
 
-import { rad2Deg } from '../deps/utils.js';
+import { rad2Deg } from 'revelryengine/utils/utils.js';
 
 import { QUATERNION, EULER_XYZ, EULER_XZY, EULER_YXZ, EULER_YZX, EULER_ZXY, EULER_ZYX, AXIS_ANGLE, EULER_ANGLE_ORDERS, EULER_ROTATION_MODES } from './constants.js';
 
 /**
- * @import { ComponentTypes, ComponentTypeSchema, ComponentTypeFromSchema, SystemBundle } from '../deps/ecs.js';
+ * @import { ComponentTypes, ComponentTypeSchema, ComponentTypeFromSchema, SystemBundle } from 'revelryengine/ecs/ecs.js';
  */
 
 
