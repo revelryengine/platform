@@ -26,7 +26,7 @@ const config = {
     coverage,
     coverageConfig: {
         reportDir: 'coverage/deno',
-        include: [`**/lib/**`],
+        exclude: [`**/__tests__/**`, `**/deps/**`],
     },
 };
 

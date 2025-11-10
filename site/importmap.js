@@ -2,9 +2,9 @@ const global = /** @type {{ REVELRY_IMPORT_MODE?: 'remote' | 'local' }} */ (glob
 
 global.REVELRY_IMPORT_MODE ??= 'remote';
 
-const packagesBasePath = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'packages/' : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/';
-const depsBasePath     = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'deps/'     : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/deps/';
-const samplesBasePath  = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/', location.href).toString() + 'samples/'  : 'https://cdn.jsdelivr.net/gh/revelryengine/';
+const packagesBasePath = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/packages/', location.href).toString() : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/';
+const depsBasePath     = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/deps/', location.href).toString()     : 'https://cdn.jsdelivr.net/gh/revelryengine/platform/deps/';
+const samplesBasePath  = global.REVELRY_IMPORT_MODE === 'local' ? new URL('/samples/', location.href).toString()  : 'https://cdn.jsdelivr.net/gh/revelryengine/';
 
 const element = document.createElement('script');
 element.type = 'importmap';
@@ -12,6 +12,7 @@ element.textContent = JSON.stringify({
     imports: {
         'revelryengine/': packagesBasePath,
         'revelryengine/deps/': depsBasePath,
+        'revelryengine/samples/': samplesBasePath,
 
         "gl-matrix":        "https://cdn.jsdelivr.net/npm/gl-matrix@beta/dist/esm/index.js",
         "es-module-shims":  "https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js",
@@ -23,7 +24,9 @@ element.textContent = JSON.stringify({
         "rfc6902":          "https://cdn.jsdelivr.net/npm/rfc6902@5.1.1/index.js/+esm",
         "lit/":             "https://esm.sh/lit@3.3.1/",
 
-        'revelryengine/samples/': samplesBasePath,
+        "webgl-memory":  "https://cdn.jsdelivr.net/gh/greggman/webgl-memory@v1.1.2/webgl-memory.js",
+        "webgpu-memory": "https://greggman.github.io/webgpu-memory/dist/1.x/webgpu-memory.module.js",
+        "stats.js":      "https://cdn.jsdelivr.net/gh/mrdoob/stats.js/build/stats.module.js"
     }
 });
 

@@ -51,7 +51,7 @@ const config = {
     coverage,
     coverageConfig: {
         reportDir: 'coverage/browser',
-        include: [`**/lib/**`],
+        exclude: [`**/__tests__/**`, `**/deps/**`],
     },
     reporters: [
         summaryReporter({})
