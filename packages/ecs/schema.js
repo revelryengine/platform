@@ -1,5 +1,5 @@
-import { deepEquals } from '../utils/deep-equals.js';
-import { NonNull    } from '../utils/non-null.js';
+import { deepEquals } from 'revelryengine/utils/deep-equals.js';
+import { NonNull    } from 'revelryengine/utils/non-null.js';
 
 /**
  * @import { Component, ComponentSchemaManagers, ComponentSchemas, ComponentTypeKey, ComponentTypeSchema, ComponentTypeSchemaArray, ComponentTypeSchemaObject, ComponentTypeSchemaTuple} from './ecs.js'

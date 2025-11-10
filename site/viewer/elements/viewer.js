@@ -4,7 +4,7 @@ import Stats from 'revelryengine/deps/stats.js';
 
 import { RevParamElement } from './param.js';
 
-import { Renderer          } from 'revelryengine/renderer/lib/renderer.js';
+import { Renderer          } from 'revelryengine/renderer/renderer.js';
 import { CanvasAutoResizer } from 'revelryengine/utils/canvas-auto-resizer.js';
 
 import { GLTF, Node                 } from 'revelryengine/gltf/gltf.js';

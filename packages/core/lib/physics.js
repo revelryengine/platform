@@ -639,7 +639,7 @@ export class PhysicsSystem extends TypedSystem({
     #projected = vec3.create();
 
     /**
-     * @param {import('revelryengine/renderer/lib/frustum.js').Frustum} frustum
+     * @param {import('revelryengine/renderer/frustum.js').Frustum} frustum
      * @param {Box2D} Box2D
      * @param {number} vertPtr
      */
@@ -649,7 +649,7 @@ export class PhysicsSystem extends TypedSystem({
     }
 
     /**
-     * @param {import('revelryengine/renderer/lib/frustum.js').Frustum} frustum
+     * @param {import('revelryengine/renderer/frustum.js').Frustum} frustum
      * @param {number} x
      * @param {number} y
      */

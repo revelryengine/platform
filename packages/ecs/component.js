@@ -1,5 +1,5 @@
-import { deepEquals       } from '../utils/deep-equals.js';
-import { SetMap           } from '../utils/set-map.js';
+import { deepEquals       } from 'revelryengine/utils/deep-equals.js';
+import { SetMap           } from 'revelryengine/utils/set-map.js';
 import { Watchable        } from './watchable.js';
 import { componentSchemas } from './schema.js';
 

@@ -4,7 +4,7 @@ import { Game   } from '../game.js';
 import { Stage  } from '../stage.js';
 import { System } from '../system.js';
 import { Model  } from '../model.js';
-import { UUID   } from '../../utils/uuid.js';
+import { UUID   } from 'revelryengine/utils/uuid.js';
 
 /**
  * @import { Component } from '../ecs.js';

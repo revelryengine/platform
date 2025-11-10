@@ -1,1 +1,1 @@
-export * from 'revelryengine/renderer/lib/renderer.js';
+export * from 'revelryengine/renderer/renderer.js';

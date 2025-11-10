@@ -8,7 +8,7 @@ import { Draco3dFactory } from "revelryengine/deps/draco3d.js";
 const draco = await Draco3dFactory();
 
 /**
- * @import { TypedArray, TypedArrayConstructor } from '../../../utils/buffers.js';
+ * @import { TypedArray, TypedArrayConstructor } from 'revelryengine/utils/buffers.js';
  */
 
 /**

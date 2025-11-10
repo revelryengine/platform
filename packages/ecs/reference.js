@@ -1,5 +1,5 @@
 import { Watchable } from './watchable.js';
-import { SetMap    } from '../utils/set-map.js';
+import { SetMap    } from 'revelryengine/utils/set-map.js';
 import { Component } from './component.js';
 
 /**

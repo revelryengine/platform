@@ -1,5 +1,5 @@
-import { UUID   } from '../utils/uuid.js';
-import { SetMap } from '../utils/set-map.js';
+import { UUID   } from 'revelryengine/utils/uuid.js';
+import { SetMap } from 'revelryengine/utils/set-map.js';
 
 
 import { Component, ComponentSet } from './component.js';

@@ -21,7 +21,7 @@ import { quat              } from "revelryengine/deps/gl-matrix.js";
 /**
  * @import { animationChannel } from './animation-channel.js';
  * @import { animationSampler } from './animation-sampler.js';
- * @import { TypedArray } from '../utils/buffers.js';
+ * @import { TypedArray } from 'revelryengine/utils/buffers.js';
  */
 
 /**

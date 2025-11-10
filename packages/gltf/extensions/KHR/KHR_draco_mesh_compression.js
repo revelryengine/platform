@@ -14,7 +14,7 @@ import { GLTFProperty     } from '../../gltf-property.js';
 import { BufferView       } from '../../buffer-view.js';
 import { Accessor         } from '../../accessor.js';
 import { registry         } from '../registry.js';
-import { WorkerHelperPool } from '../../../utils/worker-helper.js';
+import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 
 
 const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_compression.worker.js'), { count: 4, type: 'module' });
