@@ -13,7 +13,7 @@ import { registry     } from '../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { materialKHRMaterialsEmissiveStrengthExtensions, MaterialKHRMaterialsEmissiveStrengthExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { materialKHRMaterialsEmissiveStrengthExtensions, MaterialKHRMaterialsEmissiveStrengthExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

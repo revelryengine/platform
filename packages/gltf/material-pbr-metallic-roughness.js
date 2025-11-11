@@ -12,7 +12,7 @@ import { TextureInfo  } from './texture-info.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { materialPBRMetallicRoughnessExtensions, MaterialPBRMetallicRoughnessExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { materialPBRMetallicRoughnessExtensions, MaterialPBRMetallicRoughnessExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

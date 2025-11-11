@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_animation_pointer types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface animationChannelTargetExtensions {
         /** A json object representing the KHR_animation_pointer extension */
         'KHR_animation_pointer'?: import('./KHR_animation_pointer.js').animationChannelTargetKHRAnimationPointer

@@ -11,7 +11,7 @@ import { Node         } from './node.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { animationChannelTargetExtensions, AnimationChannelTargetExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { animationChannelTargetExtensions, AnimationChannelTargetExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

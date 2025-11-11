@@ -11,7 +11,7 @@ import { Buffer            } from './buffer.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { bufferViewExtensions, BufferViewExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { bufferViewExtensions, BufferViewExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

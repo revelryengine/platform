@@ -14,7 +14,7 @@ import { mat3         } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { textureInfoKHRTextureTransformExtensions, TextureInfoKHRTextureTransformExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { textureInfoKHRTextureTransformExtensions, TextureInfoKHRTextureTransformExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

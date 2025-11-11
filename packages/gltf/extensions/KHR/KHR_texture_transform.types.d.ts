@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_texture_transform types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface textureInfoExtensions {
         /** A json object representing the KHR_texture_transform extension */
         'KHR_texture_transform'?: import('./KHR_texture_transform.js').textureInfoKHRTextureTransform,

@@ -12,7 +12,7 @@ import { Sampler           } from './sampler.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { textureExtensions, TextureExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { textureExtensions, TextureExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

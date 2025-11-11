@@ -2,17 +2,17 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_environment_map types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface glTFExtensions {
         /** A json object representing the KHR_environment_map extension */
-        'KHR_environment_map'?: import('./KHR_environment_map.js').glTFKHREnvironmentMap,
+        'KHR_environment_map'?: import('./KHR_environment_map.js').khrEnvironmentMap,
     }
     interface GLTFExtensions {
-        /** A GLTFKHREnvironmentMap instance */
-        'KHR_environment_map'?: import('./KHR_environment_map.js').GLTFKHREnvironmentMap,
+        /** A KHREnvironmentMap instance */
+        'KHR_environment_map'?: import('./KHR_environment_map.js').KHREnvironmentMap,
     }
 
     interface sceneExtensions {
@@ -25,31 +25,31 @@ declare module 'virtual-rev-gltf-extensions' {
     }
 
     interface ExtendableProperties {
-        /** GLTFKHREnvironmentMap property */
-        GLTFKHREnvironmentMap: true,
+        /** KHREnvironmentMap property */
+        KHREnvironmentMap: true,
 
-        /** GLTFKHREnvironmentMapCubemap property */
-        GLTFKHREnvironmentMapCubemap: true,
+        /** KHREnvironmentMapCubemap property */
+        KHREnvironmentMapCubemap: true,
 
-        /** GLTFKHREnvironmentMapData property */
-        GLTFKHREnvironmentMapData: true,
+        /** KHREnvironmentMapData property */
+        KHREnvironmentMapData: true,
 
         /** SceneKHREnvironmentMap property */
         SceneKHREnvironmentMap: true,
     }
 
-    /** Interface for adding glTFKHREnvironmentMap extension json properties. */
-    interface glTFKHREnvironmentMapExtensions {}
-    /** Interface for adding GLTFKHREnvironmentMap extension instance properties. */
-    interface GLTFKHREnvironmentMapExtensions {}
-    /** Interface for adding glTFKHREnvironmentMapCubemap extension json properties. */
-    interface glTFKHREnvironmentMapCubemapExtensions {}
-    /** Interface for adding GLTFKHREnvironmentMapCubemap extension instance properties. */
-    interface GLTFKHREnvironmentMapCubemapExtensions {}
-    /** Interface for adding glTFKHREnvironmentMapData extension json properties. */
-    interface glTFKHREnvironmentMapDataExtensions {}
-    /** Interface for adding GLTFKHREnvironmentMapData extension instance properties. */
-    interface GLTFKHREnvironmentMapDataExtensions {}
+    /** Interface for adding khrEnvironmentMap extension json properties. */
+    interface khrEnvironmentMapExtensions {}
+    /** Interface for adding KHREnvironmentMap extension instance properties. */
+    interface KHREnvironmentMapExtensions {}
+    /** Interface for adding khrEnvironmentMapCubemap extension json properties. */
+    interface khrEnvironmentMapCubemapExtensions {}
+    /** Interface for adding KHREnvironmentMapCubemap extension instance properties. */
+    interface KHREnvironmentMapCubemapExtensions {}
+    /** Interface for adding khrEnvironmentMapData extension json properties. */
+    interface khrEnvironmentMapDataExtensions {}
+    /** Interface for adding KHREnvironmentMapData extension instance properties. */
+    interface KHREnvironmentMapDataExtensions {}
 
     /** Interface for adding sceneKHREnvironmentMap extension json properties. */
     interface sceneKHREnvironmentMapExtensions {}

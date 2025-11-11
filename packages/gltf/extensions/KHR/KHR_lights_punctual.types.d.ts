@@ -2,17 +2,17 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_lights_punctual types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface glTFExtensions {
         /** A json object representing the KHR_lights_punctual extension */
-        'KHR_lights_punctual'?: import('./KHR_lights_punctual.js').glTFKHRLightsPunctual,
+        'KHR_lights_punctual'?: import('./KHR_lights_punctual.js').khrLightsPunctual,
     }
     interface GLTFExtensions {
-        /** A GLTFKHRLightsPunctual instance */
-        'KHR_lights_punctual'?: import('./KHR_lights_punctual.js').GLTFKHRLightsPunctual,
+        /** A KHRLightsPunctual instance */
+        'KHR_lights_punctual'?: import('./KHR_lights_punctual.js').KHRLightsPunctual,
     }
 
     interface nodeExtensions {
@@ -25,31 +25,31 @@ declare module 'virtual-rev-gltf-extensions' {
     }
 
     interface ExtendableProperties {
-        /** GLTFKHRLightsPunctual property */
-        GLTFKHRLightsPunctual: true,
+        /** KHRLightsPunctual property */
+        KHRLightsPunctual: true,
 
-        /** GLTFKHRLightsPunctualLight property */
-        GLTFKHRLightsPunctualLight: true,
+        /** KHRLightsPunctualLight property */
+        KHRLightsPunctualLight: true,
 
-        /** GLTFKHRLightsPunctualLightSpot property */
-        GLTFKHRLightsPunctualLightSpot: true,
+        /** KHRLightsPunctualLightSpot property */
+        KHRLightsPunctualLightSpot: true,
 
         /** NodeKHRLightsPunctual property */
         NodeKHRLightsPunctual: true,
     }
 
-    /** Interface for adding glTFKHRLightsPunctual extension json properties. */
-    interface glTFKHRLightsPunctualExtensions {}
-    /** Interface for adding GLTFKHRLightsPunctual extension instance properties. */
-    interface GLTFKHRLightsPunctualExtensions {}
-    /** Interface for adding glTFKHRLightsPunctualLight extension json properties. */
-    interface glTFKHRLightsPunctualLightExtensions {}
-    /** Interface for adding GLTFKHRLightsPunctualLight extension instance properties. */
-    interface GLTFKHRLightsPunctualLightExtensions {}
-    /** Interface for adding glTFKHRLightsPunctualLightSpot extension json properties. */
-    interface glTFKHRLightsPunctualLightSpotExtensions {}
-    /** Interface for adding GLTFKHRLightsPunctualLightSpot extension instance properties. */
-    interface GLTFKHRLightsPunctualLightSpotExtensions {}
+    /** Interface for adding khrLightsPunctual extension json properties. */
+    interface khrLightsPunctualExtensions {}
+    /** Interface for adding KHRLightsPunctual extension instance properties. */
+    interface KHRLightsPunctualExtensions {}
+    /** Interface for adding khrLightsPunctualLight extension json properties. */
+    interface khrLightsPunctualLightExtensions {}
+    /** Interface for adding KHRLightsPunctualLight extension instance properties. */
+    interface KHRLightsPunctualLightExtensions {}
+    /** Interface for adding khrLightsPunctualLightSpot extension json properties. */
+    interface khrLightsPunctualLightSpotExtensions {}
+    /** Interface for adding KHRLightsPunctualLightSpot extension instance properties. */
+    interface KHRLightsPunctualLightSpotExtensions {}
 
     /** Interface for adding nodeKHRLightsPunctual extension json properties. */
     interface nodeKHRLightsPunctualExtensions {}

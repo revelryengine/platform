@@ -14,7 +14,7 @@ import { registry     } from '../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { materialKHRMaterialsSpecularExtensions, MaterialKHRMaterialsSpecularExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { materialKHRMaterialsSpecularExtensions, MaterialKHRMaterialsSpecularExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

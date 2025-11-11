@@ -15,7 +15,7 @@ import { BufferView   } from './buffer-view.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { accessorSparseValuesExtensions, AccessorSparseValuesExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { accessorSparseValuesExtensions, AccessorSparseValuesExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

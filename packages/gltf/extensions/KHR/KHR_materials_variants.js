@@ -15,28 +15,28 @@ import { registry                        } from '../registry.js';
 /**
  * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
  * @import {
- *  glTFKHRMaterialsVariantsExtensions, GLTFKHRMaterialsVariantsExtensions,
- *  glTFKHRMaterialsVariantsVariantExtensions, GLTFKHRMaterialsVariantsVariantExtensions,
+ *  khrMaterialsVariantsExtensions, KHRMaterialsVariantsExtensions,
+ *  khrMaterialsVariantsVariantExtensions, KHRMaterialsVariantsVariantExtensions,
  *  meshPrimitiveKHRMaterialsVariantsExtensions, MeshPrimitiveKHRMaterialsVariantsExtensions,
  *  meshPrimitiveKHRMaterialsVariantsMappingExtensions, MeshPrimitiveKHRMaterialsVariantsMappingExtensions,
- * } from 'virtual-rev-gltf-extensions';
+ * } from '@revelryengine/gltf/extensions';
  */
 
 /**
  * @typedef {object} khrMaterialsVariantsVariant - KHR_materials_variants variant JSON representation.
  * @property {string} name - The name of the material variant.
- * @property {glTFKHRMaterialsVariantsVariantExtensions} [extensions] - Extension-specific data.
+ * @property {khrMaterialsVariantsVariantExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_materials_variants variant class representation.
  */
-export class GLTFKHRMaterialsVariantsVariant extends GLTFProperty {
+export class KHRMaterialsVariantsVariant extends GLTFProperty {
     /**
      * Creates a new instance of KHRMaterialsVariantsVariant.
      * @param {{
      *  name:        string,
-     *  extensions?: GLTFKHRMaterialsVariantsVariantExtensions,
+     *  extensions?: KHRMaterialsVariantsVariantExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_materials_variants variant object
      */
     constructor(unmarshalled) {
@@ -57,32 +57,32 @@ export class GLTFKHRMaterialsVariantsVariant extends GLTFProperty {
 
     /**
      * Creates a KHRMaterialsVariantsVariant instance from its JSON representation.
-     * @param {khrMaterialsVariantsVariant & glTFPropertyData} glTFKHRMaterialsVariantsVariant - The KHR_materials_variants variant JSON representation.
+     * @param {khrMaterialsVariantsVariant & glTFPropertyData} khrMaterialsVariantsVariant - The KHR_materials_variants variant JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRMaterialsVariantsVariant, graph) {
-        return this.unmarshall(graph, glTFKHRMaterialsVariantsVariant, {
+    static fromJSON(khrMaterialsVariantsVariant, graph) {
+        return this.unmarshall(graph, khrMaterialsVariantsVariant, {
             // No reference fields
         }, this);
     }
 }
 
 /**
- * @typedef {object} glTFKHRMaterialsVariants - KHR_materials_variants JSON representation.
+ * @typedef {object} khrMaterialsVariants - KHR_materials_variants JSON representation.
  * @property {khrMaterialsVariantsVariant[]} variants - An array of objects defining a valid material variant.
- * @property {glTFKHRMaterialsVariantsExtensions} [extensions] - Extension-specific data.
+ * @property {khrMaterialsVariantsExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_materials_variants class representation for glTF root.
  */
-export class GLTFKHRMaterialsVariants extends GLTFProperty {
+export class KHRMaterialsVariants extends GLTFProperty {
     /**
-     * Creates a new instance of GLTFKHRMaterialsVariants.
+     * Creates a new instance of KHRMaterialsVariants.
      * @param {{
-     *  variants:    GLTFKHRMaterialsVariantsVariant[],
-     *  extensions?: GLTFKHRMaterialsVariantsExtensions,
+     *  variants:    KHRMaterialsVariantsVariant[],
+     *  extensions?: KHRMaterialsVariantsExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_materials_variants object
      */
     constructor(unmarshalled) {
@@ -102,14 +102,14 @@ export class GLTFKHRMaterialsVariants extends GLTFProperty {
     }
 
     /**
-     * Creates a GLTFKHRMaterialsVariants instance from its JSON representation.
-     * @param {glTFKHRMaterialsVariants & glTFPropertyData} glTFKHRMaterialsVariants - The KHR_materials_variants JSON representation.
+     * Creates a KHRMaterialsVariants instance from its JSON representation.
+     * @param {khrMaterialsVariants & glTFPropertyData} khrMaterialsVariants - The KHR_materials_variants JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRMaterialsVariants, graph) {
-        return this.unmarshall(graph, glTFKHRMaterialsVariants, {
-            variants: { factory: GLTFKHRMaterialsVariantsVariant }
+    static fromJSON(khrMaterialsVariants, graph) {
+        return this.unmarshall(graph, khrMaterialsVariants, {
+            variants: { factory: KHRMaterialsVariantsVariant }
         }, this);
     }
 }
@@ -128,7 +128,7 @@ export class MeshPrimitiveKHRMaterialsVariantsMapping extends NamedGLTFProperty 
     /**
      * Creates a new instance of MeshPrimitiveKHRMaterialsVariantsMapping.
      * @param {{
-     *  variants:    GLTFKHRMaterialsVariantsVariant[],
+     *  variants:    KHRMaterialsVariantsVariant[],
      *  material:    Material,
      *  extensions?: MeshPrimitiveKHRMaterialsVariantsMappingExtensions,
      * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_materials_variants mesh primitive mapping object
@@ -162,7 +162,7 @@ export class MeshPrimitiveKHRMaterialsVariantsMapping extends NamedGLTFProperty 
      */
     static fromJSON(meshPrimitiveKHRMaterialsVariantsMapping, graph) {
         return this.unmarshall(graph, meshPrimitiveKHRMaterialsVariantsMapping, {
-            variants: { factory: GLTFKHRMaterialsVariantsVariant, collection: ['extensions', 'KHR_materials_variants', 'variants'] },
+            variants: { factory: KHRMaterialsVariantsVariant, collection: ['extensions', 'KHR_materials_variants', 'variants'] },
             material: { factory: Material,                        collection: 'materials'                                          },
         }, this);
     }
@@ -219,7 +219,7 @@ export class MeshPrimitiveKHRMaterialsVariants extends GLTFProperty {
 
 registry.add('KHR_materials_variants', {
     schema: {
-        GLTF:          GLTFKHRMaterialsVariants,
+        GLTF:          KHRMaterialsVariants,
         MeshPrimitive: MeshPrimitiveKHRMaterialsVariants,
     },
 });

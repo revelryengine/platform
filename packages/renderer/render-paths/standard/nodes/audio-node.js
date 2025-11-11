@@ -64,29 +64,29 @@ export class AudioNode extends RenderNode {
     }
 
     /**
-     * @type {WeakMap<import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter|import('revelryengine/gltf/gltf.js').GLTFKHRAudioSource, GainNode>}
+     * @type {WeakMap<import('revelryengine/gltf/gltf.js').KHRAudioEmitter|import('revelryengine/gltf/gltf.js').KHRAudioSource, GainNode>}
      */
     #gainNodes = new WeakMap();
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter|import('revelryengine/gltf/gltf.js').GLTFKHRAudioSource} emitter
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioEmitter|import('revelryengine/gltf/gltf.js').KHRAudioSource} emitter
      */
     getGainNode(emitter) {
         return this.#gainNodes.get(emitter) ?? NonNull(this.#gainNodes.set(emitter, new GainNode(NonNull(this.audio.context), { gain: emitter.gain })).get(emitter));
     }
 
     /**
-     * @type {Map<import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter, GainNode>}
+     * @type {Map<import('revelryengine/gltf/gltf.js').KHRAudioEmitter, GainNode>}
      */
     #sceneEmitters = new Map();
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter} emitter
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioEmitter} emitter
      */
     getSceneEmitter(emitter) {
         return this.#sceneEmitters.get(emitter) ?? NonNull(this.#sceneEmitters.set(emitter, this.createSceneEmitter(emitter)).get(emitter));
     }
 
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter} emitter
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioEmitter} emitter
      */
     createSceneEmitter(emitter) {
         const emitterGain = this.getGainNode(emitter);
@@ -198,14 +198,14 @@ export class AudioNode extends RenderNode {
 
     #sourceNodes = new WeakMap();
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioSource} source
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioSource} source
      */
     getSourceNode(source) {
         return this.#sourceNodes.get(source) ?? NonNull(this.#sourceNodes.set(source, this.createSourceNode(source)).get(source));
     }
 
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioSource} source
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioSource} source
      */
     createSourceNode(source) {
         const gain         = this.getGainNode(source);

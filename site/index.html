@@ -82,7 +82,7 @@
                 display: block;
             }
 
-            /** Prevent jitter when navigating sections that have interleaved sidebar and headers*/
+            /* Prevent jitter when navigating sections that have interleaved sidebar and headers */
             .sidebar-nav .active .group {
                 margin-top: 0;
             }
@@ -94,6 +94,11 @@
                 border-radius: 2px;
                 margin-bottom: 2rem;
             }
+
+            /* Fix scroll jank in sidebar on mobile */
+            body > main {
+                overflow-y: auto;
+            }
         </style>
     </head>
     <body class="loading sidebar-chevron-right sidebar-link-clamp">
@@ -104,7 +109,7 @@
                 logo: '/assets/revelry-engine-dark.svg',
                 loadSidebar: true,
                 maxLevel: 4,
-                subMaxLevel: 4,
+                subMaxLevel: 3,
                 relativePath: true,
                 auto2top: true,
                 // noCompileLinks: [

@@ -13,7 +13,7 @@ import { read as readKTX   } from "revelryengine/deps/ktx-parse.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { imageExtensions, ImageExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { imageExtensions, ImageExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

@@ -2,17 +2,17 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_audio types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface glTFExtensions {
         /** A json object representing the KHR_audio extension */
-        'KHR_audio'?: import('./KHR_audio.js').glTFKHRAudio,
+        'KHR_audio'?: import('./KHR_audio.js').khrAudio,
     }
     interface GLTFExtensions {
-        /** A GLTFKHRAudio instance */
-        'KHR_audio'?: import('./KHR_audio.js').GLTFKHRAudio,
+        /** A KHRAudio instance */
+        'KHR_audio'?: import('./KHR_audio.js').KHRAudio,
     }
 
     interface nodeExtensions {
@@ -34,20 +34,20 @@ declare module 'virtual-rev-gltf-extensions' {
     }
 
     interface ExtendableProperties {
-        /** GLTFKHRAudio property */
-        GLTFKHRAudio: true,
+        /** KHRAudio property */
+        KHRAudio: true,
 
-        /** GLTFKHRAudioAudio property */
-        GLTFKHRAudioAudio: true,
+        /** KHRAudioAudio property */
+        KHRAudioAudio: true,
 
-        /** GLTFKHRAudioSource property */
-        GLTFKHRAudioSource: true,
+        /** KHRAudioSource property */
+        KHRAudioSource: true,
 
-        /** GLTFKHRAudioEmitter property */
-        GLTFKHRAudioEmitter: true,
+        /** KHRAudioEmitter property */
+        KHRAudioEmitter: true,
 
-        /** GLTFKHRAudioEmitterPositional property */
-        GLTFKHRAudioEmitterPositional: true,
+        /** KHRAudioEmitterPositional property */
+        KHRAudioEmitterPositional: true,
 
         /** NodeKHRAudio property */
         NodeKHRAudio: true,
@@ -56,26 +56,26 @@ declare module 'virtual-rev-gltf-extensions' {
         SceneKHRAudio: true,
     }
 
-    /** Interface for adding glTFKHRAudio extension json properties. */
-    interface glTFKHRAudioExtensions {}
-    /** Interface for adding GLTFKHRAudio extension instance properties. */
-    interface GLTFKHRAudioExtensions {}
-    /** Interface for adding glTFKHRAudioAudio extension json properties. */
-    interface glTFKHRAudioAudioExtensions {}
-    /** Interface for adding GLTFKHRAudioAudio extension instance properties. */
-    interface GLTFKHRAudioAudioExtensions {}
-    /** Interface for adding glTFKHRAudioSource extension json properties. */
-    interface glTFKHRAudioSourceExtensions {}
-    /** Interface for adding GLTFKHRAudioSource extension instance properties. */
-    interface GLTFKHRAudioSourceExtensions {}
-    /** Interface for adding glTFKHRAudioEmitter extension json properties. */
-    interface glTFKHRAudioEmitterExtensions {}
-    /** Interface for adding GLTFKHRAudioEmitter extension instance properties. */
-    interface GLTFKHRAudioEmitterExtensions {}
-    /** Interface for adding glTFKHRAudioEmitterPositional extension json properties. */
-    interface glTFKHRAudioEmitterPositionalExtensions {}
-    /** Interface for adding GLTFKHRAudioEmitterPositional extension instance properties. */
-    interface GLTFKHRAudioEmitterPositionalExtensions {}
+    /** Interface for adding khrAudio extension json properties. */
+    interface khrAudioExtensions {}
+    /** Interface for adding KHRAudio extension instance properties. */
+    interface KHRAudioExtensions {}
+    /** Interface for adding khrAudioAudio extension json properties. */
+    interface khrAudioAudioExtensions {}
+    /** Interface for adding KHRAudioAudio extension instance properties. */
+    interface KHRAudioAudioExtensions {}
+    /** Interface for adding khrAudioSource extension json properties. */
+    interface khrAudioSourceExtensions {}
+    /** Interface for adding KHRAudioSource extension instance properties. */
+    interface KHRAudioSourceExtensions {}
+    /** Interface for adding khrAudioEmitter extension json properties. */
+    interface khrAudioEmitterExtensions {}
+    /** Interface for adding KHRAudioEmitter extension instance properties. */
+    interface KHRAudioEmitterExtensions {}
+    /** Interface for adding khrAudioEmitterPositional extension json properties. */
+    interface khrAudioEmitterPositionalExtensions {}
+    /** Interface for adding KHRAudioEmitterPositional extension instance properties. */
+    interface KHRAudioEmitterPositionalExtensions {}
 
     /** Interface for adding nodeKHRAudio extension json properties. */
     interface nodeKHRAudioExtensions {}

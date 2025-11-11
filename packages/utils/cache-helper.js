@@ -5,7 +5,10 @@
 import { requestLock } from './lock.js';
 
 /**
- * @typedef {(request: Request, init?: RequestInit) => Promise<Response>} Fetcher - A function that performs a fetch request.
+ * @callback Fetcher - A function that performs a fetch request.
+ * @param {Request} request - The request to fetch.
+ * @param {RequestInit} [init] - The request init options.
+ * @return {Promise<Response>} A promise that resolves to the response.
  */
 
 /**

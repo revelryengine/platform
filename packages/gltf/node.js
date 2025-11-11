@@ -13,7 +13,7 @@ import { Skin              } from './skin.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { nodeExtensions, NodeExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { nodeExtensions, NodeExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

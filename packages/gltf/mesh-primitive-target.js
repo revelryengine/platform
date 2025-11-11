@@ -11,7 +11,7 @@ import { Accessor     } from './accessor.js';
 
 /**
  * @import { GLTFPropertyData, glTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { meshPrimitiveTargetExtensions, MeshPrimitiveTargetExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { meshPrimitiveTargetExtensions, MeshPrimitiveTargetExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

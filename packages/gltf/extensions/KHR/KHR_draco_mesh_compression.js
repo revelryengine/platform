@@ -21,7 +21,7 @@ const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { meshPrimitiveKHRDracoMeshCompressionExtensions, MeshPrimitiveKHRDracoMeshCompressionExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { meshPrimitiveKHRDracoMeshCompressionExtensions, MeshPrimitiveKHRDracoMeshCompressionExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

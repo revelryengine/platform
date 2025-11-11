@@ -11,7 +11,7 @@ import { Accessor     } from './accessor.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { animationSamplerExtensions, AnimationSamplerExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { animationSamplerExtensions, AnimationSamplerExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

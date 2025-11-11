@@ -13,7 +13,7 @@ import { mat4               } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { cameraExtensions, CameraExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { cameraExtensions, CameraExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

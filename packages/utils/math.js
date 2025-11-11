@@ -12,7 +12,9 @@ const TWO_PI  = 2 * Math.PI;
 const EPSILON = 0.000001;
 
 /**
- * @typedef {(v: number) => number} Normalizer - A function that normalizes a number
+ * @callback Normalizer - A function that normalizes a number
+ * @param {number} v - The number to normalize
+ * @return {number} - The normalized number
  */
 
 /**

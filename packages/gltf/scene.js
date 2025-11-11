@@ -11,7 +11,7 @@ import { Node              } from './node.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { sceneExtensions, SceneExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { sceneExtensions, SceneExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

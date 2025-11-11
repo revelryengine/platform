@@ -79,7 +79,7 @@ export class AudioController {
 
     #decoded = new WeakMap();
     /**
-     * @param {import('revelryengine/gltf/gltf.js').GLTFKHRAudioAudio} audio
+     * @param {import('revelryengine/gltf/gltf.js').KHRAudioAudio} audio
      */
     async decode(audio) {
         await this.contextPromise;

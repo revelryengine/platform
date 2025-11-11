@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_texture_basisu types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface textureExtensions {
         /** A json object representing the KHR_texture_basisu extension */
         'KHR_texture_basisu'?: import('./KHR_texture_basisu.js').textureKHRTextureBasisu,

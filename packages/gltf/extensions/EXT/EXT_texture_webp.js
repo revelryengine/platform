@@ -12,7 +12,7 @@ import { registry     } from '../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { textureEXTTextureWebPExtensions, TextureEXTTextureWebPExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { textureEXTTextureWebPExtensions, TextureEXTTextureWebPExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

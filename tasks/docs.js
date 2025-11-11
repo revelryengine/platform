@@ -26,7 +26,7 @@ let exit = EXIT_FLAGS.Ok;
 for(const pkg of packages) {
     console.log(`Generating docs for ${pkg}`);
 
-    const pkgConfig = (await import(`../../packages/${pkg}/typedoc.config.js`)).default;
+    const pkgConfig = (await import(`../packages/${pkg}/typedoc.config.js`)).default;
 
     if(!pkgConfig) {
         console.error(`No default export found in ./packages/${pkg}/typedoc.config.js`);
@@ -110,7 +110,12 @@ for(const pkg of packages) {
                 Vec3Like: 'https://glmatrix.net/docs/v4/types/Vec3Like.html',
                 Vec4Like: 'https://glmatrix.net/docs/v4/types/Vec4Like.html',
             }
-        }
+        },
+        exclude: [
+            '**/__tests__/**',
+            '**/__fixtures__/**',
+            '**/typedoc.config.js',
+        ]
     });
 
     app.renderer.on(MarkdownPageEvent.BEGIN, output => {

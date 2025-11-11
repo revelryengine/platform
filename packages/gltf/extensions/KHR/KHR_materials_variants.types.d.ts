@@ -2,17 +2,17 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_materials_variants types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface glTFExtensions {
         /** A json object representing the KHR_materials_variants extension */
-        'KHR_materials_variants'?: import('./KHR_materials_variants.js').glTFKHRMaterialsVariants,
+        'KHR_materials_variants'?: import('./KHR_materials_variants.js').khrMaterialsVariants,
     }
     interface GLTFExtensions {
-        /** A GLTFKHRMaterialsVariants instance */
-        'KHR_materials_variants'?: import('./KHR_materials_variants.js').GLTFKHRMaterialsVariants,
+        /** A KHRMaterialsVariants instance */
+        'KHR_materials_variants'?: import('./KHR_materials_variants.js').KHRMaterialsVariants,
     }
 
     interface meshPrimitiveExtensions {
@@ -25,10 +25,10 @@ declare module 'virtual-rev-gltf-extensions' {
     }
 
     interface ExtendableProperties {
-        /** GLTFKHRMaterialsVariants property */
-        GLTFKHRMaterialsVariants: true,
-        /** GLTFKHRMaterialsVariantsVariant property */
-        GLTFKHRMaterialsVariantsVariant: true,
+        /** KHRMaterialsVariants property */
+        KHRMaterialsVariants: true,
+        /** KHRMaterialsVariantsVariant property */
+        KHRMaterialsVariantsVariant: true,
 
         /** MeshPrimitiveKHRMaterialsVariants property */
         MeshPrimitiveKHRMaterialsVariants: true,
@@ -36,14 +36,14 @@ declare module 'virtual-rev-gltf-extensions' {
         MeshPrimitiveKHRMaterialsVariantsMapping: true,
     }
 
-    /** Interface for adding glTFKHRMaterialsVariants extension json properties. */
-    interface glTFKHRMaterialsVariantsExtensions {}
-    /** Interface for adding GLTFKHRMaterialsVariants extension instance properties. */
-    interface GLTFKHRMaterialsVariantsExtensions {}
-    /** Interface for adding glTFKHRMaterialsVariantsVariant extension json properties. */
-    interface glTFKHRMaterialsVariantsVariantExtensions {}
-    /** Interface for adding GLTFKHRMaterialsVariantsVariant extension instance properties. */
-    interface GLTFKHRMaterialsVariantsVariantExtensions {}
+    /** Interface for adding khrMaterialsVariants extension json properties. */
+    interface khrMaterialsVariantsExtensions {}
+    /** Interface for adding KHRMaterialsVariants extension instance properties. */
+    interface KHRMaterialsVariantsExtensions {}
+    /** Interface for adding khrMaterialsVariantsVariant extension json properties. */
+    interface khrMaterialsVariantsVariantExtensions {}
+    /** Interface for adding KHRMaterialsVariantsVariant extension instance properties. */
+    interface KHRMaterialsVariantsVariantExtensions {}
 
     /** Interface for adding meshPrimitiveKHRMaterialsVariants extension json properties. */
     interface meshPrimitiveKHRMaterialsVariantsExtensions {}

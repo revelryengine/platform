@@ -1,47 +1,14 @@
 /// <reference path="./extensions.types.d.ts" />
 
 /**
- * @import  { ExtendablePropertyNames } from 'virtual-rev-gltf-extensions';
- */
-
-/**
  * glTF Extensions Registry
- *
- * @remarks
- * ```js
- * // EXT_example.js
- * ```
- * ```ts
- * // EXT_example.types.d.ts
- * declare module 'virtual-rev-gltf-extensions' {
- *    interface nodeExtensions {
- *        EXT_example?: extExampleNode;
- *    }
- *
- *    interface NodeExtensions {
- *        EXT_example?: EXTExampleNode;
- *    }
- *
- *    interface ExtendableProperties {
- *        EXTExampleNode: true,
- *    }
- *
- *    interface extExampleNodeExtensions {}
- *    interface EXTExampleNodeExtensions {}
- * }
- *
- * const n = new GLTFNode({ extensions: { EXT_example: { } } });
- * console.log(n.extensions.EXT_example) // EXTExampleNode
- * ```
- *
  * @module
  */
 
 /**
- * @import {GLTFProperty} from '../gltf-property.js'
+ * @import { ExtendablePropertyNames } from '@revelryengine/gltf/extensions';
+ * @import { GLTFProperty } from '../gltf-property.js'
  */
-
-
 class GLTFExtensionRegistry {
     /** @type {Set<string>} */
     #supportedExtensions = new Set();

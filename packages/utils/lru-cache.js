@@ -4,10 +4,24 @@
  */
 
 /**
+ * @callback PersistGetHandler - Handler for getting a value from persistence.
+ * @param {string} key - The key of the value to retrieve.
+ * @return {void}
+ *
+ * @callback PersistPuHandler - Handler for getting a value from persistence.
+ * @param {string} key - The key of the value to retrieve.
+ * @param {unknown} value - The value to store.
+ * @return {void}
+ *
+ * @callback PersistDeleteHandler - Handler for deleting a value from persistence.
+ * @param {string} key - The key of the value to delete.
+ * @return {void}
+ */
+ /**
  * @typedef {object} PersistHandler - Interface for persistence operations.
- * @property {(key: string) => void} get - Retrieves a value by key.
- * @property {(key: string, value: unknown) => void} put - Stores a value by key.
- * @property {(key: string) => void} delete - Deletes a value by key.
+ * @property {PersistGetHandler} get - Retrieves a value by key.
+ * @property {PersistPuHandler} put - Stores a value by key.
+ * @property {PersistDeleteHandler} delete - Deletes a value by key.
  */
 /**
  * A simple Least Recently Used (LRU) cache implementation with optional persistence support.

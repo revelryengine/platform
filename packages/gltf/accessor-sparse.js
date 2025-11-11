@@ -12,7 +12,7 @@ import { AccessorSparseValues  } from './accessor-sparse-values.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { accessorSparseExtensions, AccessorSparseExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { accessorSparseExtensions, AccessorSparseExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

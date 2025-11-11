@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_materials_clearcoat types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface materialExtensions {
         /** A json object representing the KHR_materials_clearcoat extension */
         'KHR_materials_clearcoat'?: import('./KHR_materials_clearcoat.js').materialKHRMaterialsClearcoat,

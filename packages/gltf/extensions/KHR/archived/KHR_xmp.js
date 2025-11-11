@@ -13,7 +13,7 @@ import { registry     } from '../../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../../gltf-property.js';
- * @import { glTFKHRXMPExtensions, GLTFKHRXMPExtensions, objectKHRXMPExtensions, ObjectKHRXMPExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { khrXMPExtensions, KHRXMPExtensions, objectKHRXMPExtensions, ObjectKHRXMPExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
@@ -21,20 +21,20 @@ import { registry     } from '../../registry.js';
  * @typedef {{
  *   ['@context']: Record<string, string>,
  *   packets: Record<string, any>[],
- *   extensions?: glTFKHRXMPExtensions
- * }} glTFKHRXMP - KHR_xmp JSON representation.
+ *   extensions?: khrXMPExtensions
+ * }} khrXMP - KHR_xmp JSON representation.
  */
 
 /**
  * KHR_xmp class representation.
  */
-export class GLTFKHRXMP extends GLTFProperty {
+export class KHRXMP extends GLTFProperty {
     /**
-     * Creates a new instance of GLTFKHRXMP.
+     * Creates a new instance of KHRXMP.
      * @param {{
      *  '@context': Record<string, string>,
      *  packets:    Record<string, any>[],
-     *  extensions?: GLTFKHRXMPExtensions,
+     *  extensions?: KHRXMPExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_xmp object
      */
     constructor(unmarshalled) {
@@ -59,13 +59,13 @@ export class GLTFKHRXMP extends GLTFProperty {
     }
 
     /**
-     * Creates a GLTFKHRXMP instance from its JSON representation.
-     * @param {glTFKHRXMP & glTFPropertyData} glTFKHRXMP - The KHR_xmp JSON representation.
+     * Creates a KHRXMP instance from its JSON representation.
+     * @param {khrXMP & glTFPropertyData} khrXMP - The KHR_xmp JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRXMP, graph) {
-        return this.unmarshall(graph, glTFKHRXMP, {
+    static fromJSON(khrXMP, graph) {
+        return this.unmarshall(graph, khrXMP, {
             // No reference fields
         }, this);
     }
@@ -121,7 +121,7 @@ export class ObjectKHRXMP extends GLTFProperty {
 
 registry.add('KHR_xmp', {
     schema: {
-        GLTF:      GLTFKHRXMP,
+        GLTF:      KHRXMP,
         Asset:     ObjectKHRXMP,
         Scene:     ObjectKHRXMP,
         Node:      ObjectKHRXMP,

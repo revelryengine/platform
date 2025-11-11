@@ -49,8 +49,13 @@ function lerp(a, b, t) {
  */
 
 /**
- * @typedef {(matrix: Mat4Like) => void} OnUpdateCallback - A callback function invoked whenever the control is updated.
- * @typedef {(input: OrbitControlInput) => void} OnInputCallback - A callback function invoked whenever there is input.
+ * @callback OnUpdateCallback - A callback function invoked whenever the control is updated.
+ * @param {Mat4Like} matrix - The updated transformation matrix.
+ * @return {void}
+ *
+ * @callback OnInputCallback - A callback function invoked whenever there is input.
+ * @param {OrbitControlInput} input - The current input state.
+ * @return {void}
  */
 
 /**

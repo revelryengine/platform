@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_materials_transmission types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface materialExtensions {
         /** A json object representing the KHR_materials_transmission extension */
         'KHR_materials_transmission'?: import('./KHR_materials_transmission.js').materialKHRMaterialsTransmission,

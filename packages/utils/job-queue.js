@@ -4,7 +4,9 @@
  */
 
 /**
- * @typedef {(signal: AbortSignal) => Promise<void>} JobTask - A function that represents a job task.
+ * @callback JobTask - A function that represents a job task.
+ * @param {AbortSignal} signal - The abort signal to monitor for cancellation.
+ * @return {Promise<void>} A promise that resolves when the task is complete.
  */
 
 /**

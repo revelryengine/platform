@@ -10,7 +10,7 @@ import { registry     } from '../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { nodeREVGameObjectExtensions, NodeREVGameObjectExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { nodeREVGameObjectExtensions, NodeREVGameObjectExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

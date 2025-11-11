@@ -959,8 +959,8 @@ export class Graph {
 /**
  * @typedef {import('revelryengine/gltf/gltf.js').Node & { skin: import('revelryengine/gltf/gltf.js').Skin }} SkinNode
  * @typedef {import('revelryengine/gltf/gltf.js').Node & { mesh: import('revelryengine/gltf/gltf.js').MeshPrimitive }} MeshNode
- * @typedef {import('revelryengine/gltf/gltf.js').Node & { extensions: { KHR_lights_punctual: { light: import('revelryengine/gltf/gltf.js').KHRLightsPunctualNode } } }} LightNode
- * @typedef {import('revelryengine/gltf/gltf.js').Node & { extensions: { KHR_audio: { emitter: import('revelryengine/gltf/gltf.js').GLTFKHRAudioEmitter } } }} EmitterNode
+ * @typedef {import('revelryengine/gltf/gltf.js').Node & { extensions: { KHR_lights_punctual: { light: import('revelryengine/gltf/gltf.js').NodeKHRLightsPunctual } } }} LightNode
+ * @typedef {import('revelryengine/gltf/gltf.js').Node & { extensions: { KHR_audio: { emitter: import('revelryengine/gltf/gltf.js').KHRAudioEmitter } } }} EmitterNode
  *
  * @typedef {{
 *  index:          number,

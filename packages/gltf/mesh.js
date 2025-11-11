@@ -11,7 +11,7 @@ import { MeshPrimitive     } from './mesh-primitive.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { meshExtensions, MeshExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { meshExtensions, MeshExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

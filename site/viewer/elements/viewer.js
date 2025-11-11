@@ -7,9 +7,9 @@ import { RevParamElement } from './param.js';
 import { Renderer          } from 'revelryengine/renderer/renderer.js';
 import { CanvasAutoResizer } from 'revelryengine/utils/canvas-auto-resizer.js';
 
-import { GLTF, Node                 } from 'revelryengine/gltf/gltf.js';
-import { GLTFKHRLightsPunctualLight } from 'revelryengine/gltf/gltf.js';
-import { SceneKHREnvironmentMap     } from 'revelryengine/gltf/gltf.js';
+import { GLTF, Node } from 'revelryengine/gltf/gltf.js';
+import { KHRLightsPunctualLight, NodeKHRLightsPunctual } from 'revelryengine/gltf/gltf.js';
+import { SceneKHREnvironmentMap } from 'revelryengine/gltf/gltf.js';
 
 import { index as samplesIndex } from 'revelryengine/samples/sample-models/index.js';
 import { index as envIndex     } from 'revelryengine/samples/sample-environments/index.js';
@@ -225,9 +225,9 @@ export class RevGLTFViewerElement extends RevParamElement  {
             new Node({
                 matrix: mat4.fromRotation(mat4.create(), Math.PI / 4, [-1, 1, 0]),
                 extensions: {
-                    KHR_lights_punctual: {
-                        light: new GLTFKHRLightsPunctualLight({ type: 'directional', intensity: 2 })
-                    }
+                    KHR_lights_punctual: new NodeKHRLightsPunctual({
+                        light: new KHRLightsPunctualLight({ type: 'directional', intensity: 2 })
+                    })
                 }
             }),
         ];

@@ -13,7 +13,7 @@ import { Material            } from './material.js';
 
 /**
  * @import { GLTFPropertyData, glTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { meshPrimitiveExtensions, MeshPrimitiveExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { meshPrimitiveExtensions, MeshPrimitiveExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

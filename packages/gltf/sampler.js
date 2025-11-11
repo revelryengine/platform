@@ -11,7 +11,7 @@ import { GL } from './constants.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { samplerExtensions, SamplerExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { samplerExtensions, SamplerExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

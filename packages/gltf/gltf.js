@@ -23,13 +23,13 @@ import { Skin         } from  './skin.js';
 import { Texture      } from  './texture.js';
 
 import { registry } from './extensions/registry.js';
-import './extensions/all.js';
+import './extensions/extensions.js';
 
 import { GLTF_SUPPORTED_VERSION, GLTF_MAGIC_NUMBER_BINARY_FORMAT } from './constants.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { glTFExtensions, GLTFExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { glTFExtensions, GLTFExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
@@ -346,25 +346,4 @@ export * from './skin.js';
 export * from './texture.js';
 export * from './texture-info.js';
 export * from './extensions/registry.js';
-export * from './extensions/KHR/KHR_animation_pointer.js';
-export * from './extensions/KHR/KHR_audio.js';
-export * from './extensions/KHR/KHR_draco_mesh_compression.js';
-export * from './extensions/KHR/KHR_environment_map.js';
-export * from './extensions/KHR/KHR_lights_punctual.js';
-export * from './extensions/KHR/KHR_materials_clearcoat.js';
-export * from './extensions/KHR/KHR_materials_emissive_strength.js';
-export * from './extensions/KHR/KHR_materials_ior.js';
-export * from './extensions/KHR/KHR_materials_iridescence.js';
-export * from './extensions/KHR/KHR_materials_sheen.js';
-export * from './extensions/KHR/KHR_materials_specular.js';
-export * from './extensions/KHR/KHR_materials_transmission.js';
-export * from './extensions/KHR/KHR_materials_unlit.js';
-export * from './extensions/KHR/KHR_materials_variants.js';
-export * from './extensions/KHR/KHR_materials_volume.js';
-export * from './extensions/KHR/KHR_texture_basisu.js';
-export * from './extensions/KHR/KHR_texture_transform.js';
-export * from './extensions/KHR/KHR_xmp_json_ld.js';
-export * from './extensions/KHR/archived/KHR_materials_pbrSpecularGlossiness.js';
-export * from './extensions/KHR/archived/KHR_xmp.js';
-export * from './extensions/EXT/EXT_texture_webp.js';
-export * from './extensions/REV/REV_game_object.js';
+export * from './extensions/extensions.js';

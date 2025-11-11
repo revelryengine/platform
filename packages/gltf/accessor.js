@@ -19,7 +19,7 @@ import {
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { accessorExtensions, AccessorExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { accessorExtensions, AccessorExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

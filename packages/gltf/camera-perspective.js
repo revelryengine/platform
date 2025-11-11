@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { cameraPerspectiveExtensions, CameraPerspectiveExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { cameraPerspectiveExtensions, CameraPerspectiveExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

@@ -1,7 +1,7 @@
 import { Model, Stage, System } from 'revelryengine/ecs/ecs.js';
 
-import { GLTF, Node as GLTFNode, Camera as GLTFCamera, NodeREVGameObject, GLTFKHRLightsPunctualLightSpot       } from 'revelryengine/gltf/gltf.js';
-import { GLTFKHRLightsPunctualLight, NodeKHRLightsPunctual, SceneKHREnvironmentMap } from 'revelryengine/gltf/gltf.js';
+import { GLTF, Node as GLTFNode, Camera as GLTFCamera, NodeREVGameObject, KHRLightsPunctualLightSpot       } from 'revelryengine/gltf/gltf.js';
+import { KHRLightsPunctualLight, NodeKHRLightsPunctual, SceneKHREnvironmentMap } from 'revelryengine/gltf/gltf.js';
 import { CameraOrthographic, CameraPerspective } from 'revelryengine/gltf/gltf.js';
 
 import { PBR_DEBUG_MODES, PBR_TONEMAPS, Renderer, Viewport         } from 'revelryengine/renderer/renderer.js';
@@ -288,7 +288,7 @@ export const LightSchema = /** @type {const} @satisfies {ComponentTypeSchema}*/(
     required: ['type'],
 });
 
-export class LightProperty extends GLTFKHRLightsPunctualLight {
+export class LightProperty extends KHRLightsPunctualLight {
     /**
      * @param {LightModel} model
      */

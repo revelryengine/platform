@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_draco_mesh_compression types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface meshPrimitiveExtensions {
         /** A json object representing the KHR_draco_mesh_compression extension */
         'KHR_draco_mesh_compression'?: import('./KHR_draco_mesh_compression.js').meshPrimitiveKHRDracoMeshCompression,

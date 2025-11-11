@@ -15,7 +15,7 @@ import { quat              } from "revelryengine/deps/gl-matrix.js";
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { animationExtensions, AnimationExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { animationExtensions, AnimationExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

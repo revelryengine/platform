@@ -13,24 +13,24 @@ import { registry     } from '../registry.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { glTFKHRXMPJSONLDExtensions, GLTFKHRXMPJSONLDExtensions, objectKHRXMPJSONLDExtensions, ObjectKHRXMPJSONLDExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { khrXMPJSONLDExtensions, KHRXMPJSONLDExtensions, objectKHRXMPJSONLDExtensions, ObjectKHRXMPJSONLDExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @typedef {object} glTFKHRXMPJSONLD - KHR_xmp_json_ld JSON representation.
+ * @typedef {object} khrXMPJSONLD - KHR_xmp_json_ld JSON representation.
  * @property {Record<string, any>[]} packets - Dictionary of XMP metadata properties. Property names take the form `xmp_namespace_name:property_name`.
- * @property {glTFKHRXMPJSONLDExtensions} [extensions] - Extension-specific data.
+ * @property {khrXMPJSONLDExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_xmp_json_ld class representation.
  */
-export class GLTFKHRXMPJSONLD extends GLTFProperty {
+export class KHRXMPJSONLD extends GLTFProperty {
     /**
-     * Creates an instance of GLTFKHRXMPJSONLD.
+     * Creates an instance of KHRXMPJSONLD.
      * @param {{
      *  packets:     Record<string, any>[],
-     *  extensions?: GLTFKHRXMPJSONLDExtensions,
+     *  extensions?: KHRXMPJSONLDExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_xmp_json_ld object
      */
     constructor(unmarshalled) {
@@ -50,13 +50,13 @@ export class GLTFKHRXMPJSONLD extends GLTFProperty {
     }
 
     /**
-     * Creates a GLTFKHRXMPJSONLD instance from its JSON representation.
-     * @param {glTFKHRXMPJSONLD & glTFPropertyData} glTFKHRXMPJSONLD - KHR_xmp_json_ld JSON representation
+     * Creates a KHRXMPJSONLD instance from its JSON representation.
+     * @param {khrXMPJSONLD & glTFPropertyData} khrXMPJSONLD - KHR_xmp_json_ld JSON representation
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRXMPJSONLD, graph) {
-        return this.unmarshall(graph, glTFKHRXMPJSONLD, {
+    static fromJSON(khrXMPJSONLD, graph) {
+        return this.unmarshall(graph, khrXMPJSONLD, {
             // No reference fields
         }, this);
     }
@@ -110,7 +110,7 @@ export class ObjectKHRXMPJSONLD extends GLTFProperty {
 
 registry.add('KHR_xmp_json_ld', {
     schema: {
-        GLTF:      GLTFKHRXMPJSONLD,
+        GLTF:      KHRXMPJSONLD,
         Asset:     ObjectKHRXMPJSONLD,
         Scene:     ObjectKHRXMPJSONLD,
         Node:      ObjectKHRXMPJSONLD,

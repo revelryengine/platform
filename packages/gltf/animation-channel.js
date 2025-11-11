@@ -12,7 +12,7 @@ import { AnimationSampler       } from './animation-sampler.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { animationChannelExtensions, AnimationChannelExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { animationChannelExtensions, AnimationChannelExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

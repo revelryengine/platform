@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { assetExtensions, AssetExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { assetExtensions, AssetExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

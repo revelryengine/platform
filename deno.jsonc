@@ -19,9 +19,8 @@
         // "validate:types": "deno check",
         // "validate:lint":  "deno lint",
 
-        "validate:docs":  "deno run -A ./site/docs/generate.js --validate",
-
-        "generate:docs": "deno run -A ./site/docs/generate.js"
+        "docs:validate": "deno run -A ./tasks/docs.js --validate",
+        "docs:generate": "deno run -A ./tasks/docs.js"
     },
     "lint": {
         "rules": {

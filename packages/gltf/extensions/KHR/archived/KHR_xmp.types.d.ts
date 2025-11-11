@@ -2,17 +2,17 @@
 
 /**
  * Augments the glTF extension interfaces to include KHR_xmp types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface glTFExtensions {
         /** A json object representing the KHR_xmp extension */
-        'KHR_xmp'?: import('./KHR_xmp.js').glTFKHRXMP
+        'KHR_xmp'?: import('./KHR_xmp.js').khrXMP
     }
     interface GLTFExtensions {
-        /** A GLTFKHRXMP instance */
-        'KHR_xmp'?: import('./KHR_xmp.js').GLTFKHRXMP
+        /** A KHRXMP instance */
+        'KHR_xmp'?: import('./KHR_xmp.js').KHRXMP
     }
 
     interface assetExtensions {
@@ -80,16 +80,16 @@ declare module 'virtual-rev-gltf-extensions' {
 
 
     interface ExtendableProperties {
-        /** GLTFKHRXMP property */
-        GLTFKHRXMP: true,
+        /** KHRXMP property */
+        KHRXMP: true,
         /** ObjectKHRXMP property */
         ObjectKHRXMP: true,
     }
 
-    /** Interface for adding glTFKHRXMP extension json properties. */
-    interface glTFKHRXMPExtensions {}
-    /** Interface for adding GLTFKHRXMP extension instance properties. */
-    interface GLTFKHRXMPExtensions {}
+    /** Interface for adding khrXMP extension json properties. */
+    interface khrXMPExtensions {}
+    /** Interface for adding KHRXMP extension instance properties. */
+    interface KHRXMPExtensions {}
 
     /** Interface for adding objectKHRXMP extension json properties. */
     interface objectKHRXMPExtensions {}

@@ -1,4 +1,4 @@
-/// <reference types="./KHR_texture_basisu.types.d.ts" />
+/// <reference path="./KHR_texture_basisu.types.d.ts" />
 
 /**
  * This extension adds the ability to specify textures using KTX v2 images with Basis Universal supercompression.
@@ -15,7 +15,7 @@ import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
- * @import { textureKHRTextureBasisuExtensions, TextureKHRTextureBasisuExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { textureKHRTextureBasisuExtensions, TextureKHRTextureBasisuExtensions } from '@revelryengine/gltf/extensions';
  */
 
 const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_texture_basisu.worker.js'), { count: 4, type: 'module' });

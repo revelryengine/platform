@@ -11,7 +11,7 @@ import { Texture     } from './texture.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { materialNormalTextureInfoExtensions, MaterialNormalTextureInfoExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { materialNormalTextureInfoExtensions, MaterialNormalTextureInfoExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

@@ -2,10 +2,10 @@
 
 /**
  * Augments the glTF extension interfaces to include EXT_texture_webp types.
- * @module virtual-rev-gltf-extensions
+ * @module @revelryengine/gltf/extensions
  */
 
-declare module 'virtual-rev-gltf-extensions' {
+declare module '@revelryengine/gltf/extensions' {
     interface textureExtensions {
         /** A json object representing the EXT_texture_webp extension */
         'EXT_texture_webp'?: import('./EXT_texture_webp.js').textureEXTTextureWebP

@@ -12,7 +12,7 @@ import { Accessor          } from './accessor.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
- * @import { skinExtensions, SkinExtensions } from 'virtual-rev-gltf-extensions';
+ * @import { skinExtensions, SkinExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**

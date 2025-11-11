@@ -14,30 +14,30 @@ import { registry                        } from '../registry.js';
 /**
  * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
  * @import {
- *  glTFKHRLightsPunctualExtensions, GLTFKHRLightsPunctualExtensions,
- *  glTFKHRLightsPunctualLightExtensions, GLTFKHRLightsPunctualLightExtensions,
- *  glTFKHRLightsPunctualLightSpotExtensions, GLTFKHRLightsPunctualLightSpotExtensions,
+ *  khrLightsPunctualExtensions, KHRLightsPunctualExtensions,
+ *  khrLightsPunctualLightExtensions, KHRLightsPunctualLightExtensions,
+ *  khrLightsPunctualLightSpotExtensions, KHRLightsPunctualLightSpotExtensions,
  *  nodeKHRLightsPunctualExtensions, NodeKHRLightsPunctualExtensions,
- * } from 'virtual-rev-gltf-extensions';
+ * } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @typedef {object} glTFKHRLightsPunctualLightSpot - KHR_lights_punctual Spot Light JSON representation.
+ * @typedef {object} khrLightsPunctualLightSpot - KHR_lights_punctual Spot Light JSON representation.
  * @property {number} [innerConeAngle] - Angle in radians from centre of spotlight where falloff begins.
  * @property {number} [outerConeAngle] - Angle in radians from centre of spotlight where falloff ends.
- * @property {glTFKHRLightsPunctualLightSpotExtensions} [extensions] - Extension-specific data.
+ * @property {khrLightsPunctualLightSpotExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_lights_punctual Spot Light class representation.
  */
-export class GLTFKHRLightsPunctualLightSpot extends GLTFProperty {
+export class KHRLightsPunctualLightSpot extends GLTFProperty {
     /**
-     * Creates a new instance of GLTFKHRLightsPunctualLightSpot.
+     * Creates a new instance of KHRLightsPunctualLightSpot.
      * @param {{
      *  innerConeAngle?: number,
      *  outerConeAngle?: number,
-     *  extensions?:     GLTFKHRLightsPunctualLightSpotExtensions,
+     *  extensions?:     KHRLightsPunctualLightSpotExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_lights_punctual Spot Light object
      */
     constructor(unmarshalled) {
@@ -63,40 +63,40 @@ export class GLTFKHRLightsPunctualLightSpot extends GLTFProperty {
 
     /**
      * Creates an instance from JSON data.
-     * @param {glTFKHRLightsPunctualLightSpot & glTFPropertyData} glTFKHRLightsPunctualLightSpot - The KHR_lights_punctual Spot Light JSON representation.
+     * @param {khrLightsPunctualLightSpot & glTFPropertyData} khrLightsPunctualLightSpot - The KHR_lights_punctual Spot Light JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRLightsPunctualLightSpot, graph) {
-        return this.unmarshall(graph, glTFKHRLightsPunctualLightSpot, {
+    static fromJSON(khrLightsPunctualLightSpot, graph) {
+        return this.unmarshall(graph, khrLightsPunctualLightSpot, {
             // No reference fields
         }, this);
     }
 }
 
 /**
- * @typedef {object} glTFKHRLightsPunctualLight - KHR_lights_punctual Light JSON representation.
+ * @typedef {object} khrLightsPunctualLight - KHR_lights_punctual Light JSON representation.
  * @property {string} type - Specifies the light type.
  * @property {number} [range] - A distance cutoff at which the light's intensity may be considered to have reached zero.
  * @property {[number, number, number]} [color] - Color of the light source.
  * @property {number} [intensity] - Intensity of the light source.
- * @property {glTFKHRLightsPunctualLightSpot} [spot] - A spot light
- * @property {glTFKHRLightsPunctualLightExtensions} [extensions] - Extension-specific data.
+ * @property {khrLightsPunctualLightSpot} [spot] - A spot light
+ * @property {khrLightsPunctualLightExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_lights_punctual Light class representation.
  */
-export class GLTFKHRLightsPunctualLight extends NamedGLTFProperty {
+export class KHRLightsPunctualLight extends NamedGLTFProperty {
     /**
-     * Creates a new instance of GLTFKHRLightsPunctualLight.
+     * Creates a new instance of KHRLightsPunctualLight.
      * @param {{
      *  type:        'directional' | 'point' | 'spot',
      *  range?:       number
      *  color?:      [number, number, number],
      *  intensity?:  number,
-     *  spot?:       GLTFKHRLightsPunctualLightSpot,
-     *  extensions?: GLTFKHRLightsPunctualLightExtensions,
+     *  spot?:       KHRLightsPunctualLightSpot,
+     *  extensions?: KHRLightsPunctualLightExtensions,
      * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_lights_punctual Light object
      */
     constructor(unmarshalled) {
@@ -137,32 +137,32 @@ export class GLTFKHRLightsPunctualLight extends NamedGLTFProperty {
 
     /**
      * Creates an instance from JSON data.
-     * @param {glTFKHRLightsPunctualLight & namedGLTFPropertyData} glTFKHRLightsPunctualLight - The KHR_lights_punctual Light JSON representation.
+     * @param {khrLightsPunctualLight & namedGLTFPropertyData} khrLightsPunctualLight - The KHR_lights_punctual Light JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRLightsPunctualLight, graph) {
-        return this.unmarshall(graph, glTFKHRLightsPunctualLight, {
-            spot: { factory: GLTFKHRLightsPunctualLightSpot },
+    static fromJSON(khrLightsPunctualLight, graph) {
+        return this.unmarshall(graph, khrLightsPunctualLight, {
+            spot: { factory: KHRLightsPunctualLightSpot },
         }, this);
     }
 }
 
 /**
- * @typedef {object} glTFKHRLightsPunctual - KHR_lights_punctual JSON representation.
- * @property {glTFKHRLightsPunctualLight[]} lights - An array of lights.
- * @property {glTFKHRLightsPunctualExtensions} [extensions] - Extension-specific data.
+ * @typedef {object} khrLightsPunctual - KHR_lights_punctual JSON representation.
+ * @property {khrLightsPunctualLight[]} lights - An array of lights.
+ * @property {khrLightsPunctualExtensions} [extensions] - Extension-specific data.
  */
 
 /**
  * KHR_lights_punctual class representation.
  */
-export class GLTFKHRLightsPunctual extends GLTFProperty {
+export class KHRLightsPunctual extends GLTFProperty {
     /**
-     * Creates a new instance of GLTFKHRLightsPunctual.
+     * Creates a new instance of KHRLightsPunctual.
      * @param {{
-     *  lights:      GLTFKHRLightsPunctualLight[],
-     *  extensions?: GLTFKHRLightsPunctualExtensions,
+     *  lights:      KHRLightsPunctualLight[],
+     *  extensions?: KHRLightsPunctualExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_lights_punctual object
      */
     constructor(unmarshalled) {
@@ -183,13 +183,13 @@ export class GLTFKHRLightsPunctual extends GLTFProperty {
 
     /**
      * Creates an instance from JSON data.
-     * @param {glTFKHRLightsPunctual & glTFPropertyData} glTFKHRLightsPunctual - The KHR_lights_punctual JSON representation.
+     * @param {khrLightsPunctual & glTFPropertyData} khrLightsPunctual - The KHR_lights_punctual JSON representation.
      * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
      * @override
      */
-    static fromJSON(glTFKHRLightsPunctual, graph) {
-        return this.unmarshall(graph, glTFKHRLightsPunctual, {
-            lights: { factory: GLTFKHRLightsPunctualLight },
+    static fromJSON(khrLightsPunctual, graph) {
+        return this.unmarshall(graph, khrLightsPunctual, {
+            lights: { factory: KHRLightsPunctualLight },
         }, this);
     }
 }
@@ -207,7 +207,7 @@ export class NodeKHRLightsPunctual extends GLTFProperty {
     /**
      * Creates a new instance of NodeKHRLightsPunctual.
      * @param {{
-     *  light:       GLTFKHRLightsPunctualLight,
+     *  light:       KHRLightsPunctualLight,
      *  extensions?: NodeKHRLightsPunctualExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_lights_punctual Node object
      */
@@ -235,14 +235,14 @@ export class NodeKHRLightsPunctual extends GLTFProperty {
      */
     static fromJSON(nodeKHRLightsPunctual, graph) {
         return this.unmarshall(graph, nodeKHRLightsPunctual, {
-            light: { factory: GLTFKHRLightsPunctualLight, collection: ['extensions', 'KHR_lights_punctual', 'lights'] },
+            light: { factory: KHRLightsPunctualLight, collection: ['extensions', 'KHR_lights_punctual', 'lights'] },
         }, this);
     };
 }
 
 registry.add('KHR_lights_punctual', {
     schema: {
-        GLTF: GLTFKHRLightsPunctual,
+        GLTF: KHRLightsPunctual,
         Node: NodeKHRLightsPunctual,
     }
 });
