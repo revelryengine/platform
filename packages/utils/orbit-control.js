@@ -34,18 +34,15 @@ function lerp(a, b, t) {
 }
 
 /**
- * @typedef {object} OrbitControlInputDOF - The depth of field (dof) input state.
- * @property {number} start - Start distance.
- * @property {number} end - End distance.
- * @property {number} time - Transition time.
- */
-/**
  * @typedef {object} OrbitControlInput - The input state of the OrbitControl.
  * @property {number} yaw - Yaw rotation input.
  * @property {number} pitch - Pitch rotation input.
  * @property {number} zoom - Zoom level input.
  * @property {[number, number]} pan - Pan position input.
- * @property {OrbitControlInputDOF} dof - Depth of field (dof) input.
+ * @property {object} dof - Depth of field (dof) input.
+ * @property {number} dof.start - DOF start distance.
+ * @property {number} dof.end - DOF end distance.
+ * @property {number} dof.time - DOF transition time.
  */
 
 /**
@@ -304,7 +301,7 @@ export class OrbitControl {
     #handleWheelEvent = (e) => {
         const { ZOOM_K } = OrbitControl;
         const delta = e.deltaY;
-            // switch(e.deltaMode) { //see https://bugzilla.mozilla.org/show_bug.cgi?id=1392460#c34
+            // switch(e.deltaMode) { // See [Bug 1392460](https://bugzilla.mozilla.org/show_bug.cgi?id=1392460#c34)
             //     case e.DOM_DELTA_PIXEL:
             //         delta = e.deltaY;
             //         break;

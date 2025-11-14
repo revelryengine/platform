@@ -1,7 +1,7 @@
 /**
  * A view into a buffer generally representing a subset of the buffer.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-bufferview
+ * [Reference Spec - Buffer View](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-bufferview)
  *
  * @module
  */

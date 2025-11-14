@@ -1,7 +1,7 @@
 /**
  * Reference to a texture.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-textureinfo
+ * [Reference Spec - Texture Info](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-textureinfo)
  *
  * @module
  */
@@ -68,9 +68,6 @@ export class TextureInfo extends GLTFProperty {
 
     /**
      * Set this to true indicate that texture uses sRGB transfer function
-     *
-     * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
-     *
      * @param {boolean} v - Whether this texture uses sRGB transfer function.
      */
     set sRGB(v) {

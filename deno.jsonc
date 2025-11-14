@@ -20,7 +20,10 @@
         // "validate:lint":  "deno lint",
 
         "docs:validate": "deno run -A ./tasks/docs.js --validate",
-        "docs:generate": "deno run -A ./tasks/docs.js"
+        "docs:generate": "deno run -A ./tasks/docs.js ",
+
+        "importmap:update": "deno run -A ./tasks/importmap.js",
+        "importmap:validate": "deno run -A ./tasks/importmap.js --validate"
     },
     "lint": {
         "rules": {

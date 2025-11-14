@@ -3,7 +3,7 @@
 /**
  * An image based environment Map.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/KHR_lights_environment/extensions/2.0/Khronos/KHR_lights_environment#declaring-an-environment-map
+ * [Reference Spec - KHR_environment_map](https://github.com/KhronosGroup/glTF/tree/KHR_lights_environment/extensions/2.0/Khronos/KHR_lights_environment)
  *
  * @module
  */
@@ -162,9 +162,7 @@ export class KHREnvironmentMapData extends NamedGLTFProperty {
  */
 
 /**
- * An image based environment Map.
- *
- * @see https://github.com/KhronosGroup/glTF/tree/KHR_lights_environment/extensions/2.0/Khronos/KHR_lights_environment#declaring-an-environment-map
+ * KHR_environment_map class representation.
  */
 export class KHREnvironmentMap extends GLTFProperty {
     /**

@@ -1,7 +1,7 @@
 /**
  * Joints and matrices defining a skin.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-skin
+ * [Reference Spec - Skin](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-skin)
  *
  * @module
  */

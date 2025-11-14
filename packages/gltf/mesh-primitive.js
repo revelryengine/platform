@@ -1,7 +1,7 @@
 /**
  * Geometry to be rendered with the given material.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive
+ * [Reference Spec - Mesh Primitive](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-mesh-primitive)
  *
  * @module
  */

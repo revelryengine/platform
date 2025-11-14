@@ -3,7 +3,7 @@
 /**
  * The iridescence materials are defined by adding the KHR_materials_iridescence extension to any glTF material.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_iridescence
+ * [Reference Spec - KHR_materials_iridescence](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_iridescence)
  *
  * @module
  */

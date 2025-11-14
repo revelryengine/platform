@@ -1,7 +1,7 @@
 /**
  * Metadata about the glTF asset
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-asset
+ * [Reference Spec - Asset](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-asset)
  *
  * @module
  */

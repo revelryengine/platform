@@ -2,7 +2,7 @@
 /**
  * Image data used to create a texture.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-image
+ * [Reference Spec - Image](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-image)
  *
  * @module
  */

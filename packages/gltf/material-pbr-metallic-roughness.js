@@ -2,7 +2,7 @@
 /**
  * A set of parameter values that are used to define the metallic-roughness material model from Physically-Based Rendering (PBR) methodology.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-pbrmetallicroughness
+ * [Reference Spec - Material PBR Metallic Roughness](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-pbrmetallicroughness)
  *
  * @module
  */

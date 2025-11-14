@@ -1,7 +1,7 @@
 /**
  * A keyframe animation.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation
+ * [Reference Spec - Animation](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation)
  *
  * @module
  */
@@ -11,7 +11,7 @@ import { AnimationSampler  } from './animation-sampler.js';
 import { AnimationChannel  } from './animation-channel.js';
 import { Node              } from './node.js';
 import { GL                } from './constants.js';
-import { quat              } from "revelryengine/deps/gl-matrix.js";
+import { quat              } from 'revelryengine/deps/gl-matrix.js';
 
 /**
  * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
@@ -174,7 +174,7 @@ const interpolators = {
     /**
      * Interpolates between keyframe values.
      * The animation’s interpolation is computed using a cubic spline with specified tangents.
-     * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#appendix-c-spline-interpolation
+     * [Reference Spec - Appendix C Spline Interpolation](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#appendix-c-spline-interpolation)
      *
      * @param {TypedArray} outputArray
      * @param {any} target
@@ -316,7 +316,7 @@ export class Animator {
 
             /**
              * Clamp keyframes to start and end if outside time range
-             * @see https://github.com/KhronosGroup/glTF/issues/1179
+             * See [Issue 1179](https://github.com/KhronosGroup/glTF/issues/1179)
              */
             if (time <= input.min[0]) {
                 const t = 0;

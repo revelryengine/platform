@@ -3,9 +3,10 @@
 /**
  * This extension defines a schema to use Draco geometry compression (non-normative) libraries in glTF format.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_draco_mesh_compression
+ * [Reference Spec - KHR_draco_mesh_compression](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_draco_mesh_compression)
  *
- * The three.js implementation was used as a reference. @see https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/DRACOLoader.js
+ * @privateRemarks
+ * The [three.js](https://github.com/mrdoob/three.js/blob/02201339d5429a610a71ec19f5bf36eb4e7d2b04/examples/jsm/loaders/DRACOLoader.js) implementation was used as a reference.
  *
  * @module
  */

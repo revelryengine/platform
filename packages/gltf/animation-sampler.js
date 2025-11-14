@@ -1,7 +1,7 @@
 /**
  * An animation sampler combines timestamps with a sequence of output values and defines an interpolation algorithm.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-sampler
+ * [Reference Spec - Animation Sampler](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-sampler)
  *
  * @module
  */

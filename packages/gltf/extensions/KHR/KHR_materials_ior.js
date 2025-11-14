@@ -3,7 +3,7 @@
 /**
  * The index of refraction of a material is configured by adding the KHR_materials_ior extension to any glTF material.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_ior
+ * [Reference Spec - KHR_materials_ior](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_ior)
  *
  * @module
  */

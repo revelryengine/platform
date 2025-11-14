@@ -3,7 +3,7 @@ vendor
 node_modules
 coverage
 
-site/docs/packages
+site/docs/lib
 editor
-scripts/
+scripts/io/
 starters/

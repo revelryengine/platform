@@ -5,7 +5,7 @@
  *
  * The only major addition is, that the output values are mapped using a JSON Pointer.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_animation_pointer/README.md
+ * [Reference Spec - KHR_animation_pointer](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_animation_pointer)
  *
  * @module
  */

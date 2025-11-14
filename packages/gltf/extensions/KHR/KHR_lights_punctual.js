@@ -3,7 +3,7 @@
 /**
  * This extension defines a set of lights for use with glTF 2.0. Lights define light sources within a scene.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_lights_punctual
+ * [Reference Spec - KHR_lights_punctual](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_lights_punctual)
  *
  * @module
  */

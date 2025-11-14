@@ -118,7 +118,8 @@ export class Watchable<E extends WatchableEventMap = WatchableEventMap, T extend
     /**
      * This is useful for things such as Float32Arrays that may be changed by gl-matrix or other libraries and we don't want to hinder the performance with proxies.
      *
-     * Developer's notes: The event map is passed as an empty param because there is no way to explicitly specific generic type parameters to functions. @see https://github.com/microsoft/TypeScript/issues/27387
+     * Developer's notes: The event map is passed as an empty param because there is no way to explicitly specific generic type parameters to functions.
+     * See [Issue 27387](https://github.com/microsoft/TypeScript/issues/27387)
      *
      * @example
      * ```js

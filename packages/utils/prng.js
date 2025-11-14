@@ -16,8 +16,8 @@
  * console.log(prng.nextFloat()); // Get a pseudo-random float in [0, 1)
  * ```
  *
- * @see https://en.wikipedia.org/wiki/Linear_congruential_generator
- * Modified from https://gist.github.com/blixt/f17b47c62508be59987b
+ * [Linear Congruential Generator](https://en.wikipedia.org/wiki/Linear_congruential_generator)
+ * Modified from [blixt](ttps://gist.github.com/blixt/f17b47c62508be59987b)
  */
 export class PRNG {
     #seed;

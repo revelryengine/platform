@@ -1,7 +1,7 @@
 /**
  * The root object for a glTF asset.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-gltf
+ * [Reference Spec - glTF](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-gltf)
  *
  * @module
  */
@@ -245,9 +245,11 @@ export class GLTF extends GLTFProperty {
 
     /**
      * Fetches a glTF file from a URL, then fetches all binary data, and returns a new GLTF instance.
+     *
+     * [Reference Spec - glb File Format](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
+     *
      * @param {string|URL} url - The URL of the glTF file to be loaded.
      * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
-     * @see https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
      */
     static async load(url, signal) {
         const response = await fetch(url, { signal });
@@ -257,10 +259,12 @@ export class GLTF extends GLTFProperty {
 
     /**
      * Returns a new GLTF instance.
+     *
+     * [Reference Spec - glb File Format](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
+     *
      * @param {ArrayBuffer} buffer - The buffer to parse the file from.
      * @param {string|URL} uri - The URI where the file was loaded from. Used for relative file references.
      * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
-     * @see https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
      */
     static async loadFromBuffer(buffer, uri, signal) {
         const header = new Uint32Array(buffer, 0, 4);

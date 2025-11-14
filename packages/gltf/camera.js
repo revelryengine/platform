@@ -1,7 +1,7 @@
 /**
  * A camera's projection. A node can reference a camera to apply a transform to place the camera in the scene.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera
+ * [Reference Spec - Camera](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera)
  *
  * @module
  */

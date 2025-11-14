@@ -261,10 +261,11 @@ export class GLTFProperty {
 
     /**
      * Resolves a JSON Pointer within the context of a GLTFProperty.
+     *
+     * [Reference Spec - Pointers](https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/ObjectModel.adoc#4-core-pointers)
+     *
      * @param {Record<string, any>} root - The root glTF object
      * @param {string} pointer - The JSON Pointer string
-     *
-     * @see https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/ObjectModel.adoc#4-core-pointers
      */
     static #unmarshallJSONPointerResolver(root, pointer) {
         /**

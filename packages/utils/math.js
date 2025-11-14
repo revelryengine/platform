@@ -35,9 +35,10 @@ export const NORMALIZER_TYPES = /** @type {const} */({
 
 /**
  * Normalizers to convert from Normalized Fixed-Point to Floating-Point
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#animations
- * @see https://registry.khronos.org/vulkan/specs/1.0/html/vkspec.html#fundamentals-fixedfpconv
- * @see https://learn.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-data-conversion?redirectedfrom=MSDN#integer_conversion
+ *
+ * [glTF Spec - Animations](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#animations)
+ * [Vulkan Spec](https://registry.khronos.org/vulkan/specs/1.0/html/vkspec.html#fundamentals-fixedfpconv)
+ * [Direct3d Data Conversion Rules](https://learn.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-data-conversion?redirectedfrom=MSDN#integer_conversion)
  */
 export const normalizers = /** @type {const} */({
     /** WebGL2RenderingContext.FLOAT normalizer */
@@ -74,7 +75,9 @@ export function float16(h) {
 
 /**
  * Rounds up to the nearest specified increment
- * @see https://www.w3.org/TR/WGSL/#roundup
+ *
+ * [WGSL Spec roundUp](https://www.w3.org/TR/WGSL/#roundup)
+ *
  * @param {number} k - The increment to round up to
  * @param {number} n - The number to round up
  * @return {number}
@@ -100,9 +103,12 @@ export function nearestUpperPowerOf2(v) {
 
 /**
  * Modulus with support for negative numbers
+ *
+ * [Modulo Bug](https://web.archive.org/web/20090717035140if_/javascript.about.com/od/problemsolving/a/modulobug.htm)
+ *
  * @param {number} n - The dividend
  * @param {number} m - The divisor
- * @see https://web.archive.org/web/20090717035140if_/javascript.about.com/od/problemsolving/a/modulobug.htm
+ *
  */
 export function mod(n, m) {
     return ((n % m) + m) % m;

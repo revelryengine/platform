@@ -3,7 +3,7 @@
 /**
  * In this extension, a new emissiveStrength scalar factor is supplied, that governs the upper limit of emissive strength per material.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_emissive_strength
+ * [Reference Spec - KHR_materials_emissive_strength](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_emissive_strength)
  *
  * @module
  */

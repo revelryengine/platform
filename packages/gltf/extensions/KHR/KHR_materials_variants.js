@@ -3,7 +3,7 @@
 /**
  * For a glTF asset, a material variant represents a combination of materials that can be applied in unison to a set of primitives based on mappings.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_variants#variants
+ * [Reference Spec - KHR_materials_variants#variants](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_variants#variants)
  *
  * @module
  */
@@ -176,9 +176,7 @@ export class MeshPrimitiveKHRMaterialsVariantsMapping extends NamedGLTFProperty 
  */
 
 /**
- * For a given primitive, each mapping item represents a material that should be applied to the primitive when one of its variants is active.
- *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_variants#mappings
+ * KHR_materials_variants class representation for mesh primitives.
  */
 export class MeshPrimitiveKHRMaterialsVariants extends GLTFProperty {
     /**

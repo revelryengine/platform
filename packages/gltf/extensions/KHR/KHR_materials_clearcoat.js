@@ -3,7 +3,7 @@
 /**
  * This extension defines a clear coating that can be layered on top of an existing glTF material definition.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_clearcoat
+ * [Reference Spec - KHR_materials_clearcoat](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_clearcoat)
  *
  * @module
  */

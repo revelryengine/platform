@@ -18,7 +18,7 @@
                 --link-underline-color: inherit;
                 --link-underline-color-hover: var(--theme-color);
 
-                --content-max-width: 100ch;
+                --content-max-width: 1024px;
 
                 --table-row-alt-bg: var(--color-bg);
             }
@@ -67,6 +67,13 @@
                 border-top: 1px solid var(--theme-color);
             }
 
+            /* Adjust active link style */
+            .sidebar-nav .active > a:first-child {
+                color: var(--color-text);
+                text-decoration: underline;
+                text-decoration-color: var(--theme-color);
+                text-decoration-thickness: 2px;
+            }
 
             /* Reverse order of hardcoded sidebar items */
             li:has(.app-sub-sidebar) {
@@ -83,8 +90,8 @@
             }
 
             /* Prevent jitter when navigating sections that have interleaved sidebar and headers */
-            .sidebar-nav .active .group {
-                margin-top: 0;
+            :is(.sidebar-nav) ul.app-sub-sidebar {
+                margin-bottom: 0;
             }
 
             iframe.sample-renderer {
@@ -95,9 +102,86 @@
                 margin-bottom: 2rem;
             }
 
+            /* Fix h6 being too small by shifting everything up */
+            .markdown-section h1 {
+                border-bottom: 2px solid var(--theme-color);
+                padding-bottom: 0.25em;
+            }
+
+            .markdown-section h2 {
+                font-size: var(--font-size-xxxl);
+            }
+
+            .markdown-section h3 {
+                font-size: var(--font-size-xxl);
+            }
+
+            .markdown-section h4 {
+                font-size: var(--font-size-xl);
+            }
+
+            .markdown-section h5 {
+                font-size: var(--font-size-l);
+            }
+
+            .markdown-section h6 {
+                font-size: var(--font-size-m);
+            }
+
             /* Fix scroll jank in sidebar on mobile */
-            body > main {
-                overflow-y: auto;
+            .markdown-section > :is(p, h1, h2, h3, h4, h5, h6) {
+                overflow-wrap: break-word;
+            }
+
+            /* Better styled tables */
+            body[data-page^="docs/lib"] .markdown-section table {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid var(--color-mono-2);
+                border-radius: var(--border-radius);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table {
+                display: grid;
+                font-size: minmax(1em, var(--font-size-m));
+            }
+
+            body[data-page^="docs/lib"] .markdown-section :is(td, th, thead tr) {
+                border: none;
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(1)) {
+                grid-template-columns: minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(2)) {
+                grid-template-columns: minmax(200px, auto) minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(3)) {
+                grid-template-columns: minmax(200px, auto) minmax(200px, auto) minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(4)) {
+                grid-template-columns: minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(5)) {
+                grid-template-columns: minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section table:has(th:last-child:nth-child(6)) {
+                grid-template-columns: minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto) minmax(200px, auto);
+            }
+
+            body[data-page^="docs/lib"] .markdown-section :is(thead, tbody, tr) {
+                display: grid;
+                grid-template-columns: subgrid;
+                grid-column: 1 / -1;
+            }
+
+            body[data-page^="docs/lib"] .markdown-section :is(thead, tbody) p {
+                overflow-wrap: break-word;
             }
         </style>
     </head>
@@ -112,6 +196,7 @@
                 subMaxLevel: 3,
                 relativePath: true,
                 auto2top: true,
+                repo: 'https://github.com/revelryengine/platform',
                 // noCompileLinks: [
                 //     '/viewer/',
                 // ],
@@ -125,8 +210,6 @@
                     paths: [
                         '/about/features',
                         '/about/intro',
-                        '/getting-started/editor',
-                        '/docs/README',
                     ],
                     placeholder: 'Search documentation...',
                     noData: 'No results found.',
@@ -134,7 +217,8 @@
                 },
                 pagination: {
                     crossChapter: true,
-                }
+                },
+                pathNamespaces: ['^/docs/lib/(utils|gltf)'],
             };
         </script>
 
@@ -146,9 +230,8 @@
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-bash.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30/components/prism-json.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
 
-        <script src="/docs/packages/utils/docsify-plugin.js"></script>
-        <script src="/docs/packages/gltf/docsify-plugin.js"></script>
+        <script src="/docs/lib/docsify-plugin.js"></script>
     </body>
 </html>

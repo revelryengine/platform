@@ -3,7 +3,7 @@
  * An accessor provides a typed view into a bufferView or a subset of a bufferView similar
  * to how WebGL's vertexAttribPointer() defines an attribute in a buffer.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor
+ * [Reference Spec - Accessor](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor)
  *
  * @module
  */
@@ -284,7 +284,6 @@ export class Accessor extends NamedGLTFProperty {
      * Returns the typed ArrayBuffer for the componentType. (Int8Array, Uint8Array, Int16Array, Uint16Array, Uint32Array,
      * or Float32Array)
      * This array will not be useful for interleaved attributes
-     * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessors
      */
     getTypedArray() {
         if(!this.#typedArray) throw new Error('Invalid State');
@@ -294,7 +293,6 @@ export class Accessor extends NamedGLTFProperty {
 
     /**
      * Returns the number of bytes for the componentType. (1, 2, or 4)
-     * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessor
      */
     getNumberOfBytes() {
         return BYTES_PER_COMPONENT[this.componentType];
@@ -302,7 +300,6 @@ export class Accessor extends NamedGLTFProperty {
 
     /**
      * Returns the number of components for the type. (1, 2, 3, 4, 9 or 16)
-     * @see https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessor
      */
     getNumberOfComponents() {
         return COMPONENTS_PER_TYPE[this.type];

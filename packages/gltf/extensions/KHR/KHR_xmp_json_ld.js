@@ -3,7 +3,7 @@
 /**
  * This extension adds support for XMP (Extensible Metadata Platform) (ISO 16684-1) metadata to glTF.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_xmp_json_ld
+ * [Reference Spec - KHR_xmp_json_ld](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_xmp_json_ld)
  *
  * @module
  */

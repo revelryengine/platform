@@ -1,7 +1,7 @@
 /**
  * Sparse storage of attributes that deviate from their initialization value.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse
+ * [Reference Spec - Accessor Sparse](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse)
  *
  * @module
  */

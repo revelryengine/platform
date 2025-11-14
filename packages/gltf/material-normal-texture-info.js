@@ -1,7 +1,7 @@
 /**
  * Reference to a texture.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-normaltextureinfo
+ * [Reference Spec - Material Normal Texture Info](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-normaltextureinfo)
  *
  * @module
  */

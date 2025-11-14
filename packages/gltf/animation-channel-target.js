@@ -1,7 +1,7 @@
 /**
  * The descriptor of the animated property.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-channel-target
+ * [Reference Spec - Animation Channel Target](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-channel-target)
  *
  * @module
  */

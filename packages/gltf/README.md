@@ -71,7 +71,7 @@ console.log(buffer.getArrayBuffer()); // ArrayBuffer ready for GPU upload
 
 // Images are loaded and ready to create textures
 const image = gltf.images[0];
-console.log(image.blob); // Blob ready for texture creation
+console.log(image.getImageData()); // Image data ready for texture creation
 
 // Accessors provide typed views into buffer data
 const accessor = gltf.accessors[0];
@@ -162,7 +162,7 @@ if (gltf.extensions.KHR_lights_punctual) {
 
 ### Adding a new gltf extensions from your project
 
-Follow the [Adding Extensions Guide](https://github.com/revelryengine/platform/blob/main/packages/gltf/DEVELOP.md#adding-extensions)
+Follow the [Adding Extensions Guide](./DEVELOP.md#adding-extensions)
 
 The process is mostly the same with two key diffreences. 
 
@@ -183,6 +183,6 @@ import { registry     } from 'revelryengine/gltf/extensions/registry.js';
 
 ## Contributing
 
-See the [Development Guide](https://github.com/revelryengine/platform/blob/main/packages/gltf/DEVELOP.md) for details on how to contribute to this library.
+See the [Development Guide](./DEVELOP.md) for details on how to contribute to this library.
 
 

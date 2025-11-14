@@ -1,7 +1,7 @@
 /**
  * The root nodes of a scene.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-scene
+ * [Reference Spec - Scene](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-scene)
  *
  * @module
  */

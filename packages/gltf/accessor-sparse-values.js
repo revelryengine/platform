@@ -5,7 +5,7 @@
  * The elements have the same component type as the base accessor.
  * The elements are tightly packed. Data MUST be aligned following the same rules as the base accessor.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-values
+ * [Reference Spec - Accessor Sparse Values](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-values)
  *
  * @module
  */

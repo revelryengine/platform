@@ -1,7 +1,7 @@
 /**
  * A perspective camera containing properties to create a perspective projection matrix.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera-perspective
+ * [Reference Spec - Camera Perspective](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-camera-perspective)
  *
  * @module
  */

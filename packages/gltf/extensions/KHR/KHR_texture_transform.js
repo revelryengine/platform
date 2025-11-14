@@ -3,14 +3,14 @@
 /**
  * This extension adds offset, rotation, and scale properties to textureInfo structures. These properties would typically be implemented as an affine transform on the UV coordinates.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_transform
+ * [Reference Spec - KHR_texture_transform](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_transform)
  *
  * @module
  */
 
 import { GLTFProperty } from '../../gltf-property.js';
 import { registry     } from '../registry.js';
-import { mat3         } from "revelryengine/deps/gl-matrix.js";
+import { mat3         } from 'revelryengine/deps/gl-matrix.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';

@@ -1,7 +1,7 @@
 /**
  * A set of primitives to be rendered. Its global transform is defined by a node that references it.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-mesh
+ * [Reference Spec - Mesh](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-mesh)
  *
  * @module
  */

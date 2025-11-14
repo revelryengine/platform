@@ -3,7 +3,7 @@
 /**
  * This extension allows for the addition of spatialized and non-spatialized audio to glTF scenes.
  *
- * @see https://github.com/KhronosGroup/glTF/blob/3bed830e001187246d75186b83f5b2469d416f36/extensions/2.0/Khronos/KHR_audio/README.md
+ * [Reference Spec - KHR_audio](https://github.com/KhronosGroup/glTF/blob/3bed830e001187246d75186b83f5b2469d416f36/extensions/2.0/Khronos/KHR_audio)
  *
  * @module
  */

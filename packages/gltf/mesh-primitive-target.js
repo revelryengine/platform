@@ -1,7 +1,7 @@
 /**
  * A morph target is a morphable Mesh where the primitives' attributes are obtained by adding the original attributes to a weighted sum of the target’s attributes.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#morph-targets
+ * [Reference Spec - Morph Targets](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#morph-targets)
  *
  * @module
  */

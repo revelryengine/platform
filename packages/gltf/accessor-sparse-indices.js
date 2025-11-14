@@ -3,7 +3,7 @@
  * An object pointing to a buffer view containing the indices of deviating accessor values.
  * The number of indices is equal to accessor.sparse.count. Indices MUST strictly increase.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-indices
+ * [Reference Spec - Accessor Sparse Indices](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-accessor-sparse-indices)
  *
  * @module
  */

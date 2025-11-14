@@ -3,7 +3,7 @@
 /**
  * This extension adds the ability to specify textures using KTX v2 images with Basis Universal supercompression.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_basisu
+ * [Reference Spec - KHR_texture_basisu](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_basisu)
  *
  * @module
  */

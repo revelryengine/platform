@@ -3,7 +3,7 @@
  * @module
  */
 
-import { BasisUFactory } from "revelryengine/deps/basis_universal.js";
+import { BasisUFactory } from 'revelryengine/deps/basis_universal.js';
 
 const basis = await BasisUFactory();
 

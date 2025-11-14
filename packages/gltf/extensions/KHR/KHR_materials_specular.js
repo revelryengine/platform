@@ -3,7 +3,7 @@
 /**
  * This extension adds two parameters to the metallic-roughness material: specular and specularColor.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_specular
+ * [Reference Spec - KHR_materials_specular](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_specular)
  *
  * @module
  */

@@ -3,7 +3,7 @@
 /**
  * This extension defines a sheen that can be layered on top of an existing glTF material definition.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_sheen
+ * [Reference Spec - KHR_materials_sheen](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_sheen)
  *
  * @module
  */

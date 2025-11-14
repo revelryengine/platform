@@ -1,7 +1,7 @@
 /**
  * An animation channel combines an animation sampler with a target property being animated.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-channel
+ * [Reference Spec - Animation Channel](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-animation-channel)
  *
  * @module
  */

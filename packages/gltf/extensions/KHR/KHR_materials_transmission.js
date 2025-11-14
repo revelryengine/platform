@@ -3,7 +3,7 @@
 /**
  * A transparent material is defined by adding the KHR_materials_transmission extension to any glTF material.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_transmission
+ * [Reference Spec - KHR_materials_transmission](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_transmission)
  *
  * @module
  */

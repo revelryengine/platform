@@ -2,7 +2,9 @@
 
 /**
  * This extension allows glTF assets to use WebP as a valid image format.
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/EXT_texture_webp
+ *
+ * [Reference Spec - EXT_texture_webp](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Vendor/EXT_texture_webp)
+ *
  * @module
  */
 

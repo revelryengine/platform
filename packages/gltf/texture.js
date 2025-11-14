@@ -1,7 +1,7 @@
 /**
  * A texture and its sampler.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-texture
+ * [Reference Spec - Texture](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-texture)
  *
  * @module
  */
@@ -28,7 +28,6 @@ import { Sampler           } from './sampler.js';
 export class Texture extends NamedGLTFProperty {
     /**
      * Boolean to indicate that texture uses sRGB transfer function
-     * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#metallic-roughness-material
      */
     #sRGB = false;
 
@@ -84,8 +83,6 @@ export class Texture extends NamedGLTFProperty {
 
     /**
      * Set this to true indicate that texture uses sRGB transfer function
-     * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#metallic-roughness-material
-     *
      * @param {boolean} v - Whether this texture uses sRGB transfer function.
      */
     set sRGB(v) {

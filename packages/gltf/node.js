@@ -1,7 +1,7 @@
 /**
  * A node in the node hierarchy.
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-node
+ * [Reference Spec - Node](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-node)
  *
  * @module
  */

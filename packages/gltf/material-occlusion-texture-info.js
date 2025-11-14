@@ -1,7 +1,7 @@
 /**
  * A reference to a texture
  *
- * @see https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-occlusiontextureinfo
+ * [Reference Spec - Material Occlusion Texture Info](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-occlusiontextureinfo)
  *
  * @module
  */

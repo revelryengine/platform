@@ -1,5 +1,5 @@
 /**
- * @import { DracoDecoderModule, DecoderModule } from 'npm:@types/draco3d';
+ * @import { DracoDecoderModule, DecoderModule } from 'draco3d@ts-types';
  */
 
 /**

@@ -6,7 +6,7 @@
  * The mesh to which the material is attached defines the boundaries of an homogeneous medium and therefore must be manifold.
  * Volumes provide effects like refraction, absorption and scattering. Scattering is not subject of this extension.
  *
- * @see https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_volume
+ * [Reference Spec - KHR_materials_volume](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_volume)
  *
  * @module
  */

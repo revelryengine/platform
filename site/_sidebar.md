@@ -7,9 +7,8 @@
 
 - Getting Started
 
-  - [Documentation](/docs/ ":class=no-chevron")
+  - [Documentation](/docs/lib/ ":class=no-chevron")
 
 - Samples
 
   - [Renderer](/viewer/)
-

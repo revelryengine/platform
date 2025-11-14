@@ -1,7 +1,7 @@
 /**
  * A buffer points to binary geometry, animation, or skins.
  *
- * @see https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffer
+ * [Reference Spec - Buffer](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-buffer)
  *
  * @module
  */
