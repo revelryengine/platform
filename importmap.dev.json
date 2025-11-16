@@ -3,8 +3,8 @@
         "revelryengine/":         "./packages/",
         "revelryengine/deps/":    "./deps/",
         "revelryengine/samples/": "./samples/",
-        "bdd": "./test/bdd.js",
 
+        "bdd": "./test/bdd.js",
         "vue": "npm:vue@3.5.24",
         "vue/server-renderer": "npm:vue@3.5.24/server-renderer",
         "vitepress/theme": "npm:vitepress@next/theme"

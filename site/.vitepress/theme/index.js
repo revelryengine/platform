@@ -1,7 +1,7 @@
 // https://vitepress.dev/guide/custom-theme
-import { h } from 'vue'
+import { h } from 'vue';
 import DefaultTheme from 'vitepress/theme';
-import './style.css'
+import './style.css';
 
 /**
  * @import { Theme } from 'npm:vitepress@next'

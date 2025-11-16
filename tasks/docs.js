@@ -6,6 +6,7 @@ import * as typedoc from 'npm:typedoc@0.28.14';
 import { MarkdownPageEvent } from 'npm:typedoc-plugin-markdown@4.9.0';
 import 'npm:typedoc-plugin-mdn-links@5.0.10';
 import 'npm:typedoc-plugin-merge-modules@7.0.0';
+import 'npm:typedoc-vitepress-theme@1.1.2';
 
 /**
  * @import { TypeDocOptions } from 'npm:typedoc@0.28.14';
@@ -32,7 +33,6 @@ const EXIT_FLAGS = {
 
 const root = `./site/reference/lib`;
 
-
 const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOptions & PluginOptions} */({
     name: 'revelryengine' ,
     entryPointStrategy: 'resolve',
@@ -40,6 +40,8 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
     entryPoints: [
         `packages/{${packages.join(',')}}/**/*.{js,ts}`,
     ],
+    out: root,
+    docsRoot: './site',
     compilerOptions: {
         checkJs: true,
         target: 'esnext',
@@ -57,22 +59,12 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
         notDocumented: true,
     },
     treatValidationWarningsAsErrors: true,
-    outputs: [
-        {
-            name: 'markdown',
-            path: `${root}`
-        },
-        {
-            name: 'json',
-            path: `${root}/typedoc.json`
-        }
-    ],
-
     router: 'module',
     plugin: [
         'typedoc-plugin-mdn-links',
         'typedoc-plugin-merge-modules',
         'typedoc-plugin-markdown',
+        'typedoc-vitepress-theme',
     ],
     requiredToBeDocumented: [
         'Module',
@@ -103,6 +95,7 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
     classPropertiesFormat: 'htmlTable',
     propertyMembersFormat: 'htmlTable',
     typeDeclarationFormat: 'htmlTable',
+    indexFormat: 'htmlTable',
     tableColumnSettings: {
         hideDefaults: false,
         hideInherited: false,
@@ -115,9 +108,9 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
     expandParameters: true,
     expandObjects: true,
     hidePageHeader: true,
-    navigationJson: `${root}/_navigation.json`,
+    // navigationJson: `${root}/_navigation.json`,
     // hidePageTitle: true,
-    readme: 'none',
+    mergeReadme: true,
     hideBreadcrumbs: true,
     useFirstParagraphOfCommentAsSummary: true,
 
@@ -138,6 +131,7 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
             RequestInit: 'https://developer.mozilla.org/en-US/docs/Web/API/RequestInit',
             LockOptions: 'https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request#options',
             LockGrantedCallback: 'https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request#callback',
+            Transferable: 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects',
         }
     },
     exclude: [
@@ -160,17 +154,10 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
         'utils/set-map.SetMap.constructor.T',
         'utils/weak-cache.WeakCache.constructor.T',
     ],
+
 }));
 
 app.renderer.on(MarkdownPageEvent.BEGIN, output => {
-    // if(output.model.name === name) { // Add extension to module file names
-    //     // @ts-expect-error - Markdown plugin types are incorrect
-    //     for (const child of output.model.children ?? []) {
-    //         // Detect extension from source file
-    //         const ext = child.sources?.[0]?.fileName?.endsWith('.d.ts') ? '.d.ts' : '.js';
-    //         child.name = `${child.name}${ext}`;
-    //     }
-    // }
     // @ts-expect-error - Markdown plugin types are incorrect
     if(output.model.kind === typedoc.ReflectionKind.Module) {
         let root = 'revelryengine/';
@@ -216,17 +203,7 @@ app.renderer.on(MarkdownPageEvent.BEGIN, output => {
     }
 });
 app.renderer.on(MarkdownPageEvent.END, output => {
-    // // Add `<!-- {docsify-ignore} -->` to Modules section of main index page
-    // // @ts-expect-error - Markdown plugin types are incorrect
-    // if(output.model.kind === typedoc.ReflectionKind.Project) {
-    //     output.contents = output.contents?.replace(/^(## Modules)$/m, '$1 <!-- {docsify-ignore} -->');
-    // }
-    // // Add `<!-- {docsify-ignore-all} -->` to the top of each module index file to prevent docsify from rendering the headers in the side bar
-    // // @ts-expect-error - Markdown plugin types are incorrect
-    // if(output.model.kind === typedoc.ReflectionKind.Module) {
-    //     output.contents = output.contents?.replace((/^#(.*)$/m), '#$1 <!-- {docsify-ignore-all} -->');
-    // }
-    // Inject import example on second line
+    // Inject import example
     // @ts-expect-error - Markdown plugin types are incorrect
     if(output.model.kind !== typedoc.ReflectionKind.Project && output.model.kind !== typedoc.ReflectionKind.Module) {
 
@@ -283,107 +260,27 @@ if (project) {
         const destPath = Path.join(`${root}/`, relativePath);
         const destDir = Path.dirname(destPath);
         await Deno.mkdir(destDir, { recursive: true });
-        await Deno.copyFile(entry.path, destPath);
+        await Deno.copyFile(entry.path, destPath.replace('README.md', 'index.md'));
     }
-
-    const json = JSON.parse(await Deno.readTextFile(`${root}/typedoc.json`));
-    const descriptions = /** @type {Record<string, string>} */({});
-    for(const entry of json.children) {
-        descriptions[entry.name] = entry.comment?.summary?.[0]?.text ?? '';
-    }
-
-    // const documents = [];
-    // for await (const entry of expandGlob(`./site/reference/lib/**/*.md`)) {
-    //     const relativePath = Path.relative(`./site/`, entry.path);
-    //     documents.push(relativePath);
-    // }
-    // // Create docsify plugin for indexing the docs pages
-    // await Deno.writeTextFile(`${root}/docsify-plugin.js`, /* javascript */`
-    //     // @ts-nocheck - generated file
-    //     globalThis.$docsify ??= {};
-    //     $docsify.plugins = [(hook, vm) => {
-    //         hook.init(() => {
-    //             vm.config.search ??= {};
-    //             vm.config.search.paths ??= [];
-    //             vm.config.search.paths.push(
-    //                 ${documents.map(path => `'/${path.replaceAll('\\', '/')}'`).join(',\n                    ')}
-    //             );
-    //         });
-    //     }, ...($docsify.plugins ?? [])]
-    // `);
-
-    // Create a sidebar config for each package
-    const navigation = /** @type {NavigationEntry[]} */(JSON.parse(await Deno.readTextFile(`${root}/_navigation.json`)));
 
     /**
      * @typedef {{text: string, link?: string, collapsed?: boolean, items?: SidebarEntry[]}} SidebarEntry
      */
-    /**
-     *
-     * @param {NavigationEntry} entry
-     * @returns {SidebarEntry}
-     */
-    const sidebarEntry = (entry) => {
-        const result = /** @type {SidebarEntry} */({
-            text: entry.title,
-            items: entry.children?.map(child => sidebarEntry(child)).sort((a, b) => {
+
+    // Sort sidebar entries by folder and name
+    const sidebarPath = `${root}/typedoc-sidebar.json`;
+    const sidebar = /** @type {SidebarEntry[]}} */(JSON.parse(await Deno.readTextFile(sidebarPath)));
+    const search = [...sidebar];
+    while(search.length > 0) {
+        const entry = search.shift();
+        if(entry?.items) {
+            search.push(...entry.items);
+            entry.items.sort((a, b) => {
                 return (Number(!!b?.items?.length) - Number(!!a?.items?.length)) || a.text.localeCompare(b.text)
-            }),
-        });
-        if(entry.path) {
-            result.link = `/reference/lib/${entry.path}`;
+            });
         }
-        if(entry.children?.length) {
-            result.collapsed = true;
-        }
-        return result;
     }
-
-    for(const pkg of packages) {
-        const pkgNav = navigation.find(entry => entry.title === pkg);
-        if(!pkgNav) continue;
-
-        const sidebar = sidebarEntry(pkgNav);
-        sidebar.link = `/reference/lib/${pkg}/README.md`;
-
-        // const modules = [];
-
-        // const search = [...(pkgNav?.children ?? [])];
-        // while (search.length > 0) {
-        //     const entry = search.shift();
-
-        //     if(entry?.children) {
-        //         search.push(...entry.children);
-        //     }
-        //     if(entry?.path && entry.path.endsWith('.md')) {
-        //         modules.push({ ...entry, description: descriptions[entry.path.replace('.md', '')] ?? '' } );
-        //     }
-        // }
-
-        // const moduleGroups = Object.groupBy(modules, mod => {
-        //     return mod.path.split('/').slice(0, -2).join('/');
-        // });
-
-        // // Generate _sidebar.md for pkg
-        // const contents = [
-        //     '---',,
-        //     `title: ${pkg}`,
-        //     'sidebar:',
-        //     '  ',
-        //     `- [**Documentation**](/docs/lib/ ":class=no-chevron :class=non-collapsible")`,
-        //     `  - [revelryengine/${pkg}](./ ":class=no-chevron :class=non-collapsible")`,
-        //     `    - [Modules](./?id=modules ":class=no-chevron :class=non-collapsible")`,
-        //     ...Object.entries(moduleGroups).map(([folder, modules]) => {
-        //         return [
-        //             `      - **${folder}**`,
-        //             ...modules?.map(entry => {
-        //                 return `        - [${entry.path.split('/').at(-1)?.replace('.md', '')}](/docs/lib/${entry.path} ":class=non-collapsible")`;
-        //             }) ?? [],
-        //         ]
-        //     }).flat(),
-        // ].join('\n') + '\n' + await Deno.readTextFile(`${root}/${pkg}/README.md`);
-        await Deno.writeTextFile(`${root}/${pkg}/_sidebar.json`, JSON.stringify(sidebar, null, 4));
-    }
+    await Deno.writeTextFile(sidebarPath, JSON.stringify(sidebar, null, 4));
 } else {
     console.error('Failed to generate docs.');
     Deno.exit(EXIT_FLAGS.UnknownError);

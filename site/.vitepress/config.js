@@ -1,7 +1,6 @@
 import { defineConfig } from 'npm:vitepress@next';
 
-import utilsSidebar from '../reference/lib/utils/_sidebar.json' with { type: 'json' };
-import gltfSidebar  from '../reference/lib/gltf/_sidebar.json'  with { type: 'json' };
+import referenceSidebar from '../reference/lib/typedoc-sidebar.json' with { type: 'json' };
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -22,14 +21,14 @@ export default defineConfig({
         nav: [
             { text: 'Guide', items: [
                 { text: 'Getting Started', link: '/guide/getting-started' },
-                { text: 'Introduction', link: '/guide/introduction' },
-                { text: 'Features', link: '/guide/features' },
+                { text: 'Introduction',    link: '/guide/introduction'    },
+                { text: 'Features',        link: '/guide/features'        },
             ] },
             { text: 'Reference', items: [
                 { text: 'Libraries', items: [
-                    { text: 'Usage', link: '/reference/lib/README.md' },
-                    { text: 'GLTF',  link: '/reference/lib/gltf/README.md' },
-                    { text: 'Utils', link: '/reference/lib/utils/README.md' },
+                    { text: 'Usage', link: '/reference/lib/' },
+                    { text: 'GLTF',  link: '/reference/lib/gltf/' },
+                    { text: 'Utils', link: '/reference/lib/utils/' },
                 ] }
             ] },
         ],
@@ -38,15 +37,11 @@ export default defineConfig({
             '/guide/': [
                 { text: 'Guide', items: [
                     { text: 'Getting Started', link: '/guide/getting-started' },
-                    { text: 'Introduction', link: '/guide/introduction' },
-                    { text: 'Features', link: '/guide/features' },
+                    { text: 'Introduction',    link: '/guide/introduction'    },
+                    { text: 'Features',        link: '/guide/features'        },
                 ] },
             ],
-            '/reference/lib/': [
-                { text: 'Library Usage', link: '/reference/lib/README.md' },
-                gltfSidebar,
-                utilsSidebar,
-            ],
+            '/reference/lib/': referenceSidebar,
         },
         socialLinks: [
             { icon: 'github', link: 'https://github.com/revelryengine/platform' },

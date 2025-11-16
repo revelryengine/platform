@@ -207,7 +207,7 @@ The `import()` type syntax dynamically imports types from your implementation fi
 
 Now we create the actual JavaScript implementation with JSDoc type annotations.
 
-**`extensions/EXT/EXT_example.js`**
+**`EXT/EXT_example.js`**
 ```js
 /// <reference path="./EXT_example.types.d.ts" />
 // This triple-slash directive tells TypeScript and IDEs to load the type definitions.
@@ -218,8 +218,7 @@ Now we create the actual JavaScript implementation with JSDoc type annotations.
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
@@ -284,7 +283,7 @@ export class NodeEXTExample extends GLTFProperty {
  * Register the extension with the glTF property system.
  * This is the critical step that tells Revelry Engine how to handle this extension.
  */
-registry.add('EXT_example', {
+GLTFProperty.extensions.add('EXT_example', {
     schema: {
         Node: NodeEXTExample, // When node.extensions.EXT_example is encountered, create a NodeEXTExample instance
     },
@@ -295,21 +294,21 @@ registry.add('EXT_example', {
 
 - **`GLTFProperty` base class**: All extension classes extend `GLTFProperty`, which provides common functionality like extensions support and JSON serialization.
 - **`fromJSON` method**: This is how the glTF loader knows how to construct your class from JSON. The `unmarshall` method handles references to other glTF objects (like textures, nodes, buffers) automatically.
-- **Registry pattern**: The `registry.add()` call maps the extension name to the class constructor. The schema object indicates which glTF property type (Node, Material, TextureInfo, etc.) this extension attaches to.
+- **Registry pattern**: The `GLTFProperty.extensions.add()` call maps the extension name to the class constructor. The schema object indicates which glTF property type (Node, Material, TextureInfo, etc.) this extension attaches to.
 
 ### Step 3: Register in the Extensions Module
 
 Add an export to ensure your extension is loaded when the library initializes.
 
-**`extensions/extensions.js`**
+**`extensions.js`**
 ```js
 ...
 export * from './EXT/EXT_example.js';
 ```
 
 This export has two effects: 
-1. It executes the `registry.add()` call in your implementation file, registering the extension with the system
-2. It makes `NodeEXTExample` available when users import from `revelryengine/gltf/gltf.js` (since `gltf.js` re-exports everything from `extensions/extensions.js`)
+1. It executes the `GLTFProperty.extensions.add()` call in your implementation file, registering the extension with the system
+2. It makes `NodeEXTExample` available when users import from `revelryengine/gltf/gltf.js` (since `gltf.js` re-exports everything from `extensions.js`)
 
 ### Step 4: Using Your Extension
 
