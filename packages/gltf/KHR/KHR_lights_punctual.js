@@ -8,11 +8,10 @@
  * @module
  */
 
-import { GLTFProperty, NamedGLTFProperty } from '../../gltf-property.js';
-import { registry                        } from '../registry.js';
+import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import {
  *  khrLightsPunctualExtensions, KHRLightsPunctualExtensions,
  *  khrLightsPunctualLightExtensions, KHRLightsPunctualLightExtensions,
@@ -240,7 +239,7 @@ export class NodeKHRLightsPunctual extends GLTFProperty {
     };
 }
 
-registry.add('KHR_lights_punctual', {
+GLTFProperty.extensions.add('KHR_lights_punctual', {
     schema: {
         GLTF: KHRLightsPunctual,
         Node: NodeKHRLightsPunctual,

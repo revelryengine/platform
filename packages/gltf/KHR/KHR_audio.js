@@ -8,12 +8,11 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { BufferView   } from '../../buffer-view.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
+import { BufferView   } from '../buffer-view.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData,FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData,FromJSONGraph } from '../gltf-property.js';
  * @import {
  *  khrAudioExtensions, KHRAudioExtensions,
  *  khrAudioAudioExtensions, KHRAudioAudioExtensions,
@@ -519,7 +518,7 @@ export class SceneKHRAudio extends GLTFProperty {
     }
 }
 
-registry.add('KHR_audio', {
+GLTFProperty.extensions.add('KHR_audio', {
     schema: {
         GLTF:  KHRAudio,
         Node:  NodeKHRAudio,

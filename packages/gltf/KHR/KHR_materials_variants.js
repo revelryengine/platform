@@ -8,12 +8,11 @@
  * @module
  */
 
-import { GLTFProperty, NamedGLTFProperty } from '../../gltf-property.js';
-import { Material                        } from '../../material.js';
-import { registry                        } from '../registry.js';
+import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
+import { Material                        } from '../material.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import {
  *  khrMaterialsVariantsExtensions, KHRMaterialsVariantsExtensions,
  *  khrMaterialsVariantsVariantExtensions, KHRMaterialsVariantsVariantExtensions,
@@ -215,7 +214,7 @@ export class MeshPrimitiveKHRMaterialsVariants extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_variants', {
+GLTFProperty.extensions.add('KHR_materials_variants', {
     schema: {
         GLTF:          KHRMaterialsVariants,
         MeshPrimitive: MeshPrimitiveKHRMaterialsVariants,

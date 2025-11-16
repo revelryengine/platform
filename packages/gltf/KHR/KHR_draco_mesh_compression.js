@@ -1,4 +1,4 @@
-/// <reference path="./KHR_materials_ior.types.d.ts" />
+/// <reference path="./KHR_draco_mesh_compression.types.d.ts" />
 
 /**
  * This extension defines a schema to use Draco geometry compression (non-normative) libraries in glTF format.
@@ -11,22 +11,21 @@
  * @module
  */
 
-import { GLTFProperty     } from '../../gltf-property.js';
-import { BufferView       } from '../../buffer-view.js';
-import { Accessor         } from '../../accessor.js';
-import { registry         } from '../registry.js';
+import { GLTFProperty     } from '../gltf-property.js';
+import { BufferView       } from '../buffer-view.js';
+import { Accessor         } from '../accessor.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 
 
 const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_compression.worker.js'), { count: 4, type: 'module' });
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { meshPrimitiveKHRDracoMeshCompressionExtensions, MeshPrimitiveKHRDracoMeshCompressionExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { AttributeName, meshPrimitive, MeshPrimitiveAttributeIndices, MeshPrimitiveAttributeAccessors } from '../../mesh-primitive.js';
+ * @import { AttributeName, meshPrimitive, MeshPrimitiveAttributeIndices, MeshPrimitiveAttributeAccessors } from '../mesh-primitive.js';
  */
 
 /**
@@ -154,7 +153,7 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
     }
 }
 
-registry.add('KHR_draco_mesh_compression', {
+GLTFProperty.extensions.add('KHR_draco_mesh_compression', {
     schema: {
         MeshPrimitive: MeshPrimitiveKHRDracoMeshCompression,
     },

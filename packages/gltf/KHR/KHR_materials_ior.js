@@ -8,11 +8,10 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { materialKHRMaterialsIORExtensions, MaterialKHRMaterialsIORExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -62,7 +61,7 @@ export class MaterialKHRMaterialsIOR extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_ior', {
+GLTFProperty.extensions.add('KHR_materials_ior', {
     schema: {
         Material: MaterialKHRMaterialsIOR,
     },

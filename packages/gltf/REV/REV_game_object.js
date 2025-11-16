@@ -5,11 +5,10 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { nodeREVGameObjectExtensions, NodeREVGameObjectExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -73,7 +72,7 @@ export class NodeREVGameObject extends GLTFProperty {
     }
 }
 
-registry.add('REV_game_object', {
+GLTFProperty.extensions.add('REV_game_object', {
     schema: {
         Node: NodeREVGameObject,
     },

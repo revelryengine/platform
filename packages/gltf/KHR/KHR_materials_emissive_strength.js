@@ -8,11 +8,10 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { materialKHRMaterialsEmissiveStrengthExtensions, MaterialKHRMaterialsEmissiveStrengthExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -62,7 +61,7 @@ export class MaterialKHRMaterialsEmissiveStrength extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_emissive_strength', {
+GLTFProperty.extensions.add('KHR_materials_emissive_strength', {
     schema: {
         Material: MaterialKHRMaterialsEmissiveStrength,
     },

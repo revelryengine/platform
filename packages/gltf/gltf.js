@@ -22,9 +22,6 @@ import { Scene        } from  './scene.js';
 import { Skin         } from  './skin.js';
 import { Texture      } from  './texture.js';
 
-import { registry } from './extensions/registry.js';
-import './extensions/extensions.js';
-
 import { GLTF_SUPPORTED_VERSION, GLTF_MAGIC_NUMBER_BINARY_FORMAT } from './constants.js';
 
 /**
@@ -43,7 +40,7 @@ function ensureSupport({ asset: { version, minVersion }, extensionsRequired = []
     }
 
     for(const ext of extensionsRequired) {
-        if(!registry.isSupported(ext)) {
+        if(!GLTFProperty.extensions.isSupported(ext)) {
             throw new Error(`Unsupported glTF extension ${ext}`);
         }
     }
@@ -349,5 +346,5 @@ export * from './scene.js';
 export * from './skin.js';
 export * from './texture.js';
 export * from './texture-info.js';
-export * from './extensions/registry.js';
-export * from './extensions/extensions.js';
+
+export * from './extensions.js';

@@ -10,16 +10,15 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { animationChannelTargetKHRAnimationPointerExtensions, AnimationChannelTargetKHRAnimationPointerExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { JSONPointerResolveResult } from '../../gltf-property.js';
+ * @import { JSONPointerResolveResult } from '../gltf-property.js';
  */
 /**
  * @typedef {object} animationChannelTargetKHRAnimationPointer - KHR_animation_pointer JSON representation.
@@ -68,7 +67,7 @@ export class AnimationChannelTargetKHRAnimationPointer extends GLTFProperty {
     }
 }
 
-registry.add('KHR_animation_pointer', {
+GLTFProperty.extensions.add('KHR_animation_pointer', {
     schema: {
         AnimationChannelTarget: AnimationChannelTargetKHRAnimationPointer,
     },

@@ -1,3 +1,5 @@
+/// <reference path="./extensions.types.d.ts" />
+
 /**
  * Re-exports all glTF extensions included with this library.
  * @module

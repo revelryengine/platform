@@ -8,12 +8,11 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
 import { mat3         } from 'revelryengine/deps/gl-matrix.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { textureInfoKHRTextureTransformExtensions, TextureInfoKHRTextureTransformExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -118,7 +117,7 @@ export class TextureInfoKHRTextureTransform extends GLTFProperty {
     }
 }
 
-registry.add('KHR_texture_transform', {
+GLTFProperty.extensions.add('KHR_texture_transform', {
     schema: {
         TextureInfo:                  TextureInfoKHRTextureTransform,
         MaterialNormalTextureInfo:    TextureInfoKHRTextureTransform,

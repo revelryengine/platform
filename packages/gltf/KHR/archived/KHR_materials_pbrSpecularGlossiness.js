@@ -8,17 +8,16 @@
  * @module
  */
 
-import { GLTFProperty } from '../../../gltf-property.js';
-import { TextureInfo  } from '../../../texture-info.js';
-import { registry     } from '../../registry.js';
+import { GLTFProperty } from '../../gltf-property.js';
+import { TextureInfo  } from '../../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
  * @import { materialKHRMaterialsPBRSpecularGlossinessExtensions, MaterialKHRMaterialsPBRSpecularGlossinessExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { textureInfo } from '../../../texture-info.js';
+ * @import { textureInfo } from '../../texture-info.js';
  */
 
 /**
@@ -106,7 +105,7 @@ export class MaterialKHRMaterialsPBRSpecularGlossiness extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_pbrSpecularGlossiness', {
+GLTFProperty.extensions.add('KHR_materials_pbrSpecularGlossiness', {
     schema: {
         Material: MaterialKHRMaterialsPBRSpecularGlossiness,
     },

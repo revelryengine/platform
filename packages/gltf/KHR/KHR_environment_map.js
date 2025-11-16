@@ -8,12 +8,11 @@
  * @module
  */
 
-import { GLTFProperty, NamedGLTFProperty } from '../../gltf-property.js';
-import { Image                           } from '../../image.js';
-import { registry                        } from '../registry.js';
+import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
+import { Image                           } from '../image.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import {
  *  khrEnvironmentMapExtensions, KHREnvironmentMapExtensions,
  *  khrEnvironmentMapCubemapExtensions, KHREnvironmentMapCubemapExtensions,
@@ -254,7 +253,7 @@ export class SceneKHREnvironmentMap extends GLTFProperty {
     }
 }
 
-registry.add('KHR_environment_map', {
+GLTFProperty.extensions.add('KHR_environment_map', {
     schema: {
         GLTF:  KHREnvironmentMap,
         Scene: SceneKHREnvironmentMap,

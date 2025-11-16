@@ -8,17 +8,16 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { TextureInfo  } from '../../texture-info.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
+import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { materialKHRMaterialsSheenExtensions, MaterialKHRMaterialsSheenExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { textureInfo } from '../../texture-info.js';
+ * @import { textureInfo } from '../texture-info.js';
  */
 
 /**
@@ -89,7 +88,7 @@ export class MaterialKHRMaterialsSheen extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_sheen', {
+GLTFProperty.extensions.add('KHR_materials_sheen', {
     schema: {
         Material: MaterialKHRMaterialsSheen,
     },

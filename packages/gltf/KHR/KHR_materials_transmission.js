@@ -8,17 +8,16 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { TextureInfo  } from '../../texture-info.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
+import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { materialKHRMaterialsTransmissionExtensions, MaterialKHRMaterialsTransmissionExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { textureInfo } from '../../texture-info.js';
+ * @import { textureInfo } from '../texture-info.js';
  */
 
 /**
@@ -75,7 +74,7 @@ export class MaterialKHRMaterialsTransmission extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_transmission', {
+GLTFProperty.extensions.add('KHR_materials_transmission', {
     schema: {
         Material: MaterialKHRMaterialsTransmission,
     },

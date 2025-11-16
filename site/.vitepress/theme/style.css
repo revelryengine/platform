@@ -185,4 +185,12 @@
     border-bottom: 1px solid var(--vp-c-divider);
 }
 
+.VPHero .VPImage {
+    filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.5));
+}
 
+.VPSidebarItem :is(a, p) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

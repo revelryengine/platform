@@ -8,13 +8,12 @@
  * @module
  */
 
-import { GLTFProperty     } from '../../gltf-property.js';
-import { Image            } from '../../image.js';
-import { registry         } from '../registry.js';
+import { GLTFProperty     } from '../gltf-property.js';
+import { Image            } from '../image.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { textureKHRTextureBasisuExtensions, TextureKHRTextureBasisuExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -87,7 +86,7 @@ export class TextureKHRTextureBasisu extends GLTFProperty {
     }
 }
 
-registry.add('KHR_texture_basisu', {
+GLTFProperty.extensions.add('KHR_texture_basisu', {
     schema: {
         Texture: TextureKHRTextureBasisu,
     },

@@ -8,12 +8,11 @@
  * @module
  */
 
-import { GLTFProperty } from '../../gltf-property.js';
-import { Image        } from '../../image.js';
-import { registry     } from '../registry.js';
+import { GLTFProperty } from '../gltf-property.js';
+import { Image        } from '../image.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { textureEXTTextureWebPExtensions, TextureEXTTextureWebPExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -64,7 +63,7 @@ export class TextureEXTTextureWebP extends GLTFProperty {
     }
 }
 
-registry.add('EXT_texture_webp', {
+GLTFProperty.extensions.add('EXT_texture_webp', {
     schema: {
         Texture: TextureEXTTextureWebP,
     },

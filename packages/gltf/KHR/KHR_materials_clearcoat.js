@@ -8,19 +8,18 @@
  * @module
  */
 
-import { GLTFProperty              } from '../../gltf-property.js';
-import { TextureInfo               } from '../../texture-info.js';
-import { MaterialNormalTextureInfo } from '../../material-normal-texture-info.js';
-import { registry                  } from '../registry.js';
+import { GLTFProperty              } from '../gltf-property.js';
+import { TextureInfo               } from '../texture-info.js';
+import { MaterialNormalTextureInfo } from '../material-normal-texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
  * @import { materialKHRMaterialsClearcoatExtensions, MaterialKHRMaterialsClearcoatExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
- * @import { textureInfo } from '../../texture-info.js';
- * @import { materialNormalTextureInfo } from '../../material-normal-texture-info.js';
+ * @import { textureInfo } from '../texture-info.js';
+ * @import { materialNormalTextureInfo } from '../material-normal-texture-info.js';
  */
 
 /**
@@ -99,7 +98,7 @@ export class MaterialKHRMaterialsClearcoat extends GLTFProperty {
     }
 }
 
-registry.add('KHR_materials_clearcoat', {
+GLTFProperty.extensions.add('KHR_materials_clearcoat', {
     schema: {
         Material: MaterialKHRMaterialsClearcoat,
     },

@@ -8,11 +8,10 @@
  * @module
  */
 
-import { GLTFProperty } from '../../../gltf-property.js';
-import { registry     } from '../../registry.js';
+import { GLTFProperty } from '../../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
  * @import { khrXMPExtensions, KHRXMPExtensions, objectKHRXMPExtensions, ObjectKHRXMPExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -119,7 +118,7 @@ export class ObjectKHRXMP extends GLTFProperty {
     }
 }
 
-registry.add('KHR_xmp', {
+GLTFProperty.extensions.add('KHR_xmp', {
     schema: {
         GLTF:      KHRXMP,
         Asset:     ObjectKHRXMP,

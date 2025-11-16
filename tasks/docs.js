@@ -147,9 +147,9 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
     excludeExternals: true,
     intentionallyNotDocumented: [
         /** The `@context` field is problematic and this extension is archived so it's not worth sorting out */
-        'gltf/extensions/KHR/archived/KHR_xmp.khrXMP.__type.@context',
-        'gltf/extensions/KHR/archived/KHR_xmp.khrXMP.__type.packets',
-        'gltf/extensions/KHR/archived/KHR_xmp.khrXMP.__type.extensions',
+        'gltf/KHR/archived/KHR_xmp.khrXMP.__type.@context',
+        'gltf/KHR/archived/KHR_xmp.khrXMP.__type.packets',
+        'gltf/KHR/archived/KHR_xmp.khrXMP.__type.extensions',
 
 
         'utils/merge.merge.__type.k',
@@ -316,7 +316,7 @@ if (project) {
     const navigation = /** @type {NavigationEntry[]} */(JSON.parse(await Deno.readTextFile(`${root}/_navigation.json`)));
 
     /**
-     * @typedef {{text: string, link?: string, items?: SidebarEntry[]}} SidebarEntry
+     * @typedef {{text: string, link?: string, collapsed?: boolean, items?: SidebarEntry[]}} SidebarEntry
      */
     /**
      *
@@ -326,10 +326,15 @@ if (project) {
     const sidebarEntry = (entry) => {
         const result = /** @type {SidebarEntry} */({
             text: entry.title,
-            items: entry.children?.map(child => sidebarEntry(child)),
+            items: entry.children?.map(child => sidebarEntry(child)).sort((a, b) => {
+                return (Number(!!b?.items?.length) - Number(!!a?.items?.length)) || a.text.localeCompare(b.text)
+            }),
         });
         if(entry.path) {
             result.link = `/reference/lib/${entry.path}`;
+        }
+        if(entry.children?.length) {
+            result.collapsed = true;
         }
         return result;
     }
