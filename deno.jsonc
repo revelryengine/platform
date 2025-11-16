@@ -7,7 +7,7 @@
         "lib": ["esnext", "dom", "dom.iterable", "deno.ns"]
     },
     "tasks": {
-        "dev:serve": "deno run -A tasks/serve.js",
+        "dev:serve": "deno run -A ./tasks/serve.js",
 
         "test":         "deno task test:clean && deno task test:browser && deno task test:deno",
         "test:clean":   "rm -rf coverage",

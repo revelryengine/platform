@@ -30,7 +30,7 @@ const EXIT_FLAGS = {
  * @typedef {{ path: string, title: string, children?: NavigationEntry[], kind?: number }} NavigationEntry
  */
 
-const root = `./site/docs/lib`;
+const root = `./site/reference/lib`;
 
 
 const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOptions & PluginOptions} */({
@@ -142,9 +142,9 @@ const app = await typedoc.Application.bootstrapWithPlugins(/** @type {TypeDocOpt
     },
     exclude: [
         '**/__tests__/**',
-        '**/__fixtures__/**',
-        '**/typedoc.config.js',
+        '**/node_modules/**',
     ],
+    excludeExternals: true,
     intentionallyNotDocumented: [
         /** The `@context` field is problematic and this extension is archived so it's not worth sorting out */
         'gltf/extensions/KHR/archived/KHR_xmp.khrXMP.__type.@context',
@@ -173,19 +173,30 @@ app.renderer.on(MarkdownPageEvent.BEGIN, output => {
     // }
     // @ts-expect-error - Markdown plugin types are incorrect
     if(output.model.kind === typedoc.ReflectionKind.Module) {
+        let root = 'revelryengine/';
+        let ext  = '.js';
+
+        // If the module is virtual, don't add the revelryengine prefix or extension suffix as it will be a complete specifier
+        if(output.model.name.startsWith('@')) {
+            root = '';
+            ext  = '';
+        }
+
+        const path = `${root}${output.model.name}${ext}`;
+
         // @ts-expect-error - Markdown plugin types are incorrect
         for(const child of output.model.children ?? []) {
             if(child.kind === typedoc.ReflectionKind.TypeAlias || child.kind === typedoc.ReflectionKind.Interface) {
                 child.comment?.summary?.unshift({
-                    kind: 'text', text: `\n\n\`\`\`js\n\/\*\* @import { ${child.name} } from 'revelryengine/${output.model.name}.js'; \*\/\n\`\`\`\n`
+                    kind: 'text', text: `\n\n\`\`\`js\n\/\*\* @import { ${child.name} } from '${path}'; \*\/\n\`\`\`\n`
                 });
             } else if(child.kind === typedoc.ReflectionKind.Class || child.kind === typedoc.ReflectionKind.Variable) {
                 child.comment?.summary?.unshift({
-                    kind: 'text', text: `\n\n\`\`\`js\nimport { ${child.name} } from 'revelryengine/${output.model.name}.js';\n\`\`\`\n`
+                    kind: 'text', text: `\n\n\`\`\`js\nimport { ${child.name} } from '${path}';\n\`\`\`\n`
                 });
             } else if(child.kind === typedoc.ReflectionKind.Function) {
                 child.signatures?.[0]?.comment?.summary?.unshift({
-                    kind: 'text', text: `\n\n\`\`\`js\nimport { ${child.name} } from 'revelryengine/${output.model.name}.js';\n\`\`\`\n`
+                    kind: 'text', text: `\n\n\`\`\`js\nimport { ${child.name} } from '${path}';\n\`\`\`\n`
                 });
             }
         }
@@ -234,10 +245,16 @@ app.renderer.on(MarkdownPageEvent.END, output => {
         return `[View Source](${link})`;
     });
 
+    // Strip out any node_modules Defined in links
+    output.contents = output.contents?.replace(/Defined in\: \.\.\/node\\_modules\/(.*?)\n/gm, '');
+
     // Add `<wbr>` tags to long paths in headings
     output.contents = output.contents?.replace(/^\# (.*)$/gm, (match) => {
         return match.replace(/\//g, '/<wbr>');
-    })
+    });
+
+    // Replace any `<th>Description</th>` with `<th class="desc">Description</th>` for better styling
+    output.contents = output.contents?.replace(/<th>Description<\/th>/gm, `<th class="desc">Description</th>`);
 });
 
 
@@ -275,64 +292,93 @@ if (project) {
         descriptions[entry.name] = entry.comment?.summary?.[0]?.text ?? '';
     }
 
-    const documents = [];
-    for await (const entry of expandGlob(`./site/docs/lib/**/*.md`)) {
-        const relativePath = Path.relative(`./site/`, entry.path);
-        documents.push(relativePath);
-    }
-    // Create docsify plugin for indexing the docs pages
-    await Deno.writeTextFile(`${root}/docsify-plugin.js`, /* javascript */`
-        // @ts-nocheck - generated file
-        globalThis.$docsify ??= {};
-        $docsify.plugins = [(hook, vm) => {
-            hook.init(() => {
-                vm.config.search ??= {};
-                vm.config.search.paths ??= [];
-                vm.config.search.paths.push(
-                    ${documents.map(path => `'/${path.replaceAll('\\', '/')}'`).join(',\n                    ')}
-                );
-            });
-        }, ...($docsify.plugins ?? [])]
-    `);
+    // const documents = [];
+    // for await (const entry of expandGlob(`./site/reference/lib/**/*.md`)) {
+    //     const relativePath = Path.relative(`./site/`, entry.path);
+    //     documents.push(relativePath);
+    // }
+    // // Create docsify plugin for indexing the docs pages
+    // await Deno.writeTextFile(`${root}/docsify-plugin.js`, /* javascript */`
+    //     // @ts-nocheck - generated file
+    //     globalThis.$docsify ??= {};
+    //     $docsify.plugins = [(hook, vm) => {
+    //         hook.init(() => {
+    //             vm.config.search ??= {};
+    //             vm.config.search.paths ??= [];
+    //             vm.config.search.paths.push(
+    //                 ${documents.map(path => `'/${path.replaceAll('\\', '/')}'`).join(',\n                    ')}
+    //             );
+    //         });
+    //     }, ...($docsify.plugins ?? [])]
+    // `);
 
-    // Create a _sidebar file for each package
+    // Create a sidebar config for each package
     const navigation = /** @type {NavigationEntry[]} */(JSON.parse(await Deno.readTextFile(`${root}/_navigation.json`)));
+
+    /**
+     * @typedef {{text: string, link?: string, items?: SidebarEntry[]}} SidebarEntry
+     */
+    /**
+     *
+     * @param {NavigationEntry} entry
+     * @returns {SidebarEntry}
+     */
+    const sidebarEntry = (entry) => {
+        const result = /** @type {SidebarEntry} */({
+            text: entry.title,
+            items: entry.children?.map(child => sidebarEntry(child)),
+        });
+        if(entry.path) {
+            result.link = `/reference/lib/${entry.path}`;
+        }
+        return result;
+    }
+
     for(const pkg of packages) {
         const pkgNav = navigation.find(entry => entry.title === pkg);
-        const modules = [];
+        if(!pkgNav) continue;
 
-        const search = [...(pkgNav?.children ?? [])];
-        while (search.length > 0) {
-            const entry = search.shift();
-            if(entry?.children) {
-                search.push(...entry.children);
-            }
-            if(entry?.path && entry.path.endsWith('.md')) {
-                modules.push({ ...entry, description: descriptions[entry.path.replace('.md', '')] ?? '' } );
-            }
-        }
+        const sidebar = sidebarEntry(pkgNav);
+        sidebar.link = `/reference/lib/${pkg}/README.md`;
 
-        const moduleGroups = Object.groupBy(modules, mod => {
-            return mod.path.split('/').slice(0, -2).join('/');
-        });
+        // const modules = [];
 
-        // Generate _sidebar.md for pkg
-        const content = [
-            `- [**Documentation**](/docs/lib/ ":class=no-chevron :class=non-collapsible")`,
-            `  - [revelryengine/${pkg}](./ ":class=no-chevron :class=non-collapsible")`,
-            `    - [Modules](./?id=modules ":class=no-chevron :class=non-collapsible")`,
-            ...Object.entries(moduleGroups).map(([folder, modules]) => {
-                return [
-                    `      - **${folder}**`,
-                    ...modules?.map(entry => {
-                        return `        - [${entry.path.split('/').at(-1)?.replace('.md', '')}](/docs/lib/${entry.path} ":class=non-collapsible")`;
-                    }) ?? [],
-                ]
-            }).flat(),
-        ].join('\n');
-        await Deno.writeTextFile(`${root}/${pkg}/_sidebar.md`, content);
+        // const search = [...(pkgNav?.children ?? [])];
+        // while (search.length > 0) {
+        //     const entry = search.shift();
+
+        //     if(entry?.children) {
+        //         search.push(...entry.children);
+        //     }
+        //     if(entry?.path && entry.path.endsWith('.md')) {
+        //         modules.push({ ...entry, description: descriptions[entry.path.replace('.md', '')] ?? '' } );
+        //     }
+        // }
+
+        // const moduleGroups = Object.groupBy(modules, mod => {
+        //     return mod.path.split('/').slice(0, -2).join('/');
+        // });
+
+        // // Generate _sidebar.md for pkg
+        // const contents = [
+        //     '---',,
+        //     `title: ${pkg}`,
+        //     'sidebar:',
+        //     '  ',
+        //     `- [**Documentation**](/docs/lib/ ":class=no-chevron :class=non-collapsible")`,
+        //     `  - [revelryengine/${pkg}](./ ":class=no-chevron :class=non-collapsible")`,
+        //     `    - [Modules](./?id=modules ":class=no-chevron :class=non-collapsible")`,
+        //     ...Object.entries(moduleGroups).map(([folder, modules]) => {
+        //         return [
+        //             `      - **${folder}**`,
+        //             ...modules?.map(entry => {
+        //                 return `        - [${entry.path.split('/').at(-1)?.replace('.md', '')}](/docs/lib/${entry.path} ":class=non-collapsible")`;
+        //             }) ?? [],
+        //         ]
+        //     }).flat(),
+        // ].join('\n') + '\n' + await Deno.readTextFile(`${root}/${pkg}/README.md`);
+        await Deno.writeTextFile(`${root}/${pkg}/_sidebar.json`, JSON.stringify(sidebar, null, 4));
     }
-
 } else {
     console.error('Failed to generate docs.');
     Deno.exit(EXIT_FLAGS.UnknownError);

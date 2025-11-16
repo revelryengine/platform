@@ -1,11 +1,11 @@
-# Documentation
+# Revelry Engine Libraries
 
 > [!IMPORTANT]
-> **Documentation Under Heavy Development:** Please bare with us as we complete the documentation for the Revelry Engine packages. More packages will be added soon.
+> **Documentation Under Heavy Development:** Please bare with us as we complete the documentation for the Revelry Engine libraries. More libraries will be added soon.
 
 ## Usage
 
-Usage of this Revelry Engine packages requires that the imports found in `importmap.json` found in the root directory be included in your environment's import maps.
+Usage of Revelry Engine libraries requires that the imports found in `importmap.json` found in the root directory be included in your environment's import maps.
 
 ### Browser
 
@@ -62,9 +62,8 @@ Usage of this Revelry Engine packages requires that the imports found in `import
 
 Some utilities rely on a locking mechanism to function correctly across multiple browser tabs. In a browser this is handled by [navigator.locks](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/locks). However, for Deno there is a minimal polyfill that uses Deno to write temporary lock files. To make this work correctly, deno should be run with the `read`, `write`, and `env` permissions allowed and the  `--location <some origin>` flag set.
 
-
-**`importmap.json`**
-```json
+::: code-group
+```json [importmap.json]
 {
     "imports": {
         "revelryengine/":         "https://cdn.jsdelivr.net/gh/revelryengine/platform/packages/",
@@ -101,9 +100,7 @@ Some utilities rely on a locking mechanism to function correctly across multiple
 }
 ```
 
-
-**`deno.jsonc`**
-```json
+```json [deno.jsonc]
 {
     "importMap": "./importmap.json",
     "compilerOptions": {
@@ -120,18 +117,13 @@ Some utilities rely on a locking mechanism to function correctly across multiple
 }
 ```
 
-
-**`entry.js`**
-```js
+```js [entry.js]
 import * as utils from 'revelryengine/utils/lib/utils.js'
 ```
-
+:::
 
 ```bash
 # Run from terminal
 deno run -P=revelry --location http://example.local
 ```
-
-## [revelryengine/gltf](./gltf/)
-## [revelryengine/utils](./utils/)
 

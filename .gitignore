@@ -3,7 +3,10 @@ vendor
 node_modules
 coverage
 
-site/docs/lib
+site/reference
+site/.vitepress/dist
+site/.vitepress/cache
+
 editor
 scripts/io/
 starters/

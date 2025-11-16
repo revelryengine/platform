@@ -11,7 +11,7 @@ router.get('/importmap.js', async (ctx) => {
 router.get('/(.*)', async (ctx) => {
     let path = ctx.request.url.pathname;
     if(!path.startsWith('/packages') && !path.startsWith('/samples') && !path.startsWith('/deps')) {
-        path = `/site${path}`;
+        path = `/site/.vitepress/dist${path}`;
     }
 
     await send(ctx, path, { root: Deno.cwd(), index: 'index.html' });

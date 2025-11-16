@@ -1,0 +1,7 @@
+{
+    "deno.disablePaths": [
+        "./editor",
+        "./site/.vitepress/cache",
+        "./site/.vitepress/temp"
+    ],
+}
