@@ -210,16 +210,7 @@ const interpolators = {
     },
 };
 
-/**
- * Finds the next key frame based on time t.
- * @todo use a binary search algorithm
- * @param {TypedArray} input - The input keyframe times.
- * @param {number} t - The time to find the next keyframe for.
- */
-function findNextKeyFrame(input, t) {
-    const i = input.findIndex(v => v > t);
-    return i > 0 ? i : input.length - 1;
-}
+
 
 /**
  * Animates a glTF Animation.
@@ -323,7 +314,7 @@ export class Animator {
                 const t = outputArray.length - stride;
                 this.#clamp(outputArray, target, path, stride, t, normalizer, interpolation);
             } else {
-                const next = findNextKeyFrame(inputArray, time);
+                const next = this.#findNextKeyFrame(inputArray, time);
                 const startTime = inputArray[next - 1];
                 const endTime = inputArray[next];
 
@@ -354,5 +345,28 @@ export class Animator {
         } else {
             target[path] = normalizer(outputArray[t]);
         }
+    }
+
+    /**
+     * Finds the next key frame based on time t using a binary search.
+     * @param {TypedArray} input - The input keyframe times.
+     * @param {number} t - The time to find the next keyframe for.
+     */
+    #findNextKeyFrame(input, t) {
+        let low = 0;
+        let high = input.length - 1;
+        let candidate = input.length - 1;
+
+        while (low <= high) {
+            const mid = (low + high) >>> 1;
+            if (input[mid] > t) {
+                candidate = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return candidate > 0 ? candidate : input.length - 1;
     }
 }
