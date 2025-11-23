@@ -47,9 +47,10 @@ class RevGLTFMemoryStats extends LitElement {
         }
     `];
 
-    updateMemory() {
-        const viewer = /** @type {RevGLTFViewerElement} */(this.parentElement);
+    viewer = /** @type {RevGLTFViewerElement} */({});
 
+    updateMemory() {
+        const { viewer } = this;
         const { memory = {} } = (viewer.renderer?.mode === 'webgpu' ? getWebGPUMemoryUsage() : viewer.renderer?.gal.context.getExtension('GMAN_webgl_memory').getMemoryInfo()) ?? {};
         this.total         = memory.total ?? 0;
         this.texture       = memory.texture ?? 0;
@@ -63,14 +64,14 @@ class RevGLTFMemoryStats extends LitElement {
      * @override
      */
     render(){
-        const viewer = /** @type {RevGLTFViewerElement} */(this.parentElement);
+        const { viewer } = this;
 
         return html`
             <h4>Memory</h4>
             <hr>
             <div>Texture:</div><div class="mb">${(this.texture / 1000000).toFixed(3)} Mb</div>
             <div>Buffer:</div><div class="mb">${(this.buffer / 1000000).toFixed(3)} Mb</div>
-            ${viewer.renderer?.mode === 'webgpu' ? html`
+            ${viewer?.renderer?.mode === 'webgpu' ? html`
                 <div>Canvas:</div><div class="mb">${(this.canvas / 1000000).toFixed(3)} Mb</div>
             ` : html`
                 <div>Render Buffer:</div><div class="mb">${(this.renderbuffer / 1000000).toFixed(3)} Mb</div>

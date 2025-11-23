@@ -160,29 +160,12 @@ if (gltf.extensions.KHR_lights_punctual) {
 }
 ```
 
-### Adding a new gltf extensions from your project
+### Adding new gltf extensions 
 
-Follow the [Adding Extensions Guide](./DEVELOP.md#adding-extensions)
+See the [Adding Extensions Guide](./__docs__/adding-extensions.md) for details on how to add custom glTF extensions.
 
-The process is mostly the same with two key diffreences. 
+## Development Guide
 
-1. The import locations should use the `revelryengine` specifier.
-
-```js
-import { GLTFProperty } from 'revelryengine/gltf/gltf-property.js';
-import { registry     } from 'revelryengine/gltf/extensions/registry.js';
-
-/**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from 'revelryengine/gltf/gltf-property.js';
- * @import { nodeEXTExampleExtensions, NodeEXTExampleExtensions } from '@revelryengine/gltf/extensions';
- */
-```
-
-2. You should skip step 3 and import your implementation file directly.
-
-
-## Contributing
-
-See the [Development Guide](./DEVELOP.md) for details on how to contribute to this library.
+See the [Development Guide](./__docs__/development.md) for details on how to contribute to this library.
 
 

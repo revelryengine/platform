@@ -43,6 +43,17 @@ const config = {
                 playwrightLauncher({ product: 'chromium' }),
                 playwrightLauncher({ product: 'firefox'  }),
             ],
+        },
+        {
+            name: 'gltf',
+            files: [
+                `packages/gltf/**/__tests__/**/*.test.js`,
+                `!packages/gltf/**/__tests__/**/*.deno.test.js`
+            ],
+            browsers: [
+                playwrightLauncher({ product: 'chromium' }),
+                playwrightLauncher({ product: 'firefox'  }),
+            ],
         }
     ],
     plugins: [
@@ -51,7 +62,7 @@ const config = {
     coverage,
     coverageConfig: {
         reportDir: 'coverage/browser',
-        exclude: [`**/__tests__/**`, `**/deps/**`],
+        exclude: ['test/**', '**/__tests__/**', '**/deps/**'],
     },
     reporters: [
         summaryReporter({})

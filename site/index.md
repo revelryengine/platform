@@ -25,4 +25,8 @@ features:
   - title: Feature C
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
+> [!WARNING]
+> **Under Construction:** This documentation site is under heavy construction. Pages and navigation subject to change.
 
+> [!CAUTION]
+> **Project Status:** This project is in a very alpha state and is not fully implemented yet.

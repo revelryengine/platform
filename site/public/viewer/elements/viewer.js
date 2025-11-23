@@ -478,7 +478,7 @@ export class RevGLTFViewerElement extends RevParamElement  {
         this.loading = !!(this.loadingSample || this.loadingEnv);
 
         return html`
-            ${this.#stats ? html`${this.#stats.dom}<rev-memory-stats></rev-memory-stats>` : ''}
+            ${this.#stats ? html`${this.#stats.dom}<rev-memory-stats .viewer="${this}"></rev-memory-stats>` : ''}
             ${this.camera}
             ${this.canvas}
             ${this.vrControl}

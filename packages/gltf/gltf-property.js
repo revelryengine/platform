@@ -100,6 +100,10 @@ class GLTFExtensionRegistry {
  * @property {any} root.target - The target object within the root collection
  */
 
+/**
+ * @typedef {() => JSONPointerResolveResult} JSONPointerResolver - Function that resolves a JSON Pointer.
+ */
+
 const pending = new WeakMap();
 
 /**
@@ -162,6 +166,21 @@ export class GLTFProperty {
     }
 
     /**
+     * @param {FromJSONGraph} graph
+     * @param {Record<string, unknown>} src
+     * @param {typeof GLTFProperty} [factory]
+     */
+    static #ensureInstance(graph, src, factory){
+        const instances = GLTFProperty.#ensureInstances(graph.root);
+        let result = instances.get(src)
+        if(!result) {
+            result = factory ? factory.fromJSON(src, graph) : src;
+            instances.set(src, result);
+        }
+        return result
+    }
+
+    /**
      * Unmarshalls a JSON object into a GLTFProperty instance.
      * @template {GLTFProperty} C - The type of GLTFProperty to unmarshall
      * @param {FromJSONGraph} graph - Graph for unmarshalling
@@ -171,28 +190,13 @@ export class GLTFProperty {
      * @return {C} The unmarshalled GLTFProperty instance
      */
     static unmarshall({ uri, root, parent = {} }, json, referenceFields, ctor) {
-        const instances = GLTFProperty.#ensureInstances(root);
-
         const object = GLTFProperty.#unmarshallObject({ uri, root, parent }, json, referenceFields);
-
-        /**
-         * @param {Record<string, unknown>} src
-         * @param {typeof GLTFProperty} [factory]
-         */
-        const ensureInstance = (src, factory) => {
-            let result = instances.get(src)
-            if(!result) {
-                result = factory ? factory.fromJSON(src, { uri, root, parent: json }) : src;
-                instances.set(src, result);
-            }
-            return result
-        }
 
         if(object.extensions) {
             object.extensions = Object.fromEntries(Object.entries(object.extensions).map(([name, value]) => {
                 const factory = GLTFProperty.extensions.getFactory(ctor.name, name);
                 if(factory) {
-                    return [name, ensureInstance(value, factory)];
+                    return [name, GLTFProperty.#ensureInstance({ uri, root, parent: json }, value, factory)];
                 }
                 return [name, value];
             }));
@@ -217,19 +221,6 @@ export class GLTFProperty {
 
         /** @type {Record<string, any>} */
         const references = {};
-
-        /**
-         * @param {Record<string, unknown>} src
-         * @param {typeof GLTFProperty} [factory]
-         */
-        const ensureInstance = (src, factory) => {
-            let result = instances.get(src)
-            if(!result) {
-                result = factory ? factory.fromJSON(src, { uri, root, parent: json }) : src;
-                instances.set(src, result);
-            }
-            return result
-        }
 
         for(const entry of Object.entries(referenceFields)) {
             const [name, { factory, collection, location = 'root', assign, alias, pointer, referenceFields }] = /** @type {[string, ReferenceField]} */(entry);
@@ -261,11 +252,11 @@ export class GLTFProperty {
                         result = [];
                         for(const v of value) {
                             const srcObject = srcCollection[v];
-                            result.push(ensureInstance(srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
+                            result.push(GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
                         }
                     } else {
                         const srcObject = srcCollection[/** @type {number} */(value)];
-                        result = ensureInstance(srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
+                        result = GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
                         if(assign) {
                             Object.assign(result, assign);
                         }
@@ -275,11 +266,11 @@ export class GLTFProperty {
                         result = [];
                         for(const v of value) {
                             const srcObject = v;
-                            result.push(ensureInstance(srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
+                            result.push(GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
                         }
                     } else {
                         const srcObject = /** @type {Record<string, unknown>} */(value);
-                        result = ensureInstance(srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
+                        result = GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
                         if(assign) {
                             Object.assign(result, assign);
                         }

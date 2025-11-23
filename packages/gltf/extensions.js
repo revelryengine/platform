@@ -2,6 +2,9 @@
 
 /**
  * Re-exports all glTF extensions included with this library.
+ *
+ * See [Adding Extensions](./__docs__/adding-extensions.md) for details on how to contribute new extensions.
+ *
  * @module
  */
 

@@ -1,8 +1,12 @@
 import { defineConfig } from 'npm:vitepress@next';
+import { parseArgs    } from 'jsr:@std/cli@1.0.23/parse-args';
 
 import referenceSidebar from '../reference/lib/typedoc-sidebar.json' with { type: 'json' };
 
-// https://vitepress.dev/reference/site-config
+const { port = '8080', proxy = 'http://localhost:8081', importMode = 'local' } = parseArgs(Deno.args, {
+    string: ['port', 'proxy', 'importMode'],
+});
+
 export default defineConfig({
     title: 'Revelry Engine', // This needs to be changed in the index.md frontmatter as well
     description: 'Documentation for the Revelry Game Engine', // This needs to be changed in the index.md frontmatter as well
@@ -13,7 +17,6 @@ export default defineConfig({
         search: {
             provider: 'local',
         },
-        // https://vitepress.dev/reference/default-theme-config
         logo: {
             light: '/images/revelry-engine-light.svg',
             dark: '/images/revelry-engine-dark.svg',
@@ -51,4 +54,42 @@ export default defineConfig({
     head: [
         ['link', { rel: 'icon', href: '/images/favicon_32.png' }],
     ],
+    vite: {
+        optimizeDeps: {
+            exclude: [
+                'revelryengine/'
+            ],
+        },
+        server: {
+            host: '0.0.0.0',
+            port: Number(port),
+            allowedHosts: true,
+            watch: null, // Disable Vite's file watching, as it's handled by the outer dev server
+            proxy: {
+                '/packages/': {
+                    target: proxy,
+                    changeOrigin: true,
+                },
+                '/deps/': {
+                    target: proxy,
+                    changeOrigin: true,
+                },
+                '/samples/': {
+                    target: proxy,
+                    changeOrigin: true,
+                },
+            },
+        },
+        plugins: [
+            {
+                name: 'import-map-injector',
+                transformIndexHtml(html) {
+                    return html.replace(
+                        '<head>',
+                        `<head>\n<script>globalThis.REVELRY_IMPORT_MODE = '${importMode}';</script>\n<script src="/importmap.js"></script>\n`
+                    );
+                }
+            }
+        ]
+    },
 });

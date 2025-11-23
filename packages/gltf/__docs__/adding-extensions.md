@@ -1,114 +1,8 @@
-# Revelry Engine glTF Development Guide
+# Adding Extensions
 
-## Code Structure
+This guide walks you through creating a new glTF extension. We'll use a hypothetical `EXT_example` extension as our example, which adds custom data to glTF nodes.
 
-The package is organized into core glTF classes and extension implementations:
-
-### Core glTF Classes
-
-Each glTF 2.0 specification glTF property has a corresponding file:
-
-  - `gltf.js` - Main GLTF container class
-  - `gltf-property.js` - Base class for all glTF properties with common functionality
-  - `asset.js` - Metadata about the glTF asset (version, generator, etc.)
-  - `scene.js`, `node.js` - Scene graph hierarchy
-  - `mesh.js`, `mesh-primitive.js`, `mesh-primitive-target.js` - Geometry data
-  - `material.js`, `material-pbr-metallic-roughness.js` - Material definitions
-  - `material-normal-texture-info.js`, `material-occlusion-texture-info.js` - Material texture metadata
-  - `texture.js`, `texture-info.js`, `sampler.js`, `image.js` - Texture pipeline
-  - `animation.js`, `animation-channel.js`, `animation-channel-target.js`, `animation-sampler.js` - Animation system
-  - `accessor.js`, `accessor-sparse.js`, `accessor-sparse-indices.js`, `accessor-sparse-values.js` - Data accessors
-  - `buffer.js`, `buffer-view.js` - Binary data containers
-  - `camera.js`, `camera-perspective.js`, `camera-orthographic.js` - Camera definitions
-  - `skin.js` - Skeletal animation data
-  - `constants.js` - Shared constants and enumerations
-
-### Extensions Folder (`extensions/`)
-
-The glTF extension system is organized by vendor prefix:
-
-- **`registry.js`** - Central registry for mapping extension names to their class implementations
-- **`all.js`** - Convenience module that imports and registers all available extensions
-- **`extensions.types.d.ts`** - TypeScript declaration merging for extension interfaces. See [Adding Extensions](#adding-extensions).
-
-#### Vendor-Specific Extensions:
-- **`KHR/`** - Khronos ratified extensions (official glTF extensions):
-  - Material extensions: clearcoat, IOR, iridescence, sheen, specular, transmission, volume, emissive strength, unlit, variants
-  - Texture extensions: Basis Universal compression, texture transform, WebP
-  - Draco mesh compression with web worker support
-  - Punctual lights (point, spot, directional)
-  - Environment maps and audio
-  - Animation pointer and XMP metadata
-  - `archived/` - Deprecated or superseded extensions
-
-- **`EXT/`** - Multi-vendor extensions:
-  - WebP texture support
-
-- **`REV/`** - Revelry Engine-specific extensions:
-  - `REV_game_object` - Game object node metadata for ECS integration
-
-## Naming Conventions
-
-This library uses a naming convention to distinguish between the marshalled JSON data and unmarshalled class data of the corresponding glTF property.
-
-### Core glTF Properties
-
-- **Lowercase** (e.g., `glTFProperty`, `node`, `material`) - JSON interface representation (TypeScript type for raw JSON data)
-- **Uppercase** (e.g., `GLTFProperty`, `Node`, `Material`) - Instance class representation (JavaScript class for unmarshalled objects)
-
-The type interfaces follow these patterns:
-- JSON types use lowercase initial letter: `node`, `material`, `texture`
-- Class types use uppercase initial letter: `Node`, `Material`, `Texture`
-- Property-specific data types append descriptive names: `glTFPropertyData`, `MaterialPBRMetallicRoughness`
-
-### Extension Naming
-
-Extensions follow a systematic naming convention that combines the parent property name with the extension name converted to PascalCase:
-
-#### Pattern: `{property}{ExtensionInPascalCase}`
-
-The extension name (e.g., `KHR_materials_clearcoat`, `REV_game_object`) is converted from snake_case to PascalCase by:
-1. Removing underscores
-2. Capitalizing each word segment
-3. Preserving the vendor prefix capitalization (KHR, EXT, REV)
-
-#### Examples:
-
-**KHR_materials_clearcoat on material:**
-- JSON interface: `materialKHRMaterialsClearcoat`
-- Class type: `MaterialKHRMaterialsClearcoat`
-- Corresponds to: `material.extensions.KHR_materials_clearcoat`
-
-**KHR_texture_transform on textureInfo:**
-- JSON interface: `textureInfoKHRTextureTransform`
-- Class type: `TextureInfoKHRTextureTransform`
-- Corresponds to: `textureInfo.extensions.KHR_texture_transform`
-
-**REV_game_object on node:**
-- JSON interface: `nodeREVGameObject`
-- Class type: `NodeREVGameObject`
-- Corresponds to: `node.extensions.REV_game_object`
-
-The property prefix (node, material, textureInfo, etc.) indicates which glTF property the extension attaches to, maintaining clear type relationships throughout the codebase.
-
-#### Special Case: Root GLTF Extensions
-
-When an extension is added to the root `GLTF` property itself, the naming convention differs slightly:
-- The `glTF`/`GLTF` prefix is **omitted**
-- The vendor prefix is **lowercased** (e.g., `khr`, `ext`, `rev`)
-- This indicates the extension adds a new collection to the glTF root, similar to the built-in collections like `nodes`, `materials`, etc.
-
-**Example - KHR_lights_punctual on GLTF root:**
-- JSON interface: `khrLightsPunctual` (not `glTFKHRLightsPunctual`)
-- Class type: `KHRLightsPunctual` (not `GLTFKHRLightsPunctual`)
-- Corresponds to: `gltf.extensions.KHR_lights_punctual`
-- Adds collection: `gltf.extensions.KHR_lights_punctual.lights` (similar to `gltf.nodes`)
-
-## Adding Extensions
-
-This guide walks you through creating a new glTF extension in the Revelry Engine ecosystem. We'll use a hypothetical `EXT_example` extension as our example, which adds custom data to glTF nodes.
-
-### Understanding the Extension System
+## Understanding the Extension System
 
 Before we dive in, it's important to understand how extensions work in this library:
 
@@ -134,7 +28,7 @@ Extensions should focus on the library's two main objectives: **Simplify the glT
 
 #### Dereferencing Example
 
-Use the `unmarshall` method to convert indices to object references:
+Implement the static `fromJSON` method and use the `unmarshall` method to convert indices to object references:
 
 ```js
 static fromJSON(nodeEXTExample, graph) {
@@ -144,6 +38,7 @@ static fromJSON(nodeEXTExample, graph) {
     }, this);
 }
 ```
+See [Unmarshalling](#unmarshalling) for more details on how this works.
 
 #### Binary Data Loading Example
 
@@ -159,12 +54,11 @@ async load(signal) {
 }
 ```
 
-### Step 1: Create the Type Definition File
+## Step 1: Create the Type Definition File
 
 This file sets up the TypeScript types that will enable IntelliSense and type checking for your extension. It uses declaration merging to augment the virtual `@revelryengine/gltf/extensions` module.
 
-**`extensions/EXT/EXT_example.types.d.ts`**
-```ts
+```ts [EXT/EXT_example.types.d.ts]
 /**
  * Augments the glTF extension interfaces to include EXT_example types.
  * @module @revelryengine/gltf/extensions
@@ -203,12 +97,11 @@ declare module '@revelryengine/gltf/extensions' {
 
 The `import()` type syntax dynamically imports types from your implementation file, creating a tight coupling between the type definitions and the actual classes.
 
-### Step 2: Create the Implementation File
+## Step 2: Create the Implementation File
 
 Now we create the actual JavaScript implementation with JSDoc type annotations.
 
-**`EXT/EXT_example.js`**
-```js
+```js [EXT/EXT_example.js]
 /// <reference path="./EXT_example.types.d.ts" />
 // This triple-slash directive tells TypeScript and IDEs to load the type definitions.
 // It ensures that when someone imports this module, they also get the augmented types.
@@ -218,10 +111,11 @@ Now we create the actual JavaScript implementation with JSDoc type annotations.
  * @module
  */
 
-import { GLTFProperty } from '../gltf-property.js';
+import { GLTFProperty } from 'revelryengine/gltf/gltf-property.js'; 
+// Use relative path '../gltf-property.js' if contributing an extension to this codebase
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from 'revelryengine/gltf/gltf-property.js'; // or `../gltf-property.js` 
  * @import { nodeEXTExampleExtensions, NodeEXTExampleExtensions } from '@revelryengine/gltf/extensions';
  * 
  * These `Extensions` interfaces correspond to the ones created in `EXT_example.types.d.ts`. 
@@ -296,12 +190,13 @@ GLTFProperty.extensions.add('EXT_example', {
 - **`fromJSON` method**: This is how the glTF loader knows how to construct your class from JSON. The `unmarshall` method handles references to other glTF objects (like textures, nodes, buffers) automatically.
 - **Registry pattern**: The `GLTFProperty.extensions.add()` call maps the extension name to the class constructor. The schema object indicates which glTF property type (Node, Material, TextureInfo, etc.) this extension attaches to.
 
-### Step 3: Register in the Extensions Module
+## Step 3: Register in the Extensions Module
 
-Add an export to ensure your extension is loaded when the library initializes.
+If contributing an extension to this codebase we should consider adding it to the included built-in extensions.
 
-**`extensions.js`**
-```js
+To do this, add an export to `extensions.js` to ensure your extension is loaded when the library initializes.
+
+```js [extensions.js]
 ...
 export * from './EXT/EXT_example.js';
 ```
@@ -310,7 +205,7 @@ This export has two effects:
 1. It executes the `GLTFProperty.extensions.add()` call in your implementation file, registering the extension with the system
 2. It makes `NodeEXTExample` available when users import from `revelryengine/gltf/gltf.js` (since `gltf.js` re-exports everything from `extensions.js`)
 
-### Step 4: Using Your Extension
+## Step 4: Using Your Extension
 
 Now users can load glTF files with your extension and get fully typed access:
 
@@ -337,7 +232,7 @@ console.log(node.extensions.EXT_example.example); // 'hello world'
 node.extensions.EXT_example.example // <- IntelliSense works here!
 ```
 
-### What Happens Behind the Scenes
+## What Happens Behind the Scenes
 
 When `GLTF.fromJSON()` is called:
 

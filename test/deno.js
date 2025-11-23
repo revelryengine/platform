@@ -20,13 +20,20 @@ const config = {
                 'packages/ecs/**/__tests__/**/*.test.js',
                 `!packages/ecs/**/__tests__/**/*.browser.test.js`
             ]
+        },
+        {
+            name: 'gltf',
+            files: [
+                'packages/gltf/**/__tests__/**/*.test.js',
+                `!packages/gltf/**/__tests__/**/*.browser.test.js`
+            ]
         }
     ],
     debug,
     coverage,
     coverageConfig: {
         reportDir: 'coverage/deno',
-        exclude: [`**/__tests__/**`, `**/deps/**`],
+        exclude: [`test/`, `__tests__/`, `deps/`],
     },
 };
 
@@ -66,6 +73,19 @@ await (async () => {
 
     await command.output();
 
-    //deno coverage coverage/deno --exclude=deps --exclude=test",
+    if(config.coverage && !debug) {
+        console.log('Generating coverage report...');
+        const coverageCmd = new Deno.Command(Deno.execPath(), {
+            args: [
+                'coverage', config.coverageConfig.reportDir, '--html',
+                ...config.coverageConfig.exclude.map(pattern =>`--exclude=${pattern}`)
+
+            ],
+            stdout: "inherit",
+            stderr: "inherit"
+        }).spawn();
+
+        await coverageCmd.output();
+    }
 })();
 

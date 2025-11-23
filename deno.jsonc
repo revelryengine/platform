@@ -7,7 +7,8 @@
         "lib": ["esnext", "dom", "dom.iterable", "deno.ns"]
     },
     "tasks": {
-        "dev:serve": "deno run -A ./tasks/serve.js",
+        "dev:cache": "deno run -A ./tasks/dev.js cache",
+        "dev:serve": "deno run -A ./tasks/dev.js serve",
 
         "test":         "deno task test:clean && deno task test:browser && deno task test:deno",
         "test:clean":   "rm -rf coverage",
@@ -18,12 +19,12 @@
         // "validate":       "deno task validate:types && deno task validate:lint && deno task validate:docs",
         // "validate:types": "deno check",
         // "validate:lint":  "deno lint",
+        "docs:validate": "deno run -A ./tasks/docs.js validate",
+        "docs:generate": "deno run -A ./tasks/docs.js generate",
+        "docs:build":    "deno run -A ./tasks/docs.js build",
 
-        "docs:validate": "deno run -A ./tasks/docs.js --validate",
-        "docs:generate": "deno run -A ./tasks/docs.js ",
-
-        "importmap:update": "deno run -A ./tasks/importmap.js",
-        "importmap:validate": "deno run -A ./tasks/importmap.js --validate"
+        "importmap:update": "deno run -A ./tasks/importmap.js update",
+        "importmap:validate": "deno run -A ./tasks/importmap.js validate"
     },
     "lint": {
         "rules": {

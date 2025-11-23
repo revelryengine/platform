@@ -1,8 +1,10 @@
 // deno-lint-ignore-file no-empty-interface
 
 /**
- * glTF extension interfaces.
+ * Virtual Module for adding glTF extension interfaces. See [Adding Extensions](./__docs__/adding-extensions.md) for details on how to contribute new extensions.
+ *
  * @module @revelryengine/gltf/extensions
+ *
  * @mergeTarget
  */
 declare module '@revelryengine/gltf/extensions' {

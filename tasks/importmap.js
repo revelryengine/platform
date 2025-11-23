@@ -13,11 +13,11 @@
 
 import { parseArgs } from "jsr:@std/cli@1.0.23/parse-args";
 
-const { validate } = parseArgs(Deno.args, {
-    boolean: ["validate"],
+const { _: positionals } = parseArgs(Deno.args, {
+
 });
 
-(async () => {
+async function run(validate = false) {
     const devImportMapPath  = new URL('../importmap.dev.json', import.meta.url);
     const prodImportMapPath = new URL('../importmap.json', import.meta.url);
 
@@ -47,11 +47,23 @@ const { validate } = parseArgs(Deno.args, {
     } else {
         if(validate) {
             console.error('Validation failed - scopes are not in sync');
-            console.error('Please run the script without --validate to update the import map');
+            console.error('Please run the script with `update` to update the import map');
             Deno.exit(1);
         }
         // Write the updated production import map
         await Deno.writeTextFile(prodImportMapPath, updatedProdImportMap);
         console.log('Successfully synced scopes from importmap.dev.json to importmap.json');
     }
-})();
+};
+
+switch(positionals[0]) {
+    case 'update':
+        await run();
+        break;
+    case 'validate':
+        await run(true);
+        break;
+    default:
+        console.error('Subcommand must be one of: validate, update');
+        Deno.exit(1);
+}

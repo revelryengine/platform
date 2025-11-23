@@ -28,6 +28,6 @@ element.textContent = JSON.stringify({
         "webgpu-memory": "https://greggman.github.io/webgpu-memory/dist/1.x/webgpu-memory.module.js",
         "stats.js":      "https://cdn.jsdelivr.net/gh/mrdoob/stats.js/build/stats.module.js"
     }
-});
+}, null, 4);
 
 document.currentScript?.after(element);
