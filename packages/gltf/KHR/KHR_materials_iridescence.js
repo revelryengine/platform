@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsIridescenceExtensions, MaterialKHRMaterialsIridescenceExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -95,17 +95,14 @@ export class MaterialKHRMaterialsIridescence extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsIridescence & glTFPropertyData} materialKHRMaterialsIridescence - The KHR_materials_iridescence JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsIridescence, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsIridescence, {
-            iridescenceTexture:          { factory: TextureInfo },
-            iridescenceThicknessTexture: { factory: TextureInfo },
-        }, this);
-    }
+    static referenceFields = {
+        iridescenceTexture:          { factory: () => TextureInfo },
+        iridescenceThicknessTexture: { factory: () => TextureInfo },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_iridescence', {

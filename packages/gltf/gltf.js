@@ -25,7 +25,7 @@ import { Texture      } from  './texture.js';
 import { GLTF_SUPPORTED_VERSION, GLTF_MAGIC_NUMBER_BINARY_FORMAT } from './constants.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph, ReferenceField } from './gltf-property.types.d.ts';
  * @import { glTFExtensions, GLTFExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -213,31 +213,37 @@ export class GLTF extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {glTF & glTFPropertyData} glTF - The glTF JSON representation.
-     * @param {Omit<FromJSONGraph, 'root'>} [graph] - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(glTF, graph) {
-        ensureSupport(glTF);
+    static referenceFields = {
+        asset:       { factory: () => Asset       },
+        accessors:   { factory: () => Accessor    },
+        animations:  { factory: () => Animation   },
+        buffers:     { factory: () => Buffer      },
+        bufferViews: { factory: () => BufferView  },
+        cameras:     { factory: () => Camera      },
+        images:      { factory: () => Image       },
+        materials:   { factory: () => Material    },
+        meshes:      { factory: () => Mesh        },
+        nodes:       { factory: () => Node        },
+        samplers:    { factory: () => Sampler     },
+        scenes:      { factory: () => Scene       },
+        skins:       { factory: () => Skin        },
+        textures:    { factory: () => Texture     },
+        scene:       { factory: () => Scene, collection: 'scenes' },
+    };
 
-        return this.unmarshall({ ...(graph ?? {}), root: glTF }, glTF, {
-            asset:       { factory: Asset      },
-            accessors:   { factory: Accessor   },
-            animations:  { factory: Animation  },
-            buffers:     { factory: Buffer     },
-            bufferViews: { factory: BufferView },
-            cameras:     { factory: Camera     },
-            images:      { factory: Image      },
-            materials:   { factory: Material   },
-            meshes:      { factory: Mesh       },
-            nodes:       { factory: Node       },
-            samplers:    { factory: Sampler    },
-            scenes:      { factory: Scene      },
-            skins:       { factory: Skin       },
-            textures:    { factory: Texture    },
-            scene:       { factory: Scene, collection: 'scenes' },
-        }, this);
+    /**
+     * Prepares glTF JSON before unmarshalling.
+     * @param {glTF & glTFPropertyData} glTF - The glTF JSON representation.
+     * @param {Partial<FromJSONGraph>} graph - Graph details without root.
+     * @override
+     */
+    static prepareJSON(glTF, graph) {
+        ensureSupport(glTF);
+        return super.prepareJSON(glTF, graph);
     }
 
     /**

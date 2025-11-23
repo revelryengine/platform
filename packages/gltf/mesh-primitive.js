@@ -6,13 +6,13 @@
  * @module
  */
 
-import { GLTFProperty        } from './gltf-property.js';
+import { GLTFProperty } from './gltf-property.js';
 import { Accessor            } from './accessor.js';
 import { MeshPrimitiveTarget } from './mesh-primitive-target.js';
 import { Material            } from './material.js';
 
 /**
- * @import { GLTFPropertyData, glTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { meshPrimitiveExtensions, MeshPrimitiveExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -140,33 +140,29 @@ export class MeshPrimitive extends GLTFProperty {
         this.extensions = extensions;
     }
 
-
     /**
-     * Creates an instance from JSON data.
-     * @param {meshPrimitive & glTFPropertyData} meshPrimitive - The mesh primitive JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(meshPrimitive, graph) {
-        return this.unmarshall(graph, meshPrimitive, {
-            indices:  { factory: Accessor, collection: 'accessors' },
-            material: { factory: Material, collection: 'materials' },
-            targets:  { factory: MeshPrimitiveTarget               },
-            attributes: { referenceFields: {
-                POSITION:   { factory: Accessor, collection: 'accessors' },
-                NORMAL:     { factory: Accessor, collection: 'accessors' },
-                TANGENT:    { factory: Accessor, collection: 'accessors' },
-                TEXCOORD_0: { factory: Accessor, collection: 'accessors' },
-                TEXCOORD_1: { factory: Accessor, collection: 'accessors' },
-                TEXCOORD_2: { factory: Accessor, collection: 'accessors' },
-                TEXCOORD_3: { factory: Accessor, collection: 'accessors' },
-                COLOR_0:    { factory: Accessor, collection: 'accessors' },
-                COLOR_1:    { factory: Accessor, collection: 'accessors' },
-                WEIGHTS_0:  { factory: Accessor, collection: 'accessors' },
-                WEIGHTS_1:  { factory: Accessor, collection: 'accessors' },
-                JOINTS_0:   { factory: Accessor, collection: 'accessors' },
-                JOINTS_1:   { factory: Accessor, collection: 'accessors' },
-            } }
-        }, this);
-    }
+    static referenceFields = {
+        indices:  { factory: () => Accessor, collection: 'accessors' },
+        material: { factory: () => Material, collection: 'materials' },
+        targets:  { factory: () => MeshPrimitiveTarget },
+        attributes: { referenceFields: {
+            POSITION:   { factory: () => Accessor, collection: 'accessors' },
+            NORMAL:     { factory: () => Accessor, collection: 'accessors' },
+            TANGENT:    { factory: () => Accessor, collection: 'accessors' },
+            TEXCOORD_0: { factory: () => Accessor, collection: 'accessors' },
+            TEXCOORD_1: { factory: () => Accessor, collection: 'accessors' },
+            TEXCOORD_2: { factory: () => Accessor, collection: 'accessors' },
+            TEXCOORD_3: { factory: () => Accessor, collection: 'accessors' },
+            COLOR_0:    { factory: () => Accessor, collection: 'accessors' },
+            COLOR_1:    { factory: () => Accessor, collection: 'accessors' },
+            WEIGHTS_0:  { factory: () => Accessor, collection: 'accessors' },
+            WEIGHTS_1:  { factory: () => Accessor, collection: 'accessors' },
+            JOINTS_0:   { factory: () => Accessor, collection: 'accessors' },
+            JOINTS_1:   { factory: () => Accessor, collection: 'accessors' },
+        } },
+    };
 }

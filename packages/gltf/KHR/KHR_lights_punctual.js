@@ -11,7 +11,7 @@
 import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, NamedGLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import {
  *  khrLightsPunctualExtensions, KHRLightsPunctualExtensions,
  *  khrLightsPunctualLightExtensions, KHRLightsPunctualLightExtensions,
@@ -58,18 +58,6 @@ export class KHRLightsPunctualLightSpot extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {khrLightsPunctualLightSpot & glTFPropertyData} khrLightsPunctualLightSpot - The KHR_lights_punctual Spot Light JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(khrLightsPunctualLightSpot, graph) {
-        return this.unmarshall(graph, khrLightsPunctualLightSpot, {
-            // No reference fields
-        }, this);
     }
 }
 
@@ -135,16 +123,13 @@ export class KHRLightsPunctualLight extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrLightsPunctualLight & namedGLTFPropertyData} khrLightsPunctualLight - The KHR_lights_punctual Light JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrLightsPunctualLight, graph) {
-        return this.unmarshall(graph, khrLightsPunctualLight, {
-            spot: { factory: KHRLightsPunctualLightSpot },
-        }, this);
-    }
+    static referenceFields = {
+        spot: { factory: () => KHRLightsPunctualLightSpot },
+    };
 }
 
 /**
@@ -181,16 +166,13 @@ export class KHRLightsPunctual extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrLightsPunctual & glTFPropertyData} khrLightsPunctual - The KHR_lights_punctual JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrLightsPunctual, graph) {
-        return this.unmarshall(graph, khrLightsPunctual, {
-            lights: { factory: KHRLightsPunctualLight },
-        }, this);
-    }
+    static referenceFields = {
+        lights: { factory: () => KHRLightsPunctualLight },
+    };
 }
 
 /**
@@ -227,15 +209,12 @@ export class NodeKHRLightsPunctual extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {nodeKHRLightsPunctual & glTFPropertyData} nodeKHRLightsPunctual - The KHR_lights_punctual Node JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(nodeKHRLightsPunctual, graph) {
-        return this.unmarshall(graph, nodeKHRLightsPunctual, {
-            light: { factory: KHRLightsPunctualLight, collection: ['extensions', 'KHR_lights_punctual', 'lights'] },
-        }, this);
+    static referenceFields = {
+        light: { factory: () => KHRLightsPunctualLight, collection: ['extensions', 'KHR_lights_punctual', 'lights'] },
     };
 }
 

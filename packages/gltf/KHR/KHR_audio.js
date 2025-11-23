@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { BufferView   } from '../buffer-view.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData,FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import {
  *  khrAudioExtensions, KHRAudioExtensions,
  *  khrAudioAudioExtensions, KHRAudioAudioExtensions,
@@ -105,18 +105,6 @@ import { BufferView   } from '../buffer-view.js';
          */
         this.extensions = extensions;
     }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {khrAudioEmitterPositional & glTFPropertyData} khrAudioEmitterPositional - The KHR_audio positional audio emitter JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(khrAudioEmitterPositional, graph) {
-        return this.unmarshall(graph, khrAudioEmitterPositional, {
-            // No reference fields
-        }, this);
-    }
 }
 
 
@@ -172,17 +160,14 @@ export class KHRAudioAudio extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrAudioAudio & glTFPropertyData} khrAudioAudio - The KHR_audio audio data JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrAudioAudio, graph) {
-        return this.unmarshall(graph, khrAudioAudio, {
-            bufferView: { factory: BufferView, collection: 'bufferViews' },
-            uri:        { factory: URL                                   },
-        }, this);
-    }
+    static referenceFields = {
+        bufferView: { factory: () => BufferView, collection: 'bufferViews' },
+        uri:        { factory: () => URL                                   },
+    };
 
     /**
      * Loads the audio data as a Uint8Array.
@@ -276,16 +261,13 @@ export class KHRAudioSource extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrAudioSource & glTFPropertyData} khrAudioSource - The KHR_audio source JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrAudioSource, graph) {
-        return this.unmarshall(graph, khrAudioSource, {
-            audio: { factory: KHRAudioAudio, collection: ['extensions', 'KHR_audio', 'audio'] }
-        }, this);
-    }
+    static referenceFields = {
+        audio: { factory: () => KHRAudioAudio, collection: ['extensions', 'KHR_audio', 'audio'] },
+    };
 }
 
 /**
@@ -342,17 +324,14 @@ export class KHRAudioEmitter extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrAudioEmitter & glTFPropertyData} khrAudioEmitter - The KHR_audio emitter JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrAudioEmitter, graph) {
-        return this.unmarshall(graph, khrAudioEmitter, {
-            sources:    { factory: KHRAudioSource, collection: ['extensions', 'KHR_audio', 'sources'] },
-            positional: { factory: KHRAudioEmitterPositional                                                 },
-        }, this);
-    }
+    static referenceFields = {
+        sources:    { factory: () => KHRAudioSource,           collection: ['extensions', 'KHR_audio', 'sources'] },
+        positional: { factory: () => KHRAudioEmitterPositional                                                    },
+    };
 }
 
 /**
@@ -402,18 +381,15 @@ export class KHRAudioEmitter extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrAudio & glTFPropertyData} khrAudio - The KHR_audio JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrAudio, graph) {
-        return this.unmarshall(graph, khrAudio, {
-            sources:  { factory: KHRAudioSource  },
-            emitters: { factory: KHRAudioEmitter },
-            audio:    { factory: KHRAudioAudio   },
-        }, this);
-    }
+    static referenceFields = {
+        sources:  { factory: () => KHRAudioSource  },
+        emitters: { factory: () => KHRAudioEmitter },
+        audio:    { factory: () => KHRAudioAudio   },
+    };
 
     /**
      * Loads the audio data.
@@ -461,16 +437,13 @@ export class NodeKHRAudio extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {nodeKHRAudio & glTFPropertyData} nodeKHRAudio - The KHR_audio node JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(nodeKHRAudio, graph) {
-        return this.unmarshall(graph, nodeKHRAudio, {
-            emitter: { factory: KHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
-        }, this);
-    }
+    static referenceFields = {
+        emitter: { factory: () => KHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
+    };
 }
 
 /**
@@ -506,16 +479,13 @@ export class SceneKHRAudio extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {sceneKHRAudio & glTFPropertyData} sceneKHRAudio - The KHR_audio scene JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(sceneKHRAudio, graph) {
-        return this.unmarshall(graph, sceneKHRAudio, {
-            emitters: { factory: KHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
-        }, this);
-    }
+    static referenceFields = {
+        emitters: { factory: () => KHRAudioEmitter, collection: ['extensions', 'KHR_audio', 'emitters'] },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_audio', {

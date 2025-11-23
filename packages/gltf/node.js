@@ -12,7 +12,7 @@ import { Mesh              } from './mesh.js';
 import { Skin              } from './skin.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { nodeExtensions, NodeExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -111,19 +111,16 @@ export class Node extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {node & namedGLTFPropertyData} node - The node JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(node, graph) {
-        return this.unmarshall(graph, node, {
-            camera:   { factory: Camera, collection: 'cameras' },
-            skin:     { factory: Skin,   collection: 'skins'   },
-            mesh:     { factory: Mesh,   collection: 'meshes'  },
-            children: { factory: Node,   collection: 'nodes'   },
-        }, this);
-    }
+    static referenceFields = {
+        camera:   { factory: () => Camera, collection: 'cameras' },
+        skin:     { factory: () => Skin,   collection: 'skins'   },
+        mesh:     { factory: () => Mesh,   collection: 'meshes'  },
+        children: { factory: () => Node,   collection: 'nodes'   },
+    };
 
     /**
      * Returns the number of morph targets in the first primitive of the node's mesh. If mesh or targets is not defined

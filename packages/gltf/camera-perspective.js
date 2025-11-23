@@ -9,7 +9,7 @@
 import { GLTFProperty } from './gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData } from './gltf-property.types.d.ts';
  * @import { cameraPerspectiveExtensions, CameraPerspectiveExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -65,17 +65,5 @@ export class CameraPerspective extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {cameraPerspective & glTFPropertyData} cameraPerspective - The camera perspective JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(cameraPerspective, graph) {
-        return this.unmarshall(graph, cameraPerspective, {
-            // No reference fields
-        }, this);
     }
 }

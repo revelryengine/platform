@@ -12,7 +12,7 @@ import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 import { Image                           } from '../image.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, NamedGLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import {
  *  khrEnvironmentMapExtensions, KHREnvironmentMapExtensions,
  *  khrEnvironmentMapCubemapExtensions, KHREnvironmentMapCubemapExtensions,
@@ -62,16 +62,13 @@ export class KHREnvironmentMapCubemap extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrEnvironmentMapCubemap & glTFPropertyData} khrEnvironmentMapCubemap - The KHR_environment_map Cubemap JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrEnvironmentMapCubemap, graph) {
-        return this.unmarshall(graph, khrEnvironmentMapCubemap, {
-            source: { factory: Image, collection: ['images'] },
-        }, this);
-    }
+    static referenceFields = {
+        source: { factory: () => Image, collection: ['images'] },
+    };
 }
 
 /**
@@ -141,16 +138,13 @@ export class KHREnvironmentMapData extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrEnvironmentMapData & namedGLTFPropertyData} khrEnvironmentMapData - The KHR_environment_map Environment Map JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrEnvironmentMapData, graph) {
-        return this.unmarshall(graph, khrEnvironmentMapData, {
-            cubemap: { factory: KHREnvironmentMapCubemap, collection: ['extensions', 'KHR_environment_map', 'cubemaps'] },
-        }, this);
-    }
+    static referenceFields = {
+        cubemap: { factory: () => KHREnvironmentMapCubemap, collection: ['extensions', 'KHR_environment_map', 'cubemaps'] },
+    };
 }
 
 /**
@@ -194,17 +188,14 @@ export class KHREnvironmentMap extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {khrEnvironmentMap & glTFPropertyData} khrEnvironmentMap - The KHR_environment_map JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrEnvironmentMap, graph) {
-        return this.unmarshall(graph, khrEnvironmentMap, {
-            cubemaps:         { factory: KHREnvironmentMapCubemap },
-            environment_maps: { factory: KHREnvironmentMapData    },
-        }, this);
-    }
+    static referenceFields = {
+        cubemaps:         { factory: () => KHREnvironmentMapCubemap },
+        environment_maps: { factory: () => KHREnvironmentMapData    },
+    };
 }
 
 /**
@@ -241,16 +232,13 @@ export class SceneKHREnvironmentMap extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {sceneKHREnvironmentMap & glTFPropertyData} sceneKHREnvironmentMap - The KHR_environment_map Scene JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(sceneKHREnvironmentMap, graph) {
-        return this.unmarshall(graph, sceneKHREnvironmentMap, {
-            environment_map: { factory: KHREnvironmentMapData, collection: ['extensions', 'KHR_environment_map', 'environment_maps'] },
-        }, this);
-    }
+    static referenceFields = {
+        environment_map: { factory: () => KHREnvironmentMapData, collection: ['extensions', 'KHR_environment_map', 'environment_maps'] },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_environment_map', {

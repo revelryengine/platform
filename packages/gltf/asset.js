@@ -9,7 +9,7 @@
 import { GLTFProperty } from './gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData } from './gltf-property.types.d.ts';
  * @import { assetExtensions, AssetExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -66,17 +66,5 @@ export class Asset extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {asset & glTFPropertyData} asset - The asset JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(asset, graph) {
-        return this.unmarshall(graph, asset, {
-            // No reference fields
-        }, this);
     }
 }

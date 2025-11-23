@@ -108,7 +108,7 @@ When an extension is added to the root `GLTF` property itself, the naming conven
 
 ## Unmarshalling
 
-The `GLTFProperty.unmarshall()` static method is the core mechanism for converting raw JSON glTF data into typed JavaScript class instances. This method handles the complex task of dereferencing indices to object references and managing the object graph during deserialization.
+The [`GLTFProperty.fromJSON()`](../gltf-property#fromjson) static method is the core mechanism for converting raw JSON glTF data into typed JavaScript class instances. This method handles the complex task of dereferencing indices to object references and managing the object graph during deserialization.
 
 ### What is Unmarshalling?
 
@@ -131,62 +131,48 @@ In glTF JSON files, relationships between objects are represented as **numeric i
 
 The `indices: 1` is an index pointing to `accessors[1]`, and `material: 0` points to `materials[0]`. Unmarshalling converts these numeric indices into direct object references, creating a navigable object graph.
 
-### The unmarshall Method Signature
+### The static referenceFields property
 
-```javascript
-static unmarshall({ uri, root, parent }, json, referenceFields, ctor)
-```
+The static `referenceFields` property defines how each field in the JSON should be dereferenced. There are several types of reference fields:
 
-**Parameters:**
-- **`graph`** (`FromJSONGraph`): Context for unmarshalling
-  - `uri`: Base URI for resolving relative paths (used for images, buffers)
-  - `root`: The root glTF object containing all collections (nodes, materials, etc.)
-  - `parent`: The immediate parent object in the hierarchy
-- **`json`**: The raw JSON object to unmarshall
-- **`referenceFields`**: An object describing which fields contain references and how to resolve them
-- **`ctor`**: The constructor function to create the final instance
-
-**Returns:** An instance of the specified class with all references resolved to object instances.
-
-### Reference Field Types
-
-The `referenceFields` parameter defines how each field in the JSON should be dereferenced. There are several types of reference fields:
-
-#### 1. Simple Collection Reference
+#### Simple Collection Reference
 
 The most common pattern - resolves a numeric index to an object from a root collection.
 
 ```javascript
-static fromJSON(meshPrimitive, graph) {
-    return this.unmarshall(graph, meshPrimitive, {
-        indices:  { factory: Accessor, collection: 'accessors' },
-        material: { factory: Material, collection: 'materials' },
-    }, this);
+class ExampleProperty extends GLTFProperty {
+    static referenceFields = {
+        indices:  { factory: () => Accessor, collection: 'accessors' },
+        // converts { indices: 0 } -> { indices: <Accessor instance from root.accessors[0]> }
+        material: { factory: () => Material, collection: 'materials' },
+        // converts { material: 1 } -> { material: <Material instance from root.materials[1]> }
+    }
 }
 ```
 
 **Properties:**
-- `factory`: The class constructor to instantiate (e.g., `Accessor`, `Material`)
+- `factory`: A function that returns the class constructor to instantiate (e.g., `Accessor`, `Material`)
 - `collection`: The collection name in the root glTF object (e.g., `'accessors'`, `'materials'`)
 
-This converts `{ indices: 1 }` to `{ indices: <Accessor instance from root.accessors[1]> }`.
 
-**Array support:** If the JSON field is an array of indices, unmarshall automatically maps over them:
+**Array support:** If the value in the JSON field is an array of indices, unmarshall automatically maps over them:
 ```javascript
-{ 
-    children: { factory: Node, collection: 'nodes' } // converts [0, 1, 2] → [Node, Node, Node]
+static referenceFields = { 
+    children: { factory: () => Node, collection: 'nodes' } 
+    // converts { children: [0, 1, 2] } -> { children: [Node, Node, Node] }
 }
 ```
 
-#### 2. Parent Collection Reference
+#### Parent Collection Reference
 
 References objects from the parent object's collection instead of the root.
 
 ```javascript
-static fromJSON(animationChannel, graph) {
-    return this.unmarshall(graph, animationChannel, {
-        sampler: { factory: AnimationSampler, collection: 'samplers', location: 'parent' }
-    }, this);
+static referenceFields = {
+    sampler: { 
+        factory: () => AnimationSampler, collection: 'samplers', location: 'parent'
+        // converts { sampler: 0 } -> { sampler: <AnimationSampler instance from parent.samplers[0]>}
+    }
 }
 ```
 
@@ -195,53 +181,49 @@ static fromJSON(animationChannel, graph) {
 
 Used when the reference is scoped to the parent container. For example, animation channels reference samplers within their parent animation object, not from a global collection.
 
-#### 3. Nested Collection Path
+#### Nested Collection Path
 
 For extensions that add collections to the root glTF under `extensions.*`, use an array path.
 
 ```javascript
-{
+static referenceFields = {
     light: { 
-        factory: KHRLight, 
-        collection: ['extensions', 'KHR_lights_punctual', 'lights'] 
+        factory: () => KHRLight, collection: ['extensions', 'KHR_lights_punctual', 'lights'] 
+        // converts { light: 0 } -> { light: <KHRLight instance from root.extensions.KHR_lights_punctual.lights[0]>}
     }
 }
 ```
 
-This navigates `root.extensions.KHR_lights_punctual.lights[index]` to resolve the reference.
+#### Inline Object Reference
 
-#### 4. Inline Object Reference
-
-When the field contains a nested object (not an index), only specify the factory.
+When the field value contains a nested object (not an index), only specify the factory.
 
 ```javascript
-{
-    target: { factory: AnimationChannelTarget } // JSON contains object, not index
+static referenceFields = {
+    target: { factory: () => AnimationChannelTarget }
+    // converts { target: { ... } } -> { target: AnimationChannelTarget }
 }
 ```
 
-Unmarshall will instantiate the factory class with the nested object data.
+This will instantiate the factory class with the nested object data.
 
-#### 5. Nested Reference Fields
+#### Nested Reference Fields
 
 For complex objects with their own reference fields (like `attributes` in mesh primitives).
 
 ```javascript
-static fromJSON(meshPrimitive, graph) {
-    return this.unmarshall(graph, meshPrimitive, {
-        attributes: { 
-            referenceFields: {
-                POSITION:   { factory: Accessor, collection: 'accessors' },
-                NORMAL:     { factory: Accessor, collection: 'accessors' },
-                TEXCOORD_0: { factory: Accessor, collection: 'accessors' },
-                // ...
-            } 
+static referenceFields = {
+    attributes: { 
+        referenceFields: {
+            POSITION:   { factory: () => Accessor, collection: 'accessors' },
+            NORMAL:     { factory: () => Accessor, collection: 'accessors' },
+            TEXCOORD_0: { factory: () => Accessor, collection: 'accessors' },
         }
-    }, this);
+    }
 }
 ```
 
-This handles the case where the JSON structure is:
+This handles the cases similar to what is found in Primitive where the JSON structure is:
 ```json
 {
   "attributes": {
@@ -254,59 +236,99 @@ This handles the case where the JSON structure is:
 
 Each property of `attributes` is dereferenced individually according to its own reference field definition.
 
-#### 6. JSON Pointer Resolver
-
-For the `KHR_animation_pointer` extension, which uses JSON Pointer strings to reference any property in the glTF tree.
-
-```javascript
-static fromJSON(khrAnimationPointerTarget, graph) {
-    return this.unmarshall(graph, khrAnimationPointerTarget, {
-        pointer: { pointer: 'resolve' }
-    }, this);
-}
-```
-
-**Properties:**
-- `pointer`: Name for the resolver function (typically `'resolve'`)
-
-Instead of a direct object reference, this creates a **resolver function** that lazily evaluates the JSON Pointer path. The pointer string (e.g., `"/nodes/3/translation"`) is parsed to locate the target object and property.
-
-The resolver function returns an object with:
-- `target`: The object containing the property
-- `path`: The property name
-- `root.collection`: The root collection name
-- `root.target`: The root collection target object
-
-This is used for animation systems that need to target arbitrary properties anywhere in the scene graph.
-
-#### 7. URL References
+#### URL References
 
 Special handling for URI fields that should be resolved relative to the glTF file's location.
 
 ```javascript
-{
-    uri: { factory: URL }
+static referenceFields = {
+    uri: { factory: () => URL }
 }
 ```
 
 Converts relative URI strings into absolute `URL` objects based on the `graph.uri` base URL.
 
-#### 8. Additional Options
+#### JSON Pointer Resolver
+
+It's possible to resolve a JSON pointers instead of numeric indices. The KHR_animation_pointer extension uses this approach.
+
+```javascript
+import { JSONPointer } from 'revelryengine/gltf/gltf-property.js';
+
+static referenceFields = {
+    pointer: { factory: () => JSONPointer }
+}
+```
+Instead of a direct object reference, this creates a [JSONPointer](../gltf-property#jsonpointer) object that lazily evaluates the JSON Pointer path. The pointer string (e.g., `"/nodes/3/translation"`) is parsed to locate the target object and property.
+
+The JSONPointer object has the following properties with:
+- `target`: The object containing the property
+- `path`: The property name
+- `collection`: The root collection name
+- `rootTarget`: The root collection target object
+
+This is used for animation systems that need to target arbitrary properties anywhere in the scene graph.
+
+#### Additional Options
 
 - **`assign`**: Properties to merge into the resolved object
   ```javascript
-  { material: { factory: Material, collection: 'materials', assign: { alpha: true } } }
+  { material: { factory: () => Material, collection: 'materials', assign: { alpha: true } } }
   ```
 
 - **`alias`**: Create an additional reference under a different name
   ```javascript
-  { texture: { factory: Texture, collection: 'textures', alias: 'tex' } }
+  { texture: { factory: () => Texture, collection: 'textures', alias: 'tex' } }
   // Result has both `texture` and `tex` pointing to the same instance
   ```
 
+### Prepare JSON
+
+`GLTFProperty.fromJSON` calls a companion hook named `prepareJSON(json, graph)` before it touches any reference fields. The default implementation simply ensures that `graph.root` is set (falling back to the JSON payload) and then returns the inputs unchanged, but subclasses can override the hook to inject validation, default graph metadata, or augmented JSON structures.
+
+Guidelines for overriding:
+
+1. Always call `super.prepareJSON` if you only need to extend the behavior. If no `graph.root` is provided, it will default to the top level object that prepareJSON was called on. If you do not call `super.prepareJSON`, you must set a root manually.
+2. Return a `{ json, graph }` pair. Either value can be a new object if you need to mutate data without affecting the caller.
+3. Never call `super.fromJSON` from inside the hook. The hook should be a pure transformation step; `fromJSON` invokes it automatically.
+
+#### Example: Validating the root glTF document
+
+`GLTF` overrides the hook to enforce version support before any of the collections are dereferenced:
+
+```javascript
+static prepareJSON(glTF, graph) {
+  ensureSupport(glTF); // throws when the file targets an unsupported version/extension
+  return super.prepareJSON(glTF, graph);
+}
+```
+
+#### Example: Attaching parent context in an extension
+
+Extensions that need information from their parent object can copy that data into the JSON payload before unmarshalling. The Draco mesh compression extension needs the decoded primitive’s attribute accessors, so it overrides the hook this way:
+
+```javascript
+static prepareJSON(extensionJSON, graph) {
+  const primitive = graph?.parent;
+
+  return {
+    json: {
+      ...extensionJSON,
+      primitive: {
+        indices:    primitive.indices,
+        attributes: primitive.attributes,
+      }
+    },
+    graph,
+  };
+}
+```
+
+Because the hook runs before the reference fields are resolved, the added `primitive` object is ready for the standard `referenceFields` definition (and still benefits from instance caching).
+
 ### Instance Caching
 
-The unmarshall method maintains a `WeakMap` cache of instances per root glTF object. This ensures:
+The fromJSON method maintains a `WeakMap` cache of instances per root glTF object. This ensures:
 - **Object identity preservation**: Multiple references to the same index resolve to the same instance
 - **Cycle handling**: Circular references (e.g., nodes with parent/child relationships) don't cause infinite loops
 - **Memory efficiency**: Instances are garbage collected when the root glTF is released

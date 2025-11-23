@@ -1,24 +1,14 @@
-import { describe, it, expect, sinon } from 'bdd';
+import { describe, it, expect, sinon, beforeEach } from 'bdd';
 
-import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
+import { GLTFProperty, JSONPointer, NamedGLTFProperty } from '../gltf-property.js';
+
+const BASE_URI = new URL('https://revelry.local/test.gltf');
 
 /**
- * @import { ReferenceField } from '../gltf-property.js';
+ * @import { ReferenceField } from '../gltf-property.types.d.ts';
  */
 
 describe('GLTFProperty', () => {
-    const BASE_URI = new URL('https://revelry.local/test.gltf');
-
-    /**
-     * @typedef {{
-     *  graph: {
-     *      root: Record<string, any>,
-     *      parent: Record<string, any>
-     *  },
-     *  json:   Record<string, any>,
-     *  referenceFields: Record<string, ReferenceField>,
-     * }} UnmarshallScenario
-     */
 
     class TestProperty extends GLTFProperty {
         /**
@@ -29,46 +19,6 @@ describe('GLTFProperty', () => {
             Object.assign(this, unmarshalled);
         }
     }
-
-    class ReferencedProperty extends TestProperty {
-
-    }
-
-    class UnmarshalledProperty extends TestProperty {
-
-    }
-
-    class ExtensionProperty extends TestProperty {
-
-    }
-
-    GLTFProperty.extensions.add('EXT_example', {
-        schema: {
-            //@ts-expect-error - We are creating a test extension property
-            'UnmarshalledProperty': ExtensionProperty,
-        }
-    });
-
-    const graphTemplate = {
-        uri: BASE_URI.href,
-        root:   {
-            items: [
-                { name: 'Item0', extras: { value: 10 } },
-                { name: 'Item1' }
-            ],
-            extensions: {
-                EXT_example: {
-                    items: [{ name: 'EXTItem0' }]
-                }
-            }
-        },
-        parent: {
-            items: [
-                { name: 'ParentItem0' },
-                { name: 'ParentItem1' }
-            ]
-        }
-    };
 
     it('loadOnce caches the in-flight load promise', async () => {
         const property = new TestProperty({});
@@ -112,14 +62,71 @@ describe('GLTFProperty', () => {
         expect(GLTFProperty.extensions.isSupported('EXT_missing_support')).to.be.false;
     });
 
-    describe('unmarshall', () => {
+    describe('fromJSON', () => {
+        /**
+         * @typedef {{
+         *  graph: {
+         *      root: Record<string, any>,
+         *      parent: Record<string, any>
+         *  },
+         *  json:   Record<string, any>,
+         *  referenceFields: Record<string, ReferenceField>,
+         * }} UnmarshallScenario
+         */
+
+        class ReferencedProperty extends TestProperty {
+
+        }
+
+        class UnmarshalledProperty extends TestProperty {
+
+        }
+
+        class ExtensionProperty extends TestProperty {
+
+        }
+
+        GLTFProperty.extensions.add('EXT_example', {
+            schema: {
+                //@ts-expect-error - We are creating a test extension property
+                'ScenarioProperty': ExtensionProperty,
+            }
+        });
+
+        const graphTemplate = {
+            uri: BASE_URI.href,
+            root:   {
+                items: [
+                    { name: 'Item0', extras: { value: 10 } },
+                    { name: 'Item1' }
+                ],
+                extensions: {
+                    EXT_example: {
+                        items: [{ name: 'EXTItem0' }]
+                    }
+                }
+            },
+            parent: {
+                items: [
+                    { name: 'ParentItem0' },
+                    { name: 'ParentItem1' }
+                ]
+            }
+        };
+
         /**
          * Executes a scenario against
          * @param {UnmarshallScenario} scenario
          * @returns {Record<string, any>}
          */
         const runScenario = (scenario) => {
-            return GLTFProperty.unmarshall(scenario.graph, scenario.json, scenario.referenceFields, UnmarshalledProperty);
+            class ScenarioProperty extends UnmarshalledProperty {
+                /**
+                 * @override
+                 */
+                static referenceFields = scenario.referenceFields;
+            }
+            return ScenarioProperty.fromJSON(scenario.json, scenario.graph);
         };
 
         it('resolves root collection references', () => {
@@ -130,7 +137,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items'
                     }
                 }
@@ -149,7 +156,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items',
                         assign: { assigned: 'foobar' }
                     }
@@ -184,7 +191,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items',
                         alias: 'foobar'
                     }
@@ -201,7 +208,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items',
                         location: 'parent'
                     }
@@ -220,7 +227,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     multiRefs: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items'
                     }
                 }
@@ -240,7 +247,7 @@ describe('GLTFProperty', () => {
                     nested: {
                         referenceFields: {
                             child: {
-                                factory: ReferencedProperty,
+                                factory: () => ReferencedProperty,
                                 collection: 'items',
                             }
                         }
@@ -260,7 +267,7 @@ describe('GLTFProperty', () => {
                     nested: {
                         referenceFields: {
                             child: {
-                                factory: ReferencedProperty,
+                                factory: () => ReferencedProperty,
                                 collection: 'items',
                                 location: 'parent'
                             }
@@ -284,7 +291,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     inlineRefs: {
-                        factory: ReferencedProperty
+                        factory: () => ReferencedProperty
                     }
                 }
             });
@@ -303,7 +310,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     inlineObject: {
-                        factory: ReferencedProperty
+                        factory: () => ReferencedProperty
                     }
                 }
             });
@@ -320,7 +327,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     inlineObject: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         assign: { assigned: 'inline' }
                     }
                 }
@@ -337,7 +344,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: ['extensions', 'EXT_example', 'items']
                     }
                 }
@@ -355,7 +362,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     urlRef: {
-                        factory: URL
+                        factory: () => URL
                     }
                 }
             });
@@ -364,83 +371,79 @@ describe('GLTFProperty', () => {
             expect(result.urlRef.href).to.equal(new URL('textures/baseColor.png', BASE_URI).href);
         });
 
-        it('creates JSON pointer resolvers linked to cached instances', () => {
-            const result = runScenario({
-                graph: structuredClone(graphTemplate),
-                json: {
-                    itemRef: 0,
-                    pointerField: '/items/0/extras'
-                },
-                referenceFields: {
-                    itemRef: {
-                        factory: ReferencedProperty,
-                        collection: 'items'
+        describe('JSON Pointer references', () => {
+            /**
+             * @type {Record<string, any>}
+             */
+            let result;
+            beforeEach(() => {
+                result = runScenario({
+                    graph: structuredClone(graphTemplate),
+                    json: {
+                        itemRef: 0,
+                        pointerField: '/items/0/extras'
                     },
-                    pointerField: {
-                        pointer: 'resolve'
+                    referenceFields: {
+                        itemRef: {
+                            factory: () => ReferencedProperty,
+                            collection: 'items'
+                        },
+                        pointerField: {
+                            factory: () => JSONPointer,
+                        }
                     }
-                }
+                });
             });
-            expect(result.resolve).to.be.a('function');
-            const resolved = result.resolve();
-            expect(resolved.target).to.be.instanceOf(ReferencedProperty);
-            expect(resolved.target.name).to.equal('Item0');
-            expect(resolved.path).to.equal('extras');
-            expect(resolved.target[resolved.path]).to.deep.equal({ value: 10 });
-        });
 
-        it('returns cached pointer state on repeated resolver calls', () => {
-            const result = runScenario({
-                graph: structuredClone(graphTemplate),
-                json: {
-                    itemRef: 0,
-                    pointerField: '/items/0/extras'
-                },
-                referenceFields: {
-                    itemRef: {
-                        factory: ReferencedProperty,
-                        collection: 'items'
+            it('creates reference to target instance', () => {
+                expect(result.pointerField.target).to.be.instanceOf(ReferencedProperty);
+                expect(result.pointerField.target.name).to.equal('Item0');
+            });
+
+            it('creates getter and setter for value', () => {
+                expect(result.pointerField.value).to.deep.equal({ value: 10 });
+                result.pointerField.value = { value: 20 };
+                expect(result.pointerField.target.extras).to.deep.equal({ value: 20 });
+            });
+
+            it('creates reference to rootTarget', () => {
+                console.log(result.pointerField.rootTarget);
+                expect(result.pointerField.rootTarget).to.equal(result.pointerField.target);
+            });
+
+            it('creates reference to collection name', () => {
+                expect(result.pointerField.collection).to.equal('/items');
+            });
+
+            it('throws when pointer targets are not resolveable yet', () => {
+                const result = runScenario({
+                    graph: structuredClone(graphTemplate),
+                    json: {
+                        pointerField: '/items/0/extras'
                     },
-                    pointerField: {
-                        pointer: 'resolve'
+                    referenceFields: {
+                        pointerField: {
+                            factory: () => JSONPointer,
+                        }
                     }
-                }
+                });
+
+                expect(() => result.pointerField.target).to.throw('Invalid State');
             });
 
-            const first = result.resolve();
-            const second = result.resolve();
-
-            expect(second).to.equal(first);
-        });
-
-        it('throws when pointer targets are not cached yet', () => {
-            const result = runScenario({
-                graph: structuredClone(graphTemplate),
-                json: {
-                    pointerField: '/items/0/extras'
-                },
-                referenceFields: {
-                    pointerField: {
-                        pointer: 'resolve'
+            it('throws for invalid JSON pointer formats', () => {
+                expect(() => runScenario({
+                    graph: structuredClone(graphTemplate),
+                    json: {
+                        pointerField: '/items/extras'
+                    },
+                    referenceFields: {
+                        pointerField: {
+                            factory: () => JSONPointer,
+                        }
                     }
-                }
+                })).to.throw('Invalid JSON Pointer');
             });
-
-            expect(() => result.resolve()).to.throw('Invalid State');
-        });
-
-        it('throws for invalid JSON pointer formats', () => {
-            expect(() => runScenario({
-                graph: structuredClone(graphTemplate),
-                json: {
-                    pointerField: '/items/extras'
-                },
-                referenceFields: {
-                    pointerField: {
-                        pointer: 'resolve'
-                    }
-                }
-            })).to.throw('Invalid JSON Pointer');
         });
 
         it('instantiates registered extensions into GLTFProperty instances', () => {
@@ -469,7 +472,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items'
                     }
                 }
@@ -481,7 +484,7 @@ describe('GLTFProperty', () => {
                 },
                 referenceFields: {
                     itemRef: {
-                        factory: ReferencedProperty,
+                        factory: () => ReferencedProperty,
                         collection: 'items'
                     }
                 }
@@ -506,7 +509,52 @@ describe('GLTFProperty', () => {
 
             expect(first.extensions.EXT_example).to.equal(second.extensions.EXT_example);
         });
+
+        it('allows subclasses to override prepareJSON before unmarshalling', () => {
+            const parentGraph = structuredClone(graphTemplate.parent);
+            const rootGraph   = structuredClone(graphTemplate.root);
+
+            class HookedProperty extends UnmarshalledProperty {
+                /**
+                 * @override
+                 */
+                static referenceFields = {
+                    itemRef: { factory: () => ReferencedProperty, collection: 'items' },
+                };
+
+                /**
+                 * @override
+                 * @param {Record<string, any>} json
+                 * @param {Partial<import('../gltf-property.types.d.ts').FromJSONGraph>} [graph]
+                 * @returns {import('../gltf-property.types.d.ts').PreparedFromJSON}
+                 */
+                static prepareJSON(json, graph = {}) {
+                    return {
+                        json: { ...json, prepared: true },
+                        graph: {
+                            ...graph,
+                            root: rootGraph,
+                        },
+                    };
+                }
+            }
+
+            const prepareSpy = sinon.spy(HookedProperty, 'prepareJSON');
+
+            const result = HookedProperty.fromJSON({ itemRef: 0 }, { parent: parentGraph });
+            const typedResult = /** @type {HookedProperty & { prepared: boolean, itemRef: ReferencedProperty & { name: string } }} */(result);
+
+            expect(prepareSpy).to.have.been.calledOnce;
+            expect(typedResult).to.be.instanceOf(UnmarshalledProperty);
+            expect(typedResult.prepared).to.be.true;
+            expect(typedResult.itemRef).to.be.instanceOf(ReferencedProperty);
+            expect(typedResult.itemRef.name).to.equal('Item0');
+        });
+
+
     });
+
+
 });
 
 describe('NamedGLTFProperty', () => {
@@ -519,3 +567,6 @@ describe('NamedGLTFProperty', () => {
         expect(named.extras).to.equal(extras);
     });
 });
+
+
+

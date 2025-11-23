@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { Texture      } from './texture.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { textureInfoExtensions, TextureInfoExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -55,16 +55,13 @@ export class TextureInfo extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {textureInfo & glTFPropertyData} textureInfo - The textureInfo JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(textureInfo, graph) {
-        return this.unmarshall(graph, textureInfo, {
-            index: { factory: Texture, collection: 'textures', alias: 'texture' },
-        }, this);
-    }
+    static referenceFields = {
+        index: { factory: () => Texture, collection: 'textures', alias: 'texture' },
+    };
 
     /**
      * Set this to true indicate that texture uses sRGB transfer function

@@ -15,7 +15,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsVolumeExtensions, MaterialKHRMaterialsVolumeExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -80,16 +80,13 @@ export class MaterialKHRMaterialsVolume extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsVolume & glTFPropertyData} materialKHRMaterialsVolume - The KHR_materials_volume JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsVolume, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsVolume, {
-            thicknessTexture: { factory: TextureInfo },
-        }, this);
-    }
+    static referenceFields = {
+        thicknessTexture: { factory: () => TextureInfo },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_volume', {

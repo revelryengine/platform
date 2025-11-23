@@ -13,7 +13,7 @@ import { TextureInfo               } from '../texture-info.js';
 import { MaterialNormalTextureInfo } from '../material-normal-texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsClearcoatExtensions, MaterialKHRMaterialsClearcoatExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -84,18 +84,15 @@ export class MaterialKHRMaterialsClearcoat extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsClearcoat & glTFPropertyData} materialKHRMaterialsClearcoat - The KHR_materials_clearcoat JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsClearcoat, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsClearcoat, {
-            clearcoatTexture:          { factory: TextureInfo               },
-            clearcoatRoughnessTexture: { factory: TextureInfo               },
-            clearcoatNormalTexture:    { factory: MaterialNormalTextureInfo },
-        }, this);
-    }
+    static referenceFields = {
+        clearcoatTexture:          { factory: () => TextureInfo               },
+        clearcoatRoughnessTexture: { factory: () => TextureInfo               },
+        clearcoatNormalTexture:    { factory: () => MaterialNormalTextureInfo },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_clearcoat', {

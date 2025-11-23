@@ -47,64 +47,153 @@ class GLTFExtensionRegistry {
 }
 
 /**
- * @typedef {object} glTFPropertyData - glTFProperty data
- * @property {{ [key: string]: glTFPropertyData }} [extensions] - Extension-specific data.
- * @property {{ [key: string]: unknown }} [extras] - Application-specific data.
- */
-
-/**
- * @typedef {object} GLTFPropertyData - GLTFProperty data
- * @property {{ [key: string]: GLTFPropertyData }} [extensions] - Extension-specific data.
- * @property {{ [key: string]: unknown }} [extras] - Application-specific data.
- */
-
-/**
- * @typedef {object} namedGLTFPropertyData - glTFProperty data
- * @property {string} [name] - The name of this object.
- * @property {{ [key: string]: glTFPropertyData }} [extensions] - Extension-specific data.
- * @property {{ [key: string]: unknown }} [extras] - Application-specific data.
- */
-
-/**
- * @typedef {object} NamedGLTFPropertyData - GLTFProperty data
- * @property {string} [name] - The name of this object.
- * @property {{ [key: string]: GLTFPropertyData }} [extensions] - Extension-specific data.
- * @property {{ [key: string]: unknown }} [extras] - Application-specific data.
- */
-
-/**
- * @typedef {object} FromJSONGraph - Graph for unmarshalling JSON into GLTFProperty instances.
- * @property {Record<string, any>} root - The root glTF object.
- * @property {URL} [uri] - The base URI for resolving relative paths.
- * @property {Record<string, any>} [parent] - The parent object in the glTF hierarchy.
- */
-
-/**
- * @typedef {object} ReferenceField - Definition of a reference field for unmarshalling.
- * @property {typeof GLTFProperty | typeof URL} [factory] - The factory to create the referenced object.
- * @property {string | string[]} [collection] - The collection name(s) where the referenced object can be found.
- * @property {'root' | 'parent'} [location='root'] - The location of the collection ('root' or 'parent').
- * @property {Record<string, any>} [assign] - Additional properties to assign to the referenced object.
- * @property {string} [alias] - An alternative name for the referenced field.
- * @property {string} [pointer] - If specified, indicates that this field is a JSON Pointer resolver.
- * @property {Record<string, ReferenceField>} [referenceFields] - Nested reference fields for complex objects.
- */
-
-
-/**
- * @typedef {object} JSONPointerResolveResult - Result of resolving a JSON Pointer.
- * @property {any} target - The target object containing the property
- * @property {string} path - The property name within the target object
- * @property {object} root - The root collection and target object
- * @property {string} root.collection - The name of the root collection
- * @property {any} root.target - The target object within the root collection
- */
-
-/**
- * @typedef {() => JSONPointerResolveResult} JSONPointerResolver - Function that resolves a JSON Pointer.
+ * @import {
+ *  glTFPropertyData,
+ *  GLTFPropertyData,
+ *  NamedGLTFPropertyData,
+ *  GLTFPropertyClassInterface,
+ *  FromJSONGraph,
+ *  PreparedFromJSON,
+ *  ReferenceField
+ * } from './gltf-property.types.d.ts';
  */
 
 const pending = new WeakMap();
+
+const instances = new WeakMap();
+
+/**
+ * @param {Record<string, unknown>} root
+ */
+function ensureInstances(root) {
+    return /** @type {WeakMap<Record<string, unknown>, GLTFProperty | Record<string, unknown>>} */(instances.get(root) ?? instances.set(root, new WeakMap()).get(root));
+}
+
+/**
+ * @param {FromJSONGraph} graph
+ * @param {Record<string, unknown>} src
+ * @param {typeof GLTFProperty} [factory]
+ */
+function ensureInstance(graph, src, factory){
+    const instances = ensureInstances(graph.root);
+    let result = instances.get(src)
+    if(!result) {
+        result = factory ? factory.fromJSON(src, graph) : src;
+        instances.set(src, result);
+    }
+    return result
+}
+
+/**
+ * Unmarshalls a JSON object into a GLTFProperty instance.
+ * @template {GLTFProperty} C - The type of GLTFProperty to unmarshall
+ * @param {Record<string, unknown>} json - The JSON representation of the GLTFProperty
+ * @param {FromJSONGraph} graph - Graph for unmarshalling
+ * @param {GLTFPropertyClassInterface<C>} ctor - The constructor of the GLTFProperty
+ * @return {C} The unmarshalled GLTFProperty instance
+ */
+function unmarshall(json, { uri, root, parent = {} }, ctor) {
+    const object = unmarshallObject({ uri, root, parent }, json, ctor.referenceFields);
+
+    if(object.extensions) {
+        object.extensions = Object.fromEntries(Object.entries(object.extensions).map(([name, value]) => {
+            const factory = GLTFProperty.extensions.getFactory(ctor.name, name);
+            if(factory) {
+                return [name, ensureInstance({ uri, root, parent: json }, value, factory)];
+            }
+            return [name, value];
+        }));
+    }
+
+    return new ctor(object);
+}
+
+/**
+ * Unmarshalls a JSON object by dereferencing its fields from the root or parent context.
+ * @param {FromJSONGraph} graph - Graph for unmarshalling
+ * @param {Record<string, unknown>} json - The JSON representation of the GLTFProperty
+ * @param {Record<string, ReferenceField>} referenceFields - Fields that reference other GLTFProperties
+ */
+function unmarshallObject({ uri, root, parent = {} }, json, referenceFields) {
+    const locations = /** @type {const} */({ root, parent });
+
+    // constructor, collection, location, alias, assign
+    // arrays and attributes object
+
+    /** @type {Record<string, any>} */
+    const references = {};
+
+    for(const entry of Object.entries(referenceFields)) {
+        const [name, { factory, collection, location = 'root', assign, alias, referenceFields }] = /** @type {[string, ReferenceField]} */(entry);
+
+        const value = json[name];
+
+        const ctor = factory ? factory() : undefined;
+
+        if(value != undefined) {
+            let result;
+
+            if(referenceFields) { //Nested reference fields, value must be an object
+                result = unmarshallObject({ uri, root, parent }, /** @type {Record<string, unknown>} */(value), referenceFields);
+                references[name] = result;
+                continue;
+            }
+
+            if(ctor === URL) { //value is a string
+                result = new URL(/** @type {string} */(value), uri);
+            } else if (ctor === JSONPointer) { //value is a string
+                result = new JSONPointer(/** @type {string} */(value), root);
+            } else if(collection) { // value is either a number index or an array of number indices
+                const srcLocation = locations[location];
+
+                const srcCollection = /** @type {Record<number, Record<string, unknown>>} */(
+                    typeof collection === 'string'
+                        ? srcLocation[collection]
+                        : collection.reduce((obj, key) => /** @type {Record<number, Record<string, unknown>>} */(obj[key]), srcLocation)
+                );
+
+                if(value instanceof Array) {
+                    result = [];
+                    for(const v of value) {
+                        const srcObject = srcCollection[v];
+                        result.push(ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(ctor)));
+                    }
+                } else {
+                    const srcObject = srcCollection[/** @type {number} */(value)];
+                    result = ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(ctor));
+                    if(assign) {
+                        Object.assign(result, assign);
+                    }
+                }
+            } else {
+                if(value instanceof Array) {
+                    result = [];
+                    for(const v of value) {
+                        const srcObject = v;
+                        result.push(ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(ctor)));
+                    }
+                } else {
+                    const srcObject = /** @type {Record<string, unknown>} */(value);
+                    result = ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(ctor));
+                    if(assign) {
+                        Object.assign(result, assign);
+                    }
+                }
+            }
+
+            references[name] = result;
+
+            if(alias) {
+                references[alias] = result;
+            }
+        }
+    }
+
+    return {
+        ...json,
+        ...references
+    };
+}
 
 /**
  * GLTFProperty
@@ -148,210 +237,38 @@ export class GLTFProperty {
     }
 
     /**
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
+     */
+    static referenceFields = {};
+
+    /**
      * Creates an instance from JSON data.
+     *
+     * It automatically unmarshalls referenced fields based on the referenceFields static property.
+     *
+     * See [Unmarshalling](./__docs__/development.md#unmarshalling) for more details.
+     *
+     * @template {typeof GLTFProperty} T - The GLTFProperty subclass type
+     * @this {T} - The constructor of the GLTFProperty subclass
      * @param {Record<string, any>} json - The JSON representation of the GLTFProperty
-     * @param {FromJSONGraph} _ options - Options for creating the instance from JSON
+     * @param {Partial<FromJSONGraph>} [graph] - The graph for creating the instance from JSON.
+     * @returns {InstanceType<T>}
      */
-    static fromJSON(json, _) {
-        return new this(json);
-    }
-
-    static #instances = new WeakMap();
-
-    /**
-     * @param {Record<string, unknown>} root
-     */
-    static #ensureInstances(root) {
-        return /** @type {WeakMap<Record<string, unknown>, GLTFProperty | Record<string, unknown>>} */(GLTFProperty.#instances.get(root) ?? GLTFProperty.#instances.set(root, new WeakMap()).get(root));
+    static fromJSON(json, graph = {}) {
+        const { json: preparedJson, graph: preparedGraph } = this.prepareJSON(json, graph);
+        return /** @type {InstanceType<T>} */(unmarshall(preparedJson, preparedGraph, this));
     }
 
     /**
-     * @param {FromJSONGraph} graph
-     * @param {Record<string, unknown>} src
-     * @param {typeof GLTFProperty} [factory]
+     * Hook for subclasses to customize JSON/graph before unmarshalling.
+     * @param {Record<string, any>} json - Original JSON payload.
+     * @param {Partial<FromJSONGraph>} graph - Original graph.
+     * @returns {PreparedFromJSON}
      */
-    static #ensureInstance(graph, src, factory){
-        const instances = GLTFProperty.#ensureInstances(graph.root);
-        let result = instances.get(src)
-        if(!result) {
-            result = factory ? factory.fromJSON(src, graph) : src;
-            instances.set(src, result);
-        }
-        return result
-    }
-
-    /**
-     * Unmarshalls a JSON object into a GLTFProperty instance.
-     * @template {GLTFProperty} C - The type of GLTFProperty to unmarshall
-     * @param {FromJSONGraph} graph - Graph for unmarshalling
-     * @param {Record<string, unknown>} json - The JSON representation of the GLTFProperty
-     * @param {Record<string, ReferenceField>} referenceFields - Fields that reference other GLTFProperties
-     * @param {new (unmarshalled: any) => C} ctor - The constructor of the GLTFProperty
-     * @return {C} The unmarshalled GLTFProperty instance
-     */
-    static unmarshall({ uri, root, parent = {} }, json, referenceFields, ctor) {
-        const object = GLTFProperty.#unmarshallObject({ uri, root, parent }, json, referenceFields);
-
-        if(object.extensions) {
-            object.extensions = Object.fromEntries(Object.entries(object.extensions).map(([name, value]) => {
-                const factory = GLTFProperty.extensions.getFactory(ctor.name, name);
-                if(factory) {
-                    return [name, GLTFProperty.#ensureInstance({ uri, root, parent: json }, value, factory)];
-                }
-                return [name, value];
-            }));
-        }
-
-        return new ctor(object);
-    }
-
-    /**
-     * Unmarshalls a JSON object by dereferencing its fields from the root or parent context.
-     * @param {FromJSONGraph} graph - Graph for unmarshalling
-     * @param {Record<string, unknown>} json - The JSON representation of the GLTFProperty
-     * @param {Record<string, ReferenceField>} referenceFields - Fields that reference other GLTFProperties
-     */
-    static #unmarshallObject({ uri, root, parent = {} }, json, referenceFields) {
-        const instances = GLTFProperty.#ensureInstances(root);
-
-        const locations = /** @type {const} */({ root, parent });
-
-        // constructor, collection, location, alias, assign
-        // arrays and attributes object
-
-        /** @type {Record<string, any>} */
-        const references = {};
-
-        for(const entry of Object.entries(referenceFields)) {
-            const [name, { factory, collection, location = 'root', assign, alias, pointer, referenceFields }] = /** @type {[string, ReferenceField]} */(entry);
-
-            const value = json[name];
-
-            if(value != undefined) {
-                let result;
-
-                if(pointer) {
-                    result = GLTFProperty.#unmarshallJSONPointerResolver(root, /** @type {string} */(value));
-                    references[pointer] = result;
-                    continue;
-                }
-
-                if(referenceFields) { //Nested reference fields
-                    result = GLTFProperty.#unmarshallObject({ uri, root, parent }, /** @type {Record<string, unknown>} */(value), referenceFields);
-                    references[name] = result;
-                    continue;
-                }
-
-                if(factory === URL) {
-                    result = new URL(/** @type {string} */(value), uri);
-                } else if(collection) { // value is either a number index or an array of number indices
-                    const srcLocation   = locations[location];
-                    const srcCollection = typeof collection === 'string' ? srcLocation[collection] : collection.reduce((obj, key) => obj[key], srcLocation);
-
-                    if(value instanceof Array) {
-                        result = [];
-                        for(const v of value) {
-                            const srcObject = srcCollection[v];
-                            result.push(GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
-                        }
-                    } else {
-                        const srcObject = srcCollection[/** @type {number} */(value)];
-                        result = GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
-                        if(assign) {
-                            Object.assign(result, assign);
-                        }
-                    }
-                } else {
-                    if(value instanceof Array) {
-                        result = [];
-                        for(const v of value) {
-                            const srcObject = v;
-                            result.push(GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory)));
-                        }
-                    } else {
-                        const srcObject = /** @type {Record<string, unknown>} */(value);
-                        result = GLTFProperty.#ensureInstance({ uri, root, parent: json }, srcObject, /** @type {typeof GLTFProperty|undefined} */(factory));
-                        if(assign) {
-                            Object.assign(result, assign);
-                        }
-                    }
-                }
-
-                references[name] = result;
-
-                if(alias) {
-                    references[alias] = result;
-                }
-            }
-        }
-
-        return {
-            ...json,
-            ...references
-        };
-    }
-
-    /**
-     * Resolves a JSON Pointer within the context of a GLTFProperty.
-     *
-     * [Reference Spec - Pointers](https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/ObjectModel.adoc#4-core-pointers)
-     *
-     * @param {Record<string, any>} root - The root glTF object
-     * @param {string} pointer - The JSON Pointer string
-     */
-    static #unmarshallJSONPointerResolver(root, pointer) {
-        /**
-         * Root Collections we need to track so that they can be updated in the scene graph after animations
-         *
-         * /cameras/{}/
-         * /materials/{}/
-         * /meshes/{}/
-         * /nodes/{}/
-         * /extensions/KHR_lights_punctual/lights/{}/
-         *
-         * Find first instance of /{}/ then the collection name is everything before that
-         */
-        const indexMatch = pointer.match(/\/(\d+)\//);
-
-        if(!indexMatch) throw new Error('Invalid JSON Pointer');
-
-        const collection = pointer.substring(0, indexMatch.index);
-        const target     = collection.substring(1).split(/\//).reduce((obj, key) => obj[key], root)[Number(indexMatch[1])]
-        const tokens     = pointer.substring(1).split(/\//);
-        const path       = /** @type {string} */(tokens.at(-1));
-
-        /**
-         * @type {{
-         *  instances?: WeakMap<Record<string, unknown>, GLTFProperty | Record<string, unknown>>,
-         *  root: { collection: string, target: any },
-         *  target: any,
-         *  path: string,
-         * }}
-         */
-        const state = {
-            instances: GLTFProperty.#ensureInstances(root),
-            root:   { collection, target },
-            target: tokens.slice(0, -1).reduce((obj, key) => obj[key], root),
-            path,
-        }
-
-        const resolve = () => {
-            if(!state.instances) return state;
-
-            const rootTarget = state.instances.get(state.root.target);
-            const target     = state.instances.get(state.target);
-
-            if(!rootTarget || !target) throw new Error('Invalid State');
-
-            // allow garbage collection of unmarshalled json after first resolve call
-            state.root.target = rootTarget;
-            state.target      = target;
-            delete state.instances;
-
-            return /** @type {JSONPointerResolveResult} */(state);
-        }
-
-        return resolve;
+    static prepareJSON(json, graph) {
+        graph.root ??= json;
+        return /** @type {PreparedFromJSON} */({ json, graph });
     }
 
     /**
@@ -378,5 +295,133 @@ export class NamedGLTFProperty extends GLTFProperty {
          * The user-defined name of this object.
          */
         this.name = name;
+    }
+}
+
+/**
+ * Resolves a JSON Pointer within the context of a GLTFProperty.
+ *
+ * [Reference Spec - Pointers](https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/ObjectModel.adoc#4-core-pointers)
+ */
+export class JSONPointer {
+    /**
+     * @typedef {{
+     *  instances: WeakMap<Record<string, unknown>, GLTFProperty | Record<string, unknown>>
+     *  root: Record<string, unknown>,
+     *  target: Record<string, unknown>,
+     * }} JSONPointerReferences
+     */
+
+    /**
+     * @type {JSONPointerReferences | null}
+     */
+    #references;
+
+    /**
+     * @type {Record<string, unknown>|undefined}
+     */
+    #target;
+
+    /**
+     * @type {Record<string, unknown>|undefined}
+     */
+    #rootTarget;
+
+
+    /**
+     * Creates a new instance of JSONPointer.
+     * @param {string} pointer - The JSON Pointer string
+     * @param {Record<string, any>} root - The root glTF object
+     */
+    constructor(pointer, root) {
+        /**
+         * Root Collections we need to track so that they can be updated in the scene graph after animations
+         *
+         * /cameras/{}/
+         * /materials/{}/
+         * /meshes/{}/
+         * /nodes/{}/
+         * /extensions/KHR_lights_punctual/lights/{}/
+         *
+         * Find first instance of /{}/ then the collection name is everything before that
+         */
+        const indexMatch = pointer.match(/\/(\d+)\//);
+
+        if(!indexMatch) throw new Error('Invalid JSON Pointer');
+
+        const collection = pointer.substring(0, indexMatch.index);
+        const target     = collection.substring(1).split(/\//).reduce((obj, key) => obj[key], root)[Number(indexMatch[1])]
+        const tokens     = pointer.substring(1).split(/\//);
+        const path       = /** @type {string} */(tokens.at(-1));
+
+        /**
+         * The collection name this JSON Pointer targets.
+         * This is used to update the scene graph during animations.
+         */
+        this.collection = collection;
+
+        /**
+         * The property name within the target object.
+         */
+        this.path = path;
+
+        this.#references = {
+            instances: ensureInstances(root),
+            root: target,
+            target: tokens.slice(0, -1).reduce((obj, key) => obj[key], root),
+        }
+    }
+
+    /**
+     * The target object of this JSON Pointer.
+     */
+    get target() {
+        if(this.#target) return this.#target;
+        this.#resolve();
+        return this.#target;
+    }
+
+    /**
+     * The root target object of this JSON Pointer.
+     * This is used to update the scene graph during animations.
+     * This may be identical to the target.
+     */
+    get rootTarget() {
+        if(this.#rootTarget) return this.#rootTarget;
+        this.#resolve();
+        return this.#rootTarget;
+    }
+
+    /**
+     * Gets the value at the JSON Pointer's path.
+     */
+    get value() {
+        return this.target[this.path];
+    }
+
+    /**
+     * Sets the value at the JSON Pointer's path.
+     * @param {unknown} v - The value to set
+     */
+    set value(v) {
+        this.target[this.path] = v;
+    }
+
+    /**
+     * @returns {asserts this is { #target: Record<string, unknown>, #rootTarget: Record<string, unknown> }}
+     */
+    #resolve() {
+        const refs = /** @type {JSONPointerReferences} */(this.#references);
+
+        const rootTarget = refs.instances.get(refs.root);
+        const target     = refs.instances.get(refs.target) ?? refs.target; // may not be a GLTFProperty
+
+        if(!rootTarget || !target) throw new Error('Invalid State');
+
+        this.#rootTarget = /** @type {Record<string, unknown>} */(rootTarget);
+        this.#target     = /** @type {Record<string, unknown>} */(target);
+
+        // allow garbage collection of unmarshalled json after first resolve call
+        this.#references = null;
     }
 }

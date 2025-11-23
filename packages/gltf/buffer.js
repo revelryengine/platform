@@ -9,7 +9,7 @@
 import { NamedGLTFProperty } from './gltf-property.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { bufferExtensions, BufferExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -59,16 +59,13 @@ export class Buffer extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {buffer & namedGLTFPropertyData} buffer - The buffer JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(buffer, graph) {
-        return this.unmarshall(graph, buffer, {
-            uri: { factory: URL }
-        }, this);
-    }
+    static referenceFields = {
+        uri: { factory: () => URL },
+    };
 
     /**
      * Fetches the binary data into an array buffer.

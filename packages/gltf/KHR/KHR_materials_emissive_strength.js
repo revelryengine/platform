@@ -11,7 +11,7 @@
 import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsEmissiveStrengthExtensions, MaterialKHRMaterialsEmissiveStrengthExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -46,18 +46,6 @@ export class MaterialKHRMaterialsEmissiveStrength extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsEmissiveStrength & glTFPropertyData} materialKHRMaterialsEmissiveStrength - The KHR_materials_emissive_strength JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(materialKHRMaterialsEmissiveStrength, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsEmissiveStrength, {
-            // No reference fields
-        }, this);
     }
 }
 

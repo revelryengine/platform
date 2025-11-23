@@ -18,7 +18,7 @@ import {
 } from './constants.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { accessorExtensions, AccessorExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -40,6 +40,10 @@ import {
  * @property {accessorSparse} [sparse] - Sparse storage of attributes that deviate from their initialization value.
  * @property {accessorExtensions} [extensions] - Extension-specific data.
  */
+
+const _ArrayBufferClass = typeof SharedArrayBuffer !== 'undefined'
+    ? SharedArrayBuffer
+    : ArrayBuffer;
 
 /**
  * Accessor class representation.
@@ -171,17 +175,14 @@ export class Accessor extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {accessor & namedGLTFPropertyData} accessor - The accessor JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(accessor, graph) {
-        return this.unmarshall(graph, accessor, {
-            bufferView: { factory: BufferView, collection: 'bufferViews' },
-            sparse:     { factory: AccessorSparse }
-        }, this);
-    }
+    static referenceFields = {
+        bufferView: { factory: () => BufferView, collection: 'bufferViews' },
+        sparse:     { factory: () => AccessorSparse },
+    };
 
     /**
      * Loads the accessor data.
@@ -209,7 +210,7 @@ export class Accessor extends NamedGLTFProperty {
         let start = byteOffset;
 
         if (!bufferView) {
-            this.#arrayBuffer = new SharedArrayBuffer(
+            this.#arrayBuffer = new _ArrayBufferClass(
                 count * numberOfComponents * numberOfBytes,
             );
 

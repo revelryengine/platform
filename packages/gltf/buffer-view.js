@@ -10,7 +10,7 @@ import { NamedGLTFProperty } from './gltf-property.js';
 import { Buffer            } from './buffer.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { bufferViewExtensions, BufferViewExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -85,14 +85,11 @@ export class BufferView extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {bufferView & namedGLTFPropertyData} bufferView - The bufferView JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(bufferView, graph) {
-        return this.unmarshall(graph, bufferView, {
-            buffer: { factory: Buffer, collection: 'buffers' },
-        }, this);
-    }
+    static referenceFields = {
+        buffer: { factory: () => Buffer, collection: 'buffers' },
+    };
 }

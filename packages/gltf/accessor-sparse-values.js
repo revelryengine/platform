@@ -14,7 +14,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { BufferView   } from './buffer-view.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { accessorSparseValuesExtensions, AccessorSparseValuesExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -65,16 +65,13 @@ export class AccessorSparseValues extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {accessorSparseValues & glTFPropertyData} accessorSparseValues - The accessor sparse values JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(accessorSparseValues, graph) {
-        return this.unmarshall(graph, accessorSparseValues, {
-            bufferView: { factory: BufferView, collection: 'bufferViews' },
-        }, this);
-    }
+    static referenceFields = {
+        bufferView: { factory: () => BufferView, collection: 'bufferViews' },
+    };
 
     /**
      * Loads the sparse values data.

@@ -13,7 +13,7 @@ import { Image            } from '../image.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { textureKHRTextureBasisuExtensions, TextureKHRTextureBasisuExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -54,16 +54,13 @@ export class TextureKHRTextureBasisu extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {textureKHRTextureBasisu & glTFPropertyData} textureKHRTextureBasisu - The KHR_texture_basisu JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(textureKHRTextureBasisu, graph) {
-        return this.unmarshall(graph, textureKHRTextureBasisu, {
-            source: { factory: Image, collection: 'images' },
-        }, this);
-    }
+    static referenceFields = {
+        source: { factory: () => Image, collection: 'images' },
+    };
 
     /**
      * Transcodes the texture given the support compression formats

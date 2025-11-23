@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { Image        } from '../image.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { textureEXTTextureWebPExtensions, TextureEXTTextureWebPExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -51,16 +51,13 @@ export class TextureEXTTextureWebP extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {textureEXTTextureWebP & glTFPropertyData} textureEXTTextureWebP - The EXT_texture_webp JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(textureEXTTextureWebP, graph) {
-        return this.unmarshall(graph, textureEXTTextureWebP, {
-            source: { factory: Image, collection: 'images' },
-        }, this);
-    }
+    static referenceFields = {
+        source: { factory: () => Image, collection: 'images' },
+    };
 }
 
 GLTFProperty.extensions.add('EXT_texture_webp', {
@@ -68,3 +65,4 @@ GLTFProperty.extensions.add('EXT_texture_webp', {
         Texture: TextureEXTTextureWebP,
     },
 });
+

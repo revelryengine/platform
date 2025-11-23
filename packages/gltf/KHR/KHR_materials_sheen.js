@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsSheenExtensions, MaterialKHRMaterialsSheenExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -75,17 +75,14 @@ export class MaterialKHRMaterialsSheen extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsSheen & glTFPropertyData} materialKHRMaterialsSheen - The KHR_materials_sheen JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsSheen, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsSheen, {
-            sheenColorTexture:     { factory: TextureInfo },
-            sheenRoughnessTexture: { factory: TextureInfo },
-        }, this);
-    }
+    static referenceFields = {
+        sheenColorTexture:     { factory: () => TextureInfo, assign: { sRGB: true } },
+        sheenRoughnessTexture: { factory: () => TextureInfo                         },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_sheen', {

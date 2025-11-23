@@ -11,7 +11,7 @@
  * @module
  */
 
-import { GLTFProperty     } from '../gltf-property.js';
+import { GLTFProperty } from '../gltf-property.js';
 import { BufferView       } from '../buffer-view.js';
 import { Accessor         } from '../accessor.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
@@ -20,7 +20,7 @@ import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
 const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_compression.worker.js'), { count: 4, type: 'module' });
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { meshPrimitiveKHRDracoMeshCompressionExtensions, MeshPrimitiveKHRDracoMeshCompressionExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -82,41 +82,51 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {meshPrimitiveKHRDracoMeshCompression & glTFPropertyData} meshPrimitiveKHRDracoMeshCompression - The KHR_draco_mesh_compression JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(meshPrimitiveKHRDracoMeshCompression, graph) {
-        const primitive  = /** @type {meshPrimitive} */(graph.parent);
-
-        return this.unmarshall(graph, {
-            ...meshPrimitiveKHRDracoMeshCompression,
-            primitive: {
-                indices:    primitive.indices,
-                attributes: primitive.attributes,
-            }
-        }, {
-            bufferView: { factory: BufferView, collection: 'bufferViews' },
-            primitive: { referenceFields: {
-                indices: { factory: Accessor, collection: 'accessors' },
-                attributes: { referenceFields: {
-                    POSITION:   { factory: Accessor, collection: 'accessors' },
-                    NORMAL:     { factory: Accessor, collection: 'accessors' },
-                    TANGENT:    { factory: Accessor, collection: 'accessors' },
-                    TEXCOORD_0: { factory: Accessor, collection: 'accessors' },
-                    TEXCOORD_1: { factory: Accessor, collection: 'accessors' },
-                    TEXCOORD_2: { factory: Accessor, collection: 'accessors' },
-                    TEXCOORD_3: { factory: Accessor, collection: 'accessors' },
-                    COLOR_0:    { factory: Accessor, collection: 'accessors' },
-                    COLOR_1:    { factory: Accessor, collection: 'accessors' },
-                    WEIGHTS_0:  { factory: Accessor, collection: 'accessors' },
-                    WEIGHTS_1:  { factory: Accessor, collection: 'accessors' },
-                    JOINTS_0:   { factory: Accessor, collection: 'accessors' },
-                    JOINTS_1:   { factory: Accessor, collection: 'accessors' },
-                } },
+    static referenceFields = {
+        bufferView: { factory: () => BufferView, collection: 'bufferViews' },
+        primitive: { referenceFields: {
+            indices: { factory: () => Accessor, collection: 'accessors' },
+            attributes: { referenceFields: {
+                POSITION:   { factory: () => Accessor, collection: 'accessors' },
+                NORMAL:     { factory: () => Accessor, collection: 'accessors' },
+                TANGENT:    { factory: () => Accessor, collection: 'accessors' },
+                TEXCOORD_0: { factory: () => Accessor, collection: 'accessors' },
+                TEXCOORD_1: { factory: () => Accessor, collection: 'accessors' },
+                TEXCOORD_2: { factory: () => Accessor, collection: 'accessors' },
+                TEXCOORD_3: { factory: () => Accessor, collection: 'accessors' },
+                COLOR_0:    { factory: () => Accessor, collection: 'accessors' },
+                COLOR_1:    { factory: () => Accessor, collection: 'accessors' },
+                WEIGHTS_0:  { factory: () => Accessor, collection: 'accessors' },
+                WEIGHTS_1:  { factory: () => Accessor, collection: 'accessors' },
+                JOINTS_0:   { factory: () => Accessor, collection: 'accessors' },
+                JOINTS_1:   { factory: () => Accessor, collection: 'accessors' },
             } },
-        }, this);
+        } },
+    };
+
+    /**
+     * Prepares JSON with attached primitive references prior to unmarshalling.
+     * @param {meshPrimitiveKHRDracoMeshCompression & glTFPropertyData} meshPrimitiveKHRDracoMeshCompression - JSON representation.
+     * @param {Partial<FromJSONGraph>} graph - Graph context.
+     * @override
+     */
+    static prepareJSON(meshPrimitiveKHRDracoMeshCompression, graph) {
+        const primitive = /** @type {meshPrimitive} */(graph.parent);
+
+        return super.prepareJSON(
+            {
+                ...meshPrimitiveKHRDracoMeshCompression,
+                primitive: {
+                    indices:    primitive.indices,
+                    attributes: primitive.attributes,
+                },
+            },
+            graph
+        );
     }
 
     /**
@@ -145,6 +155,14 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
         const response = await workerHelper.callMethod({
             method: 'decode', args: [{ arrayBuffer, byteOffset, byteLength, attributes, indices }], signal
         });
+
+        if(typeof SharedArrayBuffer === 'undefined') {
+            for (const [name, arrayBuffer] of Object.entries(response.attributes)) {
+                const accessor = this.primitive.attributes[/** @type {AttributeName} */(name)];
+                const accessorArray = /** @type {Accessor} */(accessor).getArrayBuffer();
+                new Uint8Array(accessorArray).set(new Uint8Array(arrayBuffer.buffer));
+            }
+        }
 
         const accessor = this.primitive.indices;
         new Uint8Array(accessor.getArrayBuffer()).set(new Uint8Array(response.indices.buffer));

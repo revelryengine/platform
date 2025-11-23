@@ -10,7 +10,7 @@ import { NamedGLTFProperty } from './gltf-property.js';
 import { MeshPrimitive     } from './mesh-primitive.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { meshExtensions, MeshExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -59,16 +59,13 @@ export class Mesh extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {mesh & namedGLTFPropertyData} mesh - The mesh JSON representation.
-     * @param {FromJSONGraph} options - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(mesh, options) {
-        return this.unmarshall(options, mesh, {
-            primitives: { factory: MeshPrimitive },
-        }, this);
-    }
+    static referenceFields = {
+        primitives: { factory: () => MeshPrimitive },
+    };
 
     /**
      * Loads all primitives associated with this mesh

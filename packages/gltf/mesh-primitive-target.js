@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { Accessor     } from './accessor.js';
 
 /**
- * @import { GLTFPropertyData, glTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { meshPrimitiveTargetExtensions, MeshPrimitiveTargetExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -77,18 +77,15 @@ export class MeshPrimitiveTarget extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {meshPrimitiveTarget & glTFPropertyData} meshPrimitiveTarget - The mesh primitive target JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(meshPrimitiveTarget, graph) {
-        return this.unmarshall(graph, meshPrimitiveTarget, {
-            POSITION:   { factory: Accessor, collection: 'accessors' },
-            NORMAL:     { factory: Accessor, collection: 'accessors' },
-            TANGENT:    { factory: Accessor, collection: 'accessors' },
-            TEXCOORD_0: { factory: Accessor, collection: 'accessors' },
-            TEXCOORD_1: { factory: Accessor, collection: 'accessors' },
-        }, this);
-    }
+    static referenceFields = {
+        POSITION:   { factory: () => Accessor, collection: 'accessors' },
+        NORMAL:     { factory: () => Accessor, collection: 'accessors' },
+        TANGENT:    { factory: () => Accessor, collection: 'accessors' },
+        TEXCOORD_0: { factory: () => Accessor, collection: 'accessors' },
+        TEXCOORD_1: { factory: () => Accessor, collection: 'accessors' },
+    };
 }

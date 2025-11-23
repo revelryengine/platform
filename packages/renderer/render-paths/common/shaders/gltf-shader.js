@@ -280,6 +280,10 @@ export class GLTFShader extends Shader {
             flags.colorTargets.motion ? /** @type {const} */({ format: 'rg16float'   }) : null,
         ]);
 
+        const depthBias = flags.shadowPass && primitive.mode > 3 ? 1 : 0;
+
+        const stripIndexFormat = primitive.indices && (primitive.mode === 3 || primitive.mode === 5) ? `uint${primitive.indices.getNumberOfBytes() * 8}` : undefined;
+
         return {
             label: this.constructor.name,
             layout: this.hints[0].layout,
@@ -297,11 +301,12 @@ export class GLTFShader extends Shader {
                 format:              'depth24plus',
                 depthWriteEnabled:   flags.depthWriteEnabled ?? true,
                 depthCompare:        'less',
-                depthBias:           flags.shadowPass ? 1 : 0,
-                depthBiasSlopeScale: flags.shadowPass ? 1 : 0,
+                depthBias:           depthBias,
+                depthBiasSlopeScale: depthBias,
             },
             primitive: {
                 topology: PRIMITIVE_MODES[primitive.mode],
+                stripIndexFormat,
                 cullMode: flags.doubleSided ? 'none': 'back',
                 frontFace,
             },

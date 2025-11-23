@@ -6,13 +6,13 @@
  * @module
  */
 
-import { NamedGLTFProperty  } from './gltf-property.js';
+import { NamedGLTFProperty } from './gltf-property.js';
 import { CameraOrthographic } from './camera-orthographic.js';
 import { CameraPerspective  } from './camera-perspective.js';
 import { mat4               } from "revelryengine/deps/gl-matrix.js";
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { cameraExtensions, CameraExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -80,17 +80,14 @@ export class Camera extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {camera & namedGLTFPropertyData} camera - The camera JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(camera, graph) {
-        return this.unmarshall(graph, camera, {
-            orthographic: { factory: CameraOrthographic },
-            perspective:  { factory: CameraPerspective  },
-        }, this);
-    }
+    static referenceFields = {
+        orthographic: { factory: () => CameraOrthographic },
+        perspective:  { factory: () => CameraPerspective  },
+    };
 
     /**
      * Checks if the camera is a perspective camera.

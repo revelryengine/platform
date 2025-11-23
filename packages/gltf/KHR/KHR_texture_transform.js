@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { mat3         } from 'revelryengine/deps/gl-matrix.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData } from '../gltf-property.types.d.ts';
  * @import { textureInfoKHRTextureTransformExtensions, TextureInfoKHRTextureTransformExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -67,18 +67,6 @@ export class TextureInfoKHRTextureTransform extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {textureInfoKHRTextureTransform & glTFPropertyData} textureInfoKHRTextureTransform - The KHR_texture_transform JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(textureInfoKHRTextureTransform, graph) {
-        return this.unmarshall(graph, textureInfoKHRTextureTransform, {
-            // No reference fields
-        }, this);
     }
 
     /**

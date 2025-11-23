@@ -10,16 +10,13 @@
  * @module
  */
 
-import { GLTFProperty } from '../gltf-property.js';
+import { GLTFProperty, JSONPointer } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { animationChannelTargetKHRAnimationPointerExtensions, AnimationChannelTargetKHRAnimationPointerExtensions } from '@revelryengine/gltf/extensions';
  */
 
-/**
- * @import { JSONPointerResolveResult } from '../gltf-property.js';
- */
 /**
  * @typedef {object} animationChannelTargetKHRAnimationPointer - KHR_animation_pointer JSON representation.
  * @property {string} pointer - A JSON Pointer string.
@@ -34,19 +31,19 @@ export class AnimationChannelTargetKHRAnimationPointer extends GLTFProperty {
     /**
      * Creates a new instance of AnimationChannelTargetKHRAnimationPointer.
      * @param {{
-     *  resolve: () => JSONPointerResolveResult,
+     *  pointer: JSONPointer,
      *  extensions?: AnimationChannelTargetKHRAnimationPointerExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_animation_pointer object
      */
     constructor(unmarshalled) {
         super(unmarshalled);
 
-        const { resolve, extensions } = unmarshalled;
+        const { pointer, extensions } = unmarshalled;
 
         /**
-         * Resolves the target and path
+         * A pointer that resolves the target and path
          */
-        this.resolve = resolve;
+        this.pointer = pointer;
 
         /**
          * Extension-specific data.
@@ -55,16 +52,13 @@ export class AnimationChannelTargetKHRAnimationPointer extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {animationChannelTargetKHRAnimationPointer & glTFPropertyData} khrAnimationPointerTarget - The KHR_animation_pointer JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrAnimationPointerTarget, graph) {
-        return this.unmarshall(graph, khrAnimationPointerTarget, {
-            pointer: { pointer: 'resolve' }
-        }, this);
-    }
+    static referenceFields = {
+        pointer: { factory: () => JSONPointer },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_animation_pointer', {

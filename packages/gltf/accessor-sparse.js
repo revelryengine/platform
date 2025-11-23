@@ -6,12 +6,12 @@
  * @module
  */
 
-import { GLTFProperty } from './gltf-property.js';
+import { GLTFProperty          } from './gltf-property.js';
 import { AccessorSparseIndices } from './accessor-sparse-indices.js';
 import { AccessorSparseValues  } from './accessor-sparse-values.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { accessorSparseExtensions, AccessorSparseExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -65,17 +65,14 @@ export class AccessorSparse extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {accessorSparse & glTFPropertyData} accessorSparse - The accessor sparse JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(accessorSparse, graph) {
-        return this.unmarshall(graph, accessorSparse, {
-            indices: { factory: AccessorSparseIndices },
-            values:  { factory: AccessorSparseValues  },
-        }, this);
-    }
+    static referenceFields = {
+        indices: { factory: () => AccessorSparseIndices },
+        values:  { factory: () => AccessorSparseValues  },
+    };
 
     /**
      * Loads the sparse data.

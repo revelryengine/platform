@@ -10,7 +10,7 @@ import { TextureInfo } from './texture-info.js';
 import { Texture     } from './texture.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { materialNormalTextureInfoExtensions, MaterialNormalTextureInfoExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -53,14 +53,11 @@ export class MaterialNormalTextureInfo extends TextureInfo {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialNormalTextureInfo & glTFPropertyData} materialNormalTextureInfo - The material normal texture info JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialNormalTextureInfo, graph) {
-        return this.unmarshall(graph, materialNormalTextureInfo, {
-            index: { factory: Texture, collection: 'textures', alias: 'texture' },
-        }, this);
-    }
+    static referenceFields = {
+        index: { factory: () => Texture, collection: 'textures', alias: 'texture' },
+    };
 }

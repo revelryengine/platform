@@ -12,7 +12,7 @@ import { GLTFProperty } from '../gltf-property.js';
 import { TextureInfo  } from '../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsSpecularExtensions, MaterialKHRMaterialsSpecularExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -76,17 +76,14 @@ export class MaterialKHRMaterialsSpecular extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsSpecular & glTFPropertyData} materialKHRMaterialsSpecular - The KHR_materials_specular JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsSpecular, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsSpecular, {
-            specularTexture:      { factory: TextureInfo },
-            specularColorTexture: { factory: TextureInfo },
-        }, this);
-    }
+    static referenceFields = {
+        specularTexture:      { factory: () => TextureInfo },
+        specularColorTexture: { factory: () => TextureInfo, assign: { sRGB: true } },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_specular', {

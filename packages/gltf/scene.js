@@ -10,7 +10,7 @@ import { NamedGLTFProperty } from './gltf-property.js';
 import { Node              } from './node.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { sceneExtensions, SceneExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -48,16 +48,13 @@ export class Scene extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {scene & namedGLTFPropertyData} scene - The scene JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(scene, graph) {
-        return this.unmarshall(graph, scene, {
-            nodes: { factory: Node, collection: 'nodes' },
-        }, this);
-    }
+    static referenceFields = {
+        nodes: { factory: () => Node, collection: 'nodes' },
+    };
 
     /**
      * Traverses the scene's node hierarchy depth-first

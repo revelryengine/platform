@@ -11,7 +11,7 @@ import { Image             } from './image.js';
 import { Sampler           } from './sampler.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { textureExtensions, TextureExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -62,23 +62,20 @@ export class Texture extends NamedGLTFProperty {
     }
 
     /**
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
+     * @override
+     */
+    static referenceFields = {
+        sampler: { factory: () => Sampler, collection: 'samplers' },
+        source:  { factory: () => Image,   collection: 'images'   },
+    };
+
+    /**
      * Returns the source image of this texture from any extensions that may be present or falls back to the default source.
      */
     getSource() {
         return this.extensions?.EXT_texture_webp?.source ?? this.source;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {texture & namedGLTFPropertyData} texture - The texture JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(texture, graph) {
-        return this.unmarshall(graph, texture, {
-            sampler: { factory: Sampler, collection: 'samplers' },
-            source:  { factory: Image,   collection: 'images'   },
-        }, this);
     }
 
     /**

@@ -13,7 +13,7 @@ import { MaterialOcclusionTextureInfo } from './material-occlusion-texture-info.
 import { TextureInfo                  } from './texture-info.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { materialExtensions, MaterialExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -112,17 +112,14 @@ export class Material extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {material & namedGLTFPropertyData} material - The material JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(material, graph) {
-        return this.unmarshall(graph, material, {
-            pbrMetallicRoughness: { factory: MaterialPBRMetallicRoughness        },
-            normalTexture:        { factory: MaterialNormalTextureInfo           },
-            occlusionTexture:     { factory: MaterialOcclusionTextureInfo        },
-            emissiveTexture:      { factory: TextureInfo, assign: { sRGB: true } },
-        }, this);
-    }
+    static referenceFields = {
+        pbrMetallicRoughness: { factory: () => MaterialPBRMetallicRoughness },
+        normalTexture:        { factory: () => MaterialNormalTextureInfo    },
+        occlusionTexture:     { factory: () => MaterialOcclusionTextureInfo },
+        emissiveTexture:      { factory: () => TextureInfo, assign: { sRGB: true } },
+    };
 }

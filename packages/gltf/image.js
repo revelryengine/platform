@@ -12,7 +12,7 @@ import { BufferView        } from './buffer-view.js';
 import { read as readKTX   } from "revelryengine/deps/ktx-parse.js";
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { imageExtensions, ImageExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -74,17 +74,14 @@ export class Image extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {image & namedGLTFPropertyData} image - The image JSON representation.
-     * @param {import('./gltf-property.js').FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(image, graph) {
-        return this.unmarshall(graph, image, {
-            bufferView: { factory: BufferView, collection: 'bufferViews' },
-            uri:        { factory: URL },
-        }, this);
-    }
+    static referenceFields = {
+        bufferView: { factory: () => BufferView, collection: 'bufferViews' },
+        uri:        { factory: () => URL                                      },
+    };
 
     /**
      * Loads the image data as a Uint8Array.

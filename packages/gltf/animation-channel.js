@@ -11,7 +11,7 @@ import { AnimationChannelTarget } from './animation-channel-target.js';
 import { AnimationSampler       } from './animation-sampler.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { animationChannelExtensions, AnimationChannelExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -60,15 +60,12 @@ export class AnimationChannel extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {animationChannel & glTFPropertyData} animationChannel - The animation channel JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(animationChannel, graph) {
-        return this.unmarshall(graph, animationChannel, {
-            sampler: { factory: AnimationSampler, collection: 'samplers', location: 'parent' },
-            target:  { factory: AnimationChannelTarget }
-        }, this);
-    }
+    static referenceFields = {
+        sampler: { factory: () => AnimationSampler, collection: 'samplers', location: 'parent' },
+        target:  { factory: () => AnimationChannelTarget },
+    };
 }

@@ -11,7 +11,7 @@
 import { GLTFProperty } from '../../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../../gltf-property.types.d.ts';
  * @import { khrXMPExtensions, KHRXMPExtensions, objectKHRXMPExtensions, ObjectKHRXMPExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -56,18 +56,6 @@ export class KHRXMP extends GLTFProperty {
          */
         this.extensions = extensions;
     }
-
-    /**
-     * Creates a KHRXMP instance from its JSON representation.
-     * @param {khrXMP & glTFPropertyData} khrXMP - The KHR_xmp JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(khrXMP, graph) {
-        return this.unmarshall(graph, khrXMP, {
-            // No reference fields
-        }, this);
-    }
 }
 
 /**
@@ -106,16 +94,13 @@ export class ObjectKHRXMP extends GLTFProperty {
     }
 
     /**
-     * Creates an ObjectKHRXMP instance from its JSON representation.
-     * @param {objectKHRXMP & glTFPropertyData} objectKHRXMP - The KHR_xmp object JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(objectKHRXMP, graph) {
-        return this.unmarshall(graph, objectKHRXMP, {
-            packet: { collection: ['extensions', 'KHR_xmp', 'packets'] }
-        }, this);
-    }
+    static referenceFields = {
+        packet: { collection: ['extensions', 'KHR_xmp', 'packets'] },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_xmp', {

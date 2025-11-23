@@ -28,17 +28,15 @@ Extensions should focus on the library's two main objectives: **Simplify the glT
 
 #### Dereferencing Example
 
-Implement the static `fromJSON` method and use the `unmarshall` method to convert indices to object references:
+Add the static `referenceFields`
 
 ```js
-static fromJSON(nodeEXTExample, graph) {
-    return this.unmarshall(graph, nodeEXTExample, {
-        texture: { factory: Texture },  // Converts texture index → Texture instance
-        node:    { factory: Node    },  // Converts node index → Node instance
-    }, this);
+static referenceFields = {
+    texture: { factory: () => Texture },  // Converts texture index → Texture instance
+    node:    { factory: () => Node    },  // Converts node index → Node instance
 }
 ```
-See [Unmarshalling](#unmarshalling) for more details on how this works.
+See [Unmarshalling](./development.md#unmarshalling) for more details on how this works.
 
 #### Binary Data Loading Example
 
@@ -115,7 +113,7 @@ import { GLTFProperty } from 'revelryengine/gltf/gltf-property.js';
 // Use relative path '../gltf-property.js' if contributing an extension to this codebase
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from 'revelryengine/gltf/gltf-property.js'; // or `../gltf-property.js` 
+ * @import { GLTFPropertyData } from 'revelryengine/gltf/gltf-property.types.d.ts'; // or `../gltf-property.types.d.ts` 
  * @import { nodeEXTExampleExtensions, NodeEXTExampleExtensions } from '@revelryengine/gltf/extensions';
  * 
  * These `Extensions` interfaces correspond to the ones created in `EXT_example.types.d.ts`. 
@@ -157,19 +155,14 @@ export class NodeEXTExample extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * This static method is called by the glTF loader when deserializing JSON.
-     * @param {nodeEXTExample & glTFPropertyData} nodeEXTExample - The EXT_example JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      */
-    static fromJSON(nodeEXTExample, graph) {
-        return this.unmarshall(graph, nodeEXTExample, {
-            // If your extension has reference fields (indices pointing to other glTF objects),
-            // you would list them here. For example:
-            // texture: { factory: Texture },
-            // node:    { factory: Node },
-        }, this);
+    static referenceFields = {
+        // If your extension has reference fields (indices pointing to other glTF objects),
+        // you would list them here. For example:
+        // texture: { factory: () => Texture },
+        // node:    { factory: () => Node },
     }
 }
 
@@ -187,7 +180,7 @@ GLTFProperty.extensions.add('EXT_example', {
 **Key points:**
 
 - **`GLTFProperty` base class**: All extension classes extend `GLTFProperty`, which provides common functionality like extensions support and JSON serialization.
-- **`fromJSON` method**: This is how the glTF loader knows how to construct your class from JSON. The `unmarshall` method handles references to other glTF objects (like textures, nodes, buffers) automatically.
+- **`constructor` and `referenceFields`**: The constructor receives an unmarshalled object with all references already resolved. The static `referenceFields` property defines how references to other glTF objects (like textures, nodes, buffers) are handled automatically during the unmarshalling process when the static `fromJSON` method is called. See [Unmarshalling](./development.md#unmarshalling) for more details on how this works.
 - **Registry pattern**: The `GLTFProperty.extensions.add()` call maps the extension name to the class constructor. The schema object indicates which glTF property type (Node, Material, TextureInfo, etc.) this extension attaches to.
 
 ## Step 3: Register in the Extensions Module
@@ -239,8 +232,8 @@ When `GLTF.fromJSON()` is called:
 1. The loader encounters `node.extensions.EXT_example` in the JSON
 2. It looks up `'EXT_example'` in the registry
 3. It finds the mapping to `NodeEXTExample` for the `Node` schema
-4. It calls `NodeEXTExample.fromJSON(...)` with the JSON data
-5. The `fromJSON` method creates a new instance via the constructor
+4. It calls the internal unmarshalling system, which uses `NodeEXTExample.referenceFields` to dereference any indices
+5. The unmarshalled data is passed to the `NodeEXTExample` constructor to create the instance
 6. The instance is assigned to `node.extensions.EXT_example`
 
 All of this happens automatically, giving users a seamless, strongly-typed experience when working with glTF extensions.

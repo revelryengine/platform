@@ -11,7 +11,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { TextureInfo  } from './texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { materialPBRMetallicRoughnessExtensions, MaterialPBRMetallicRoughnessExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -84,15 +84,12 @@ export class MaterialPBRMetallicRoughness extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {materialPBRMetallicRoughness & glTFPropertyData} materialPBRMetallicRoughness - The material PBR metallic-roughness JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialPBRMetallicRoughness, graph) {
-        return this.unmarshall(graph, materialPBRMetallicRoughness, {
-            baseColorTexture:         { factory: TextureInfo, assign: { sRGB: true } },
-            metallicRoughnessTexture: { factory: TextureInfo                         },
-        }, this);
-    }
+    static referenceFields = {
+        baseColorTexture:         { factory: () => TextureInfo, assign: { sRGB: true } },
+        metallicRoughnessTexture: { factory: () => TextureInfo                         },
+    };
 }

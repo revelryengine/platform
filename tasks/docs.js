@@ -203,18 +203,24 @@ async function generate(validate = false) {
 
     app.renderer.on(MarkdownPageEvent.BEGIN, output => {
         const declaration = /** @type {DeclarationReflection} */(output.model);
-
+        // if(declaration.sources?.[0]?.fileName.endsWith('gltf-property.types.d.ts')) {
+        //     console.log(Deno.inspect(declaration, {depth: 10}));
+        // }
         if(declaration.kind === typedoc.ReflectionKind.Module) {
             let root = 'revelryengine/';
             let ext  = '.js';
 
+            if(declaration.sources?.[0]?.fileName.endsWith('.d.ts')) {
+                ext = '.d.ts';
+            }
+
             // If the module is virtual, don't add the revelryengine prefix or extension suffix as it will be a complete specifier
-            if(output.model.name.startsWith('@')) {
+            if(declaration.name.startsWith('@')) {
                 root = '';
                 ext  = '';
             }
 
-            const path = `${root}${output.model.name}${ext}`;
+            const path = `${root}${declaration.name}${ext}`;
 
             for(const child of declaration.children ?? []) {
                 if(child.kind === typedoc.ReflectionKind.TypeAlias || child.kind === typedoc.ReflectionKind.Interface) {
@@ -244,10 +250,11 @@ async function generate(validate = false) {
                     child.typeParameters = undefined;
                 }
 
-                if(child?.comment?.summary) {
-                    for(const part of child.comment.summary) {
+                const summary = [...(child?.comment?.summary ?? []), ...(child?.signatures?.map(sig => sig.comment?.summary ?? []) ?? [])].flat();
+
+                if(summary.length) {
+                    for(const part of summary) {
                         if(part.kind === 'relative-link' && declaration.sources) {
-                            console.log('Found relative link in', declaration.name, ':', part.text);
                             // @ts-expect-error - we are purposely changing the kind
                             part.kind = 'text';
 
@@ -268,19 +275,6 @@ async function generate(validate = false) {
     });
 
     app.renderer.on(MarkdownPageEvent.END, output => {
-        const declaration = /** @type {DeclarationReflection} */(output.model);
-        if(declaration.kind === typedoc.ReflectionKind.Module) {
-            // console.log(declaration);
-        }
-        // Inject import example
-        if(declaration.kind !== typedoc.ReflectionKind.Project && declaration.kind !== typedoc.ReflectionKind.Module) {
-            if(declaration.kind === typedoc.ReflectionKind.TypeAlias || declaration.kind === typedoc.ReflectionKind.Interface) {
-                output.contents = output.contents?.replace(/\n\n/, `\n\n\`\`\`js\n\/\*\* @import { ${declaration.name} } from 'revelryengine/${pkg}/${declaration.parent?.name}'; \*\/\n\`\`\`\n`);
-            } else {
-                output.contents = output.contents?.replace(/\n\n/, `\n\n\`\`\`js\nimport { ${declaration.name} } from 'revelryengine/${pkg}/${declaration.parent?.name}';\n\`\`\`\n`);
-            }
-        }
-
         // Transform all `Defined in: [text](link)` links to be `[View Source](link)`
         output.contents = output.contents?.replace(/Defined in\: \[(.*?)\]\((.*?)\)/gm, (_match, _text, link) => {
             return `[View Source](${link})`;

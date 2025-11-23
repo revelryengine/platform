@@ -14,7 +14,7 @@ import { GL                } from './constants.js';
 import { quat              } from 'revelryengine/deps/gl-matrix.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { animationExtensions, AnimationExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -67,17 +67,14 @@ export class Animation extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {animation & namedGLTFPropertyData} animation - The animation JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(animation, graph) {
-        return this.unmarshall(graph, animation, {
-            samplers: { factory: AnimationSampler },
-            channels: { factory: AnimationChannel },
-        }, this);
-    }
+    static referenceFields = {
+        samplers: { factory: () => AnimationSampler },
+        channels: { factory: () => AnimationChannel },
+    };
 
     /**
      * Create an animator for the animation.
@@ -258,9 +255,9 @@ export class Animator {
 
             if(path === 'pointer') {
                 if(!channel.target.extensions?.KHR_animation_pointer) throw new Error('Invalid State');
-                const { root, target, path } = channel.target.extensions.KHR_animation_pointer.resolve();
-                this.targets[root.collection] ??= new Set();
-                this.targets[root.collection].add(root.target);
+                const { target, rootTarget, collection, path } = channel.target.extensions.KHR_animation_pointer.pointer;
+                this.targets[collection] ??= new Set();
+                this.targets[collection].add(rootTarget);
 
                 target[path] ??= type !== 'SCALAR' || path === 'weights' ? [] : 0;
             } else {
@@ -301,7 +298,7 @@ export class Animator {
             let target, path;
             if(channel.target.path === 'pointer'){
                 if(!channel.target.extensions?.KHR_animation_pointer) continue;
-                const resolved = channel.target.extensions.KHR_animation_pointer.resolve();
+                const resolved = channel.target.extensions.KHR_animation_pointer.pointer;
                 target = resolved.target;
                 path   = resolved.path;
             } else {

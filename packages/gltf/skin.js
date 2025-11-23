@@ -11,7 +11,7 @@ import { Node              } from './node.js';
 import { Accessor          } from './accessor.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { skinExtensions, SkinExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -65,16 +65,13 @@ export class Skin extends NamedGLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {skin & namedGLTFPropertyData} skin - The skin JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(skin, graph) {
-        return this.unmarshall(graph, skin, {
-            joints:              { factory: Node,     collection: 'nodes'     },
-            inverseBindMatrices: { factory: Accessor, collection: 'accessors' },
-            skeleton:            { factory: Node,     collection: 'nodes'     },
-        }, this);
-    }
+    static referenceFields = {
+        joints:              { factory: () => Node,     collection: 'nodes'     },
+        inverseBindMatrices: { factory: () => Accessor, collection: 'accessors' },
+        skeleton:            { factory: () => Node,     collection: 'nodes'     },
+    };
 }

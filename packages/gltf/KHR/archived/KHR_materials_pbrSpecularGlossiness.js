@@ -12,7 +12,7 @@ import { GLTFProperty } from '../../gltf-property.js';
 import { TextureInfo  } from '../../texture-info.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../../gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from '../../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsPBRSpecularGlossinessExtensions, MaterialKHRMaterialsPBRSpecularGlossinessExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -92,17 +92,14 @@ export class MaterialKHRMaterialsPBRSpecularGlossiness extends GLTFProperty {
     }
 
     /**
-     * Creates a MaterialKHRMaterialsPBRSpecularGlossiness instance from its JSON representation.
-     * @param {materialKHRMaterialsPBRSpecularGlossiness & glTFPropertyData} materialKHRMaterialsPBRSpecularGlossiness - The KHR_materials_pbrSpecularGlossiness JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(materialKHRMaterialsPBRSpecularGlossiness, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsPBRSpecularGlossiness, {
-            diffuseTexture:            { factory: TextureInfo, assign: { sRGB: true } },
-            specularGlossinessTexture: { factory: TextureInfo, assign: { sRGB: true } },
-        }, this);
-    }
+    static referenceFields = {
+        diffuseTexture:            { factory: () => TextureInfo, assign: { sRGB: true } },
+        specularGlossinessTexture: { factory: () => TextureInfo, assign: { sRGB: true } },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_pbrSpecularGlossiness', {

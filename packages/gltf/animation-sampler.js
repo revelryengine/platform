@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { Accessor     } from './accessor.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { animationSamplerExtensions, AnimationSamplerExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -66,15 +66,12 @@ export class AnimationSampler extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {animationSampler & glTFPropertyData} animationSampler - The animation sampler JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(animationSampler, graph) {
-        return this.unmarshall(graph, animationSampler, {
-            input:  { factory: Accessor, collection: 'accessors' },
-            output: { factory: Accessor, collection: 'accessors' },
-        }, this);
-    }
+    static referenceFields = {
+        input:  { factory: () => Accessor, collection: 'accessors' },
+        output: { factory: () => Accessor, collection: 'accessors' },
+    };
 }

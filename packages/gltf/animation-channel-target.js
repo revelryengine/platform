@@ -10,7 +10,7 @@ import { GLTFProperty } from './gltf-property.js';
 import { Node         } from './node.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
  * @import { animationChannelTargetExtensions, AnimationChannelTargetExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -58,14 +58,11 @@ export class AnimationChannelTarget extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {animationChannelTarget & glTFPropertyData} animationChannelTarget - The animation channel target JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(animationChannelTarget, graph) {
-        return this.unmarshall(graph, animationChannelTarget, {
-            node: { factory: Node, collection: 'nodes' },
-        }, this);
-    }
+    static referenceFields = {
+        node: { factory: () => Node, collection: 'nodes' },
+    };
 }

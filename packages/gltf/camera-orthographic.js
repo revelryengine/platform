@@ -9,7 +9,7 @@
 import { GLTFProperty } from './gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { GLTFPropertyData } from './gltf-property.types.d.ts';
  * @import { cameraOrthographicExtensions, CameraOrthographicExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -65,17 +65,5 @@ export class CameraOrthographic extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {cameraOrthographic & glTFPropertyData} cameraOrthographic - The camera orthographic JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(cameraOrthographic, graph) {
-        return this.unmarshall(graph, cameraOrthographic, {
-            // No reference fields
-        }, this);
     }
 }

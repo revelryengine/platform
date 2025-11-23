@@ -8,7 +8,7 @@
 import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData } from '../gltf-property.types.d.ts';
  * @import { nodeREVGameObjectExtensions, NodeREVGameObjectExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -57,18 +57,6 @@ export class NodeREVGameObject extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {nodeREVGameObject & glTFPropertyData} nodeREVGameObject - The REV_game_object JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(nodeREVGameObject, graph) {
-        return this.unmarshall(graph, nodeREVGameObject, {
-            // No reference fields
-        }, this);
     }
 }
 

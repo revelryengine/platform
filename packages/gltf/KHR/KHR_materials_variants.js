@@ -12,7 +12,7 @@ import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 import { Material                        } from '../material.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData, NamedGLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import {
  *  khrMaterialsVariantsExtensions, KHRMaterialsVariantsExtensions,
  *  khrMaterialsVariantsVariantExtensions, KHRMaterialsVariantsVariantExtensions,
@@ -53,18 +53,6 @@ export class KHRMaterialsVariantsVariant extends GLTFProperty {
          */
         this.extensions = extensions;
     }
-
-    /**
-     * Creates a KHRMaterialsVariantsVariant instance from its JSON representation.
-     * @param {khrMaterialsVariantsVariant & glTFPropertyData} khrMaterialsVariantsVariant - The KHR_materials_variants variant JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(khrMaterialsVariantsVariant, graph) {
-        return this.unmarshall(graph, khrMaterialsVariantsVariant, {
-            // No reference fields
-        }, this);
-    }
 }
 
 /**
@@ -101,16 +89,13 @@ export class KHRMaterialsVariants extends GLTFProperty {
     }
 
     /**
-     * Creates a KHRMaterialsVariants instance from its JSON representation.
-     * @param {khrMaterialsVariants & glTFPropertyData} khrMaterialsVariants - The KHR_materials_variants JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(khrMaterialsVariants, graph) {
-        return this.unmarshall(graph, khrMaterialsVariants, {
-            variants: { factory: KHRMaterialsVariantsVariant }
-        }, this);
-    }
+    static referenceFields = {
+        variants: { factory: () => KHRMaterialsVariantsVariant },
+    };
 }
 
 /**
@@ -154,17 +139,14 @@ export class MeshPrimitiveKHRMaterialsVariantsMapping extends NamedGLTFProperty 
     }
 
     /**
-     * Creates a MeshPrimitiveKHRMaterialsVariantsMapping instance from its JSON representation.
-     * @param {meshPrimitiveKHRMaterialsVariantsMapping & namedGLTFPropertyData} meshPrimitiveKHRMaterialsVariantsMapping - The KHR_materials_variants mesh primitive mapping JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(meshPrimitiveKHRMaterialsVariantsMapping, graph) {
-        return this.unmarshall(graph, meshPrimitiveKHRMaterialsVariantsMapping, {
-            variants: { factory: KHRMaterialsVariantsVariant, collection: ['extensions', 'KHR_materials_variants', 'variants'] },
-            material: { factory: Material,                        collection: 'materials'                                          },
-        }, this);
-    }
+    static referenceFields = {
+        variants: { factory: () => KHRMaterialsVariantsVariant, collection: ['extensions', 'KHR_materials_variants', 'variants'] },
+        material: { factory: () => Material,                    collection: 'materials'                                          },
+    };
 }
 
 /**
@@ -202,16 +184,13 @@ export class MeshPrimitiveKHRMaterialsVariants extends GLTFProperty {
     }
 
     /**
-     * Creates an instance from JSON data.
-     * @param {meshPrimitiveKHRMaterialsVariants} meshPrimitiveKHRMaterialsVariants - The KHR_materials_variants mesh primitive JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
+     * Reference fields for this class.
+     * @type {Record<string, ReferenceField>}
      * @override
      */
-    static fromJSON(meshPrimitiveKHRMaterialsVariants, graph) {
-        return this.unmarshall(graph, meshPrimitiveKHRMaterialsVariants, {
-            mappings: { factory: MeshPrimitiveKHRMaterialsVariantsMapping },
-        }, this);
-    }
+    static referenceFields = {
+        mappings: { factory: () => MeshPrimitiveKHRMaterialsVariantsMapping },
+    };
 }
 
 GLTFProperty.extensions.add('KHR_materials_variants', {

@@ -10,7 +10,7 @@ import { NamedGLTFProperty } from './gltf-property.js';
 import { GL } from './constants.js';
 
 /**
- * @import { namedGLTFPropertyData, NamedGLTFPropertyData, FromJSONGraph } from './gltf-property.js';
+ * @import { NamedGLTFPropertyData } from './gltf-property.types.d.ts';
  * @import { samplerExtensions, SamplerExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -66,17 +66,5 @@ export class Sampler extends NamedGLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {sampler & namedGLTFPropertyData} sampler - The sampler JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(sampler, graph) {
-        return this.unmarshall(graph, sampler, {
-            // No reference fields
-        }, this);
     }
 }

@@ -11,7 +11,7 @@
 import { GLTFProperty } from '../gltf-property.js';
 
 /**
- * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph } from '../gltf-property.js';
+ * @import { GLTFPropertyData } from '../gltf-property.types.d.ts';
  * @import { materialKHRMaterialsIORExtensions, MaterialKHRMaterialsIORExtensions } from '@revelryengine/gltf/extensions';
  */
 
@@ -46,18 +46,6 @@ export class MaterialKHRMaterialsIOR extends GLTFProperty {
          * Extension-specific data.
          */
         this.extensions = extensions;
-    }
-
-    /**
-     * Creates an instance from JSON data.
-     * @param {materialKHRMaterialsIOR & glTFPropertyData} materialKHRMaterialsIOR - The KHR_materials_ior JSON representation.
-     * @param {FromJSONGraph} graph - The graph for creating the instance from JSON.
-     * @override
-     */
-    static fromJSON(materialKHRMaterialsIOR, graph) {
-        return this.unmarshall(graph, materialKHRMaterialsIOR, {
-            // No reference fields
-        }, this);
     }
 }
 
