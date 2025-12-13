@@ -14,10 +14,27 @@ let esModuleShimsPromise;
  * @typedef {object} WorkerHelperOptions - Options for the WorkerHelper.
  * @property {boolean} [shared] - If true, creates a SharedWorker instead of a Worker.
  *
+ * @typedef {object} AsyncModuleMethodResult - The result of an asynchronous module method call.
+ * @property {unknown} result - The result of the method call.
+ * @property {Transferable[]} transfer - The transferable objects associated with the result.
+ *
  * @callback AsyncModuleMethod - A method that can be called asynchronously on the worker module.
  * @param {...unknown} args - The arguments to pass to the method.
  * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the method call.
- * @returns {Promise<{ result: unknown, transfer: Transferable[] }>}
+ * @returns {Promise<AsyncModuleMethodResult>}
+ *
+ * @typedef {object} ConnectedWorkerHelper - A connected WorkerHelper instance.
+ * @property {'connected'} status - The status of the WorkerHelper.
+ * @property {Worker|SharedWorker} worker - The Worker or SharedWorker instance.
+ * @property {MessageChannel} channel - The MessageChannel used for communication with the worker.
+ *
+ * @typedef {object} WorkerChannelPair - A pair of Worker/SharedWorker and MessageChannel.
+ * @property {Worker|SharedWorker} worker - The Worker or SharedWorker instance.
+ * @property {MessageChannel} channel - The MessageChannel used for communication with the worker.
+ *
+ * @typedef {object} ConnectedWorkerHelperPool - A connected WorkerHelperPool instance.
+ * @property {'connected'} status - The status of the WorkerHelperPool.
+ * @property {WorkerChannelPair[]} pool - The array of worker and channel pairs.
  */
 
 /**
@@ -219,7 +236,7 @@ export class WorkerHelper {
 
     /**
      * Checks if the worker is connected.
-     * @return {this is { status: 'connected', worker: Worker|SharedWorker, channel: MessageChannel}}
+     * @return {this is ConnectedWorkerHelper}
      */
     isConnected() {
         return this.#status === 'connected' && this.#worker !== null && this.#channel !== null;
@@ -449,6 +466,9 @@ export class WorkerHelperPool {
     /** @type {WorkerHelper[]} */
     #workers = [];
 
+    /**
+     * The array of WorkerHelper instances in the pool.
+     */
     get workers() {
         return this.#workers;
     }
@@ -550,7 +570,7 @@ export class WorkerHelperPool {
 
     /**
      * Returns true if the worker pool is connected.
-     * @return {this is { status: 'connected', pool: ({ worker: Worker|SharedWorker, channel: MessageChannel })[] }}
+     * @return {this is ConnectedWorkerHelperPool }}
      */
     isConnected() {
         return this.#status === 'connected';

@@ -132,10 +132,18 @@ export const TYPEDARRAYS = /** @type {const} */({
 
 
 /**
+ * @typedef {object} ImageMimeSniffingPattern - Image Mime Sniffing Pattern definition.
+ * See [Matching an image type pattern](https://mimesniff.spec.whatwg.org/#matching-an-image-type-pattern)
+ * @property {string} mime - The MIME type.
+ * @property {number[]} pattern - The byte pattern to match.
+ * @property {number[]} mask - The mask to apply to the byte pattern.
+ */
+
+/**
  * Image Mime Sniffing Patterns. Limited to image types supported by glTF.
  * See [Matching an image type pattern](https://mimesniff.spec.whatwg.org/#matching-an-image-type-pattern)
  */
-export const IMAGE_MIME_SNIFFING_PATTERNS = /** @type {const} */([
+export const IMAGE_MIME_SNIFFING_PATTERNS = /** @type {ImageMimeSniffingPattern[]} */([
     {
         mime:    'image/webp',
         pattern: [0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50],

@@ -44,14 +44,14 @@ import { expandGlob } from 'jsr:@std/fs@1.0.19/expand-glob';
 import * as Path from 'jsr:@std/path@1.1.2';
 import * as Posix from 'jsr:@std/path@1.1.2/posix';
 
-import * as typedoc from 'npm:typedoc@0.28.14';
+import * as typedoc from 'npm:typedoc@0.28.15';
 import { MarkdownPageEvent } from 'npm:typedoc-plugin-markdown@4.9.0';
 import 'npm:typedoc-plugin-mdn-links@5.0.10';
 import 'npm:typedoc-plugin-merge-modules@7.0.0';
 import 'npm:typedoc-vitepress-theme@1.1.2';
 
 /**
- * @import { TypeDocOptions, DeclarationReflection } from 'npm:typedoc@0.28.14';
+ * @import { TypeDocOptions, DeclarationReflection } from 'npm:typedoc@0.28.15';
  * @import { PluginOptions } from 'npm:typedoc-plugin-markdown@4.9.0';
  * @import { WalkEntry } from 'jsr:@std/fs@1.0.19/expand-glob';
  */
@@ -81,6 +81,7 @@ async function generate(validate = false) {
         entryPointStrategy: 'resolve',
         basePath: './packages',
         entryPoints: [
+            `packages/settings.d.ts`,
             `packages/{${packages.join(',')}}/**/*.{js,ts}`,
         ],
         out: root,
@@ -190,14 +191,7 @@ async function generate(validate = false) {
 
 
             'utils/merge.merge.__type.k',
-
-            /** Constructor generics are not handled correctly: https://github.com/TypeStrong/typedoc/issues/3031#issuecomment-3476346397 */
-            'utils/lru-cache.LRUCache.constructor.T',
-            'utils/set-map.SetMap.constructor.K',
-            'utils/set-map.SetMap.constructor.T',
-            'utils/weak-cache.WeakCache.constructor.T',
         ],
-
     }));
 
 
