@@ -158,9 +158,9 @@ export class Camera extends NamedGLTFProperty {
      *   height?: number,
      *   ndcZO?: boolean,
      *   override?: Partial<cameraOrthographic | cameraPerspective>
-     * }} options - Options for generating the projection matrix.
+     * }} [options] - Options for generating the projection matrix.
      */
-    getProjectionMatrix({ width = 1, height = 1, ndcZO, override = {} }) {
+    getProjectionMatrix({ width = 1, height = 1, ndcZO, override = {} } = {}) {
         const matrix = mat4.create();
 
         if (this.isPerspective()) {

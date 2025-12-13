@@ -142,7 +142,6 @@ export class LRUCache {
         return Array.from(this.cache)[this.cache.size - 1];
     }
 
-    // deno-coverage-ignore-start - Not yet supported in Deno: https://github.com/denoland/deno/issues/1699
     /**
      * Creates an `LRUCache` instance backed by IndexedDB for persistence.
      *
@@ -227,5 +226,4 @@ export class LRUCache {
             }
         });
     }
-    // deno-coverage-ignore-stop
 }

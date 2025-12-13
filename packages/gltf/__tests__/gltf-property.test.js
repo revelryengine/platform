@@ -407,7 +407,6 @@ describe('GLTFProperty', () => {
             });
 
             it('creates reference to rootTarget', () => {
-                console.log(result.pointerField.rootTarget);
                 expect(result.pointerField.rootTarget).to.equal(result.pointerField.target);
             });
 

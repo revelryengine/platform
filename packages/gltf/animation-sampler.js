@@ -18,7 +18,7 @@ import { Accessor     } from './accessor.js';
  * @typedef {object} animationSampler - Animation sampler JSON representation.
  * @property {number} input - The input accessor.
  * @property {number} output - The output accessor.
- * @property {'LINEAR' | 'STEP' | 'CUBICSPLINE'} interpolation - The interpolation algorithm.
+ * @property {'LINEAR' | 'STEP' | 'CUBICSPLINE'} [interpolation] - The interpolation algorithm.
  * @property {animationSamplerExtensions} [extensions] - Extension-specific data.
  */
 
@@ -29,10 +29,10 @@ export class AnimationSampler extends GLTFProperty {
     /**
      * Creates a new instance of AnimationSampler.
      * @param {{
-     *  input:         Accessor,
-     *  output:        Accessor,
-     *  interpolation: animationSampler['interpolation'],
-     *  extensions?:   AnimationSamplerExtensions,
+     *  input:          Accessor,
+     *  output:         Accessor,
+     *  interpolation?: animationSampler['interpolation'],
+     *  extensions?:    AnimationSamplerExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled animation sampler object
      */
     constructor(unmarshalled) {

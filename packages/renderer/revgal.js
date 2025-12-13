@@ -164,7 +164,7 @@ export class RevGAL {
      * @param {boolean} sRGB
      */
     #createTextureFromGLTFBasisU(basisuInfo, sRGB) {
-        const ktx = basisuInfo.source.getImageDataKTX();
+        const ktx = basisuInfo.getImageDataKTX();
         const { pixelWidth, pixelHeight } = ktx;
 
         const size    = { width: pixelWidth, height: pixelHeight };

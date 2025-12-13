@@ -1,0 +1,46 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_texture_basisu"
+  ],
+  "extensionsRequired": [
+    "KHR_texture_basisu"
+  ],
+  "images": [
+    {
+      "name": "Etc1sKTX2",
+      "uri": "textures/2d_etc1s.ktx2",
+      "mimeType": "image/ktx2",
+      "extras": {
+        "license": "CC BY-SA 4.0",
+        "source": "https://github.com/donmccurdy/KTX2-Samples"
+      }
+    },
+    {
+      "name": "UastcKTX2",
+      "uri": "textures/2d_uastc.ktx2",
+      "mimeType": "image/ktx2",
+      "extras": {
+        "license": "CC BY-SA 4.0",
+        "source": "https://github.com/donmccurdy/KTX2-Samples"
+      }
+    }
+  ],
+  "textures": [
+    {
+      "name": "Etc1sTexture",
+      "extensions": {
+        "KHR_texture_basisu": { "source": 0 }
+      }
+    },
+    {
+      "name": "UastcTexture",
+      "extensions": {
+        "KHR_texture_basisu": { "source": 1 }
+      }
+    }
+  ]
+}

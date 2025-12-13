@@ -1,0 +1,76 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_texture_transform"
+  ],
+  "images": [
+    {
+      "name": "SharedTexture",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "textures": [
+    { "name": "BaseColorTexture", "source": 0 },
+    { "name": "MetallicRoughnessTexture", "source": 0 },
+    { "name": "NormalTexture", "source": 0 },
+    { "name": "OcclusionTexture", "source": 0 },
+    { "name": "EmissiveTexture", "source": 0 }
+  ],
+  "materials": [
+    {
+      "name": "TestMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.2, 0.4, 0.6, 0.8],
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 1,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [0.1, 0.2],
+              "rotation": 0.7853981633974483,
+              "scale": [0.5, 0.75],
+              "texCoord": 2
+            }
+          }
+        },
+        "metallicFactor": 0.3,
+        "roughnessFactor": 0.7,
+        "metallicRoughnessTexture": { "index": 1 }
+      },
+      "normalTexture": {
+        "index": 2,
+        "texCoord": 1,
+        "scale": 0.8,
+        "extensions": {
+          "KHR_texture_transform": {
+            "offset": [0.25, 0.5],
+            "rotation": 0.5235987755982988,
+            "scale": [1.25, 0.9]
+          }
+        }
+      },
+      "occlusionTexture": {
+        "index": 3,
+        "texCoord": 0,
+        "strength": 0.6,
+        "extensions": {
+          "KHR_texture_transform": {
+            "offset": [0, 0.1],
+            "rotation": 0,
+            "scale": [0.8, 0.8],
+            "texCoord": 3
+          }
+        }
+      },
+      "emissiveTexture": { "index": 4 },
+      "emissiveFactor": [0.5, 0.25, 0.75],
+      "alphaMode": "MASK",
+      "alphaCutoff": 0.25,
+      "doubleSided": true
+    }
+  ]
+}

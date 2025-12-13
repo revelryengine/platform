@@ -1,0 +1,29 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "nodes": [
+    {
+      "name": "RootA",
+      "children": [1]
+    },
+    {
+      "name": "ChildA",
+      "children": [2]
+    },
+    {
+      "name": "LeafA"
+    },
+    {
+      "name": "RootB"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "TestScene",
+      "nodes": [0, 3]
+    }
+  ],
+  "scene": 0
+}

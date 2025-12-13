@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, sinon } from 'bdd';
+import { describe, it, expect, beforeEach, afterEach, sinon, browserOnly } from 'bdd';
 
 import { CacheHelper } from '../cache-helper.js';
 
-describe('CacheHelper', () => {
+browserOnly('CacheHelper', () => {
     describe('constructor', () => {
         /** @type {Cache} */
         let cache;

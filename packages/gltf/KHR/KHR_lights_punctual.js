@@ -79,7 +79,7 @@ export class KHRLightsPunctualLight extends NamedGLTFProperty {
      * Creates a new instance of KHRLightsPunctualLight.
      * @param {{
      *  type:        'directional' | 'point' | 'spot',
-     *  range?:       number
+     *  range?:      number
      *  color?:      [number, number, number],
      *  intensity?:  number,
      *  spot?:       KHRLightsPunctualLightSpot,
@@ -152,7 +152,7 @@ export class KHRLightsPunctual extends GLTFProperty {
     constructor(unmarshalled) {
         super(unmarshalled);
 
-        const { lights = [], extensions } = unmarshalled;
+        const { lights, extensions } = unmarshalled;
 
         /**
          * An array of lights.

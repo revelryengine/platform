@@ -26,3 +26,14 @@ declare module '@revelryengine/gltf/extensions' {
     interface MeshPrimitiveKHRDracoMeshCompressionExtensions {}
 }
 
+declare module '@revelryengine/settings' {
+    interface RevelryEngineSettings {
+        /** KHR_draco_mesh_compression settings. */
+        KHR_draco_mesh_compression?: {
+            /**
+             * The number of web workers to use for decompressing meshes. Default is 4.
+             */
+            workerCount?: number
+        },
+    }
+}

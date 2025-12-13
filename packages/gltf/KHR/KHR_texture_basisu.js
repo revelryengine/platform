@@ -1,3 +1,4 @@
+/// <reference path="revelryengine/settings.d.ts" />
 /// <reference path="./KHR_texture_basisu.types.d.ts" />
 
 /**
@@ -11,13 +12,12 @@
 import { GLTFProperty     } from '../gltf-property.js';
 import { Image            } from '../image.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
+import { read as readKTX  } from 'revelryengine/deps/ktx-parse.js';
 
 /**
  * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import { textureKHRTextureBasisuExtensions, TextureKHRTextureBasisuExtensions } from '@revelryengine/gltf/extensions';
  */
-
-const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_texture_basisu.worker.js'), { count: 4, type: 'module' });
 
 /**
  * @typedef {object} textureKHRTextureBasisu - KHR_texture_basisu JSON representation.
@@ -29,6 +29,10 @@ const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_texture_bas
  * KHR_texture_basisu class representation.
  */
 export class TextureKHRTextureBasisu extends GLTFProperty {
+    /**
+     * @type {import("revelryengine/deps/ktx-parse.js").KTX2Container|undefined}
+     */
+    #imageDataKTX;
 
     /**
      * Creates a new instance of TextureKHRTextureBasisu.
@@ -68,19 +72,36 @@ export class TextureKHRTextureBasisu extends GLTFProperty {
      * @param {AbortSignal} [signal] - The abort controller signal for the given transode request
      */
     async transcode(supportedCompression, signal) {
-        const arrayBuffer = this.source.getImageData();
-        const response = await workerHelper.callMethod({ method: 'transcode', args: [{ arrayBuffer, supportedCompression }], signal });
-        return /** @type {Uint8Array} */(response.data);
+        const input = /** @type {Uint8Array}*/(this.source.getImageData());
+        const response = await TextureKHRTextureBasisu.workerPool.callMethod({ method: 'transcode', args: [{ input, supportedCompression }], signal });
+        return /** @type {Uint8Array} */(response.output);
     }
 
     /**
-     * Initializes the worker helper
+     * Initializes the worker helper and loads the KTX image data.
+     * @param {AbortSignal} [signal] - The abort controller signal for the load request
      * @override
      */
-    async load() {
-        await workerHelper.init();
-        return this;
+    async load(signal) {
+        await TextureKHRTextureBasisu.workerPool.connect(globalThis.REV?.KHR_texture_basisu?.workerCount ?? 4);
+        await this.source.loadOnce(signal);
+        this.#imageDataKTX = readKTX(this.source.getImageData());
+
+        return super.load(signal);
     }
+
+    /**
+     * Gets the KTX image data.
+     */
+    getImageDataKTX() {
+        if(!this.#imageDataKTX) throw new Error('Invalid State');
+        return this.#imageDataKTX;
+    }
+
+    /**
+     * Worker helper pool for transcoding KTX2 textures.
+     */
+    static workerPool = new WorkerHelperPool(import.meta.resolve('./KHR_texture_basisu.worker.js'), { type: 'module' });;
 }
 
 GLTFProperty.extensions.add('KHR_texture_basisu', {

@@ -10,10 +10,7 @@
         "dev:cache": "deno run -A ./tasks/dev.js cache",
         "dev:serve": "deno run -A ./tasks/dev.js serve",
 
-        "test":         "deno task test:clean && deno task test:browser && deno task test:deno",
-        "test:clean":   "rm -rf coverage",
-        "test:browser": "deno run -A ./test/browser.js",
-        "test:deno":    "deno run -A ./test/deno.js",
+        "test": "deno run -A ./tasks/test.js",
 
         //not yet implemented
         // "validate":       "deno task validate:types && deno task validate:lint && deno task validate:docs",

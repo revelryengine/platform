@@ -5,7 +5,7 @@
         "revelryengine/samples/": "https://cdn.jsdelivr.net/gh/revelryengine/"
     },
     "scopes": {
-        "https://cdn.jsdelivr.net/gh/revelryengine/deps/": {
+        "https://cdn.jsdelivr.net/gh/revelryengine/": {
             "gl-matrix":        "https://cdn.jsdelivr.net/npm/gl-matrix@beta/dist/esm/index.js",
             "es-module-shims":  "https://cdn.jsdelivr.net/npm/es-module-shims@2.6.2/dist/es-module-shims.wasm.js",
             "ktx-parse":        "https://cdn.jsdelivr.net/npm/ktx-parse@0.4.5/dist/ktx-parse.esm.js",

@@ -11,7 +11,7 @@
 
     (async () => {
         const helper = new WorkerHelper(import.meta.resolve('./worker.js'), { type: 'module', shared: true });
-        await helper.init();
+        await helper.connect();
         const count = await helper.callMethod({ method: 'methodIncrement' });
         window.opener?.postMessage({ id, count }, '*');
     })();

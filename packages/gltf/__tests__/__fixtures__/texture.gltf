@@ -1,0 +1,36 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "EXT_texture_webp"
+  ],
+  "images": [
+    {
+      "name": "BaseColorPNG",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "samplers": [
+    {
+      "name": "DefaultSampler",
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "textures": [
+    {
+      "name": "TextureWithSampler",
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "name": "TextureWithoutSampler",
+      "source": 0
+    }
+  ]
+}

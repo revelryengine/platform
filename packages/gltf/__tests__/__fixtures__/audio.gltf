@@ -1,0 +1,102 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_audio"
+  ],
+  "buffers": [
+    {
+      "name": "AudioBuffer",
+      "uri": "buffers/audio.bin",
+      "byteLength": 1080
+    }
+  ],
+  "bufferViews": [
+    {
+      "name": "AudioDataView",
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1080
+    }
+  ],
+  "extensions": {
+    "KHR_audio": {
+      "sources": [
+        {
+          "autoPlay": true,
+          "gain": 0.5,
+          "loop": true,
+          "audio": 0
+        },
+        {
+          "autoPlay": false,
+          "gain": 1,
+          "loop": false,
+          "audio": 1
+        }
+      ],
+      "emitters": [
+        {
+          "type": "positional",
+          "gain": 0.8,
+          "sources": [0],
+          "positional": {
+            "coneInnerAngle": 1.5707963267948966,
+            "coneOuterAngle": 3.141592653589793,
+            "coneOuterGain": 0.25,
+            "distanceModel": "linear",
+            "maxDistance": 10,
+            "refDistance": 2,
+            "rolloffFactor": 0.5
+          }
+        },
+        {
+          "type": "global",
+          "gain": 0.4,
+          "sources": [1]
+        }
+      ],
+      "audio": [
+        {
+          "name": "BufferAudio",
+          "bufferView": 0,
+          "mimeType": "audio/mpeg"
+        },
+        {
+          "name": "UriAudio",
+          "uri": "audio/tone.mp3",
+          "mimeType": "audio/mpeg"
+        },
+        {
+          "name": "EmbeddedAudio",
+          "uri": "data:audio/mpeg;base64,/+NIxAAAAAAAAAAAAFhpbmcAAAAPAAAAAwAABDgAdHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR00dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR////////////////////////////////////////////AAAAPExBTUUzLjEwMAQoAAAAAAAAAAAVCCQC8iEAAcwAAAQ4RubxkgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/+NYxAAj2MqcP08AAQqX6gAP379+/fx73pAePHjx48iP37Gr1er37Gh5oHQ6P8b4R8HOIeS9QMCsVisVjx5Efv379+Hh4AAAAABh4eHjwAAADEYeHh7+AAAAKh4eH/8AR4GHh4eegAAAz8w8Pf4AAO/w////d/x////9f/6H//4f/6H//QwR/AAPD/9IZ/iA8PDw8MAAAAAA8PDx6tQAABG23JK43GlLuR6aSppDrjmBgI6LOWuyqGWsxJrRchWBMN/s3RcJYZHrEzADzDIEU0Mgi06XRjJAeROCgNMMBkwcA3Bcl2ZVGo0dzqTpEAaY7brSWM16remnRclhsNP81qIw6CgMkrlxEHFqJhuO4LOWcyqemZU/0M1qaNVaWU1qaVdWOu9t1iO5edxyH4f6rS3KspjNamzq0sZrU0aq0sprU0qTDZfPv+7b9qaNckFSGIpWlUNSmW8xpYzWprVWMxmtTRqrSxmt/+NIxMtGA8KhuZzAIE0qq0rX3fn+V7bkP5OU+Vh33/1lKqtLZ/dLWpqbfKusst446yy3jjrLLeMvlljN/IYlkP0/xuNy9/JZyklFarS0uXatampscdY1aWtfcIAEcu/34AEAgIUdVV14zUKAnVVdgICWMzagICYUBE7Nq3VVYBAQCBp4ayzwVHgrLHq3A0MBqJTolvBUeCrhEHAaedEQwGjwlDYldKxKdEQcET+o8VOiX8seLflTolOw71Hix6Ct1Z1Z2DSj3sgqsNVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MoxMYcKNpeX8MAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+          "mimeType": "audio/mpeg"
+        }
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "name": "PositionalNode",
+      "extensions": {
+        "KHR_audio": {
+          "emitter": 0
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "name": "AudioScene",
+      "nodes": [0],
+      "extensions": {
+        "KHR_audio": {
+          "emitters": [1]
+        }
+      }
+    }
+  ],
+  "scene": 0
+}

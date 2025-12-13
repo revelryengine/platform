@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, sinon } from 'bdd';
+import { describe, it, expect, beforeEach, afterEach, sinon, browserOnly } from 'bdd';
 
 import { CanvasAutoResizer } from '../canvas-auto-resizer.js';
 
 const dpr = globalThis.devicePixelRatio ?? 1;
 
-describe('CanvasAutoResizer', () => {
+browserOnly('CanvasAutoResizer', () => {
     /** @type {HTMLCanvasElement & { context?: CanvasRenderingContext2D }} */
     let canvas;
     /** @type {HTMLElement} */

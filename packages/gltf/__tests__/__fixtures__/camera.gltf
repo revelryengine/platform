@@ -1,0 +1,53 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "cameras": [
+    {
+      "name": "PerspectiveWithAspect",
+      "type": "perspective",
+      "perspective": {
+        "yfov": 1.0471975512,
+        "znear": 0.1,
+        "zfar": 100,
+        "aspectRatio": 1.6
+      }
+    },
+    {
+      "name": "OrthographicWide",
+      "type": "orthographic",
+      "orthographic": {
+        "xmag": 4,
+        "ymag": 2,
+        "znear": 0.01,
+        "zfar": 500
+      }
+    },
+    {
+      "name": "PerspectiveAutoAspect",
+      "type": "perspective",
+      "perspective": {
+        "yfov": 0.7853981634,
+        "znear": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "PerspectiveNode",
+      "camera": 0
+    },
+    {
+      "name": "OrthoNode",
+      "camera": 1
+    }
+  ],
+  "scenes": [
+    {
+      "name": "CameraScene",
+      "nodes": [0, 1]
+    }
+  ],
+  "scene": 0
+}

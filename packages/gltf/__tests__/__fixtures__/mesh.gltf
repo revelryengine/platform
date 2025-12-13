@@ -1,0 +1,269 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "buffers": [
+    {
+      "name": "MeshData",
+      "uri": "buffers/mesh.bin",
+      "byteLength": 1132
+    }
+  ],
+  "bufferViews": [
+    { "name": "Positions"          , "buffer": 0, "byteOffset": 0   , "byteLength": 36  },
+    { "name": "Normals"            , "buffer": 0, "byteOffset": 36  , "byteLength": 36  },
+    { "name": "Tangents"           , "buffer": 0, "byteOffset": 72  , "byteLength": 48  },
+    { "name": "Texcoord0"          , "buffer": 0, "byteOffset": 120 , "byteLength": 24  },
+    { "name": "Texcoord1"          , "buffer": 0, "byteOffset": 144 , "byteLength": 24  },
+    { "name": "Texcoord2"          , "buffer": 0, "byteOffset": 168 , "byteLength": 24  },
+    { "name": "Texcoord3"          , "buffer": 0, "byteOffset": 192 , "byteLength": 24  },
+    { "name": "Color0"             , "buffer": 0, "byteOffset": 216 , "byteLength": 48  },
+    { "name": "Color1"             , "buffer": 0, "byteOffset": 264 , "byteLength": 48  },
+    { "name": "Weights0"           , "buffer": 0, "byteOffset": 312 , "byteLength": 48  },
+    { "name": "Weights1"           , "buffer": 0, "byteOffset": 360 , "byteLength": 48  },
+    { "name": "Joints0"            , "buffer": 0, "byteOffset": 408 , "byteLength": 24  },
+    { "name": "Joints1"            , "buffer": 0, "byteOffset": 432 , "byteLength": 24  },
+    { "name": "TargetPositions"    , "buffer": 0, "byteOffset": 456 , "byteLength": 36  },
+    { "name": "TargetNormals"      , "buffer": 0, "byteOffset": 492 , "byteLength": 36  },
+    { "name": "TargetTangents"     , "buffer": 0, "byteOffset": 528 , "byteLength": 36  },
+    { "name": "TargetTexcoord0"    , "buffer": 0, "byteOffset": 564 , "byteLength": 24  },
+    { "name": "TargetTexcoord1"    , "buffer": 0, "byteOffset": 588 , "byteLength": 24  },
+    { "name": "InverseBindMatrices", "buffer": 0, "byteOffset": 612 , "byteLength": 512 },
+    { "name": "Indices"            , "buffer": 0, "byteOffset": 1124, "byteLength": 6   }
+  ],
+  "accessors": [
+    {
+      "name": "AccessorPositions",
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [1, 1, 0]
+    },
+    {
+      "name": "AccessorNormals",
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "name": "AccessorTangents",
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorTexcoord0",
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorTexcoord1",
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorTexcoord2",
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorTexcoord3",
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorColor0",
+      "bufferView": 7,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorColor1",
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorWeights0",
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorWeights1",
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorJoints0",
+      "bufferView": 11,
+      "componentType": 5123,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorJoints1",
+      "bufferView": 12,
+      "componentType": 5123,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "name": "AccessorTargetPositions",
+      "bufferView": 13,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [0.01, 0.01, 0]
+    },
+    {
+      "name": "AccessorTargetNormals",
+      "bufferView": 14,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "name": "AccessorTargetTangents",
+      "bufferView": 15,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "name": "AccessorTargetTexcoord0",
+      "bufferView": 16,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorTargetTexcoord1",
+      "bufferView": 17,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "name": "AccessorInverseBindMatrices",
+      "bufferView": 18,
+      "componentType": 5126,
+      "count": 8,
+      "type": "MAT4"
+    },
+    {
+      "name": "AccessorIndices",
+      "bufferView": 19,
+      "componentType": 5123,
+      "count": 3,
+      "type": "SCALAR"
+    }
+  ],
+  "materials": [
+    {
+      "name": "DefaultMaterial"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "TestMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3,
+            "TEXCOORD_1": 4,
+            "TEXCOORD_2": 5,
+            "TEXCOORD_3": 6,
+            "COLOR_0": 7,
+            "COLOR_1": 8,
+            "WEIGHTS_0": 9,
+            "WEIGHTS_1": 10,
+            "JOINTS_0": 11,
+            "JOINTS_1": 12
+          },
+          "indices": 19,
+          "material": 0,
+          "mode": 4,
+          "targets": [
+            {
+              "POSITION": 13,
+              "NORMAL": 14,
+              "TANGENT": 15,
+              "TEXCOORD_0": 16,
+              "TEXCOORD_1": 17
+            }
+          ]
+        }
+      ],
+      "weights": [0.25]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "RootNode",
+      "mesh": 0,
+      "skin": 0,
+      "camera": 0,
+      "children": [1]
+    },
+    {
+      "name": "ChildNode"
+    },
+    { "name": "Joint0", "children": [3] },
+    { "name": "Joint1", "children": [4] },
+    { "name": "Joint2", "children": [5] },
+    { "name": "Joint3", "children": [6] },
+    { "name": "Joint4", "children": [7] },
+    { "name": "Joint5", "children": [8] },
+    { "name": "Joint6", "children": [9] },
+    { "name": "Joint7" }
+  ],
+  "skins": [
+    {
+      "name": "TestSkin",
+      "inverseBindMatrices": 18,
+      "joints": [2, 3, 4, 5, 6, 7, 8, 9],
+      "skeleton": 2
+    }
+  ],
+  "scenes": [
+    {
+      "name": "MeshScene",
+      "nodes": [0, 2]
+    }
+  ],
+  "cameras": [
+    {
+      "name": "PerspectiveCamera",
+      "type": "perspective",
+      "perspective": {
+        "yfov": 0.7853981633974483,
+        "znear": 0.1,
+        "zfar": 1000
+      }
+    }
+  ],
+  "scene": 0
+}

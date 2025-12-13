@@ -10,6 +10,7 @@
 
 import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 import { Image                           } from '../image.js';
+import { read as readKTX                 } from 'revelryengine/deps/ktx-parse.js';
 
 /**
  * @import { GLTFPropertyData, NamedGLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
@@ -25,6 +26,7 @@ import { Image                           } from '../image.js';
  * @typedef {object} khrEnvironmentMapCubemap - KHR_environment_map Cubemap JSON representation.
  * @property {number} source - Image reference to one of the cubemap images declared by this extension.
  * @property {number} [layer] - Layer in the image that contains the cubemap, defaults to 0 if no value supplied.
+ * @property {number} [intensity] - Intensity of cubemap values. The cubemap texel values shall be scaled by this value. Defaults to 1 if no value specified.
  * @property {khrEnvironmentMapCubemapExtensions} [extensions] - Extension-specific data.
  */
 
@@ -33,17 +35,23 @@ import { Image                           } from '../image.js';
  */
 export class KHREnvironmentMapCubemap extends GLTFProperty {
     /**
+     * @type {import("revelryengine/deps/ktx-parse.js").KTX2Container|undefined}
+     */
+    #imageDataKTX;
+
+    /**
      * Creates a new instance of KHREnvironmentMapCubemap.
      * @param {{
      *  source:      Image,
      *  layer?:      number,
+     *  intensity?:  number,
      *  extensions?: KHREnvironmentMapCubemapExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_environment_map Cubemap object
      */
     constructor(unmarshalled) {
         super(unmarshalled);
 
-        const { source, layer = 0, extensions } = unmarshalled;
+        const { source, layer = 0, intensity = 1, extensions } = unmarshalled;
 
         /**
          * Image reference to one of the cubemap images declared by this extension.
@@ -54,6 +62,11 @@ export class KHREnvironmentMapCubemap extends GLTFProperty {
          * Layer in the image that contains the cubemap, defaults to 0 if no value supplied.
          */
         this.layer = layer;
+
+        /**
+         * Intensity of cubemap values. The cubemap texel values shall be scaled by this value. Defaults to 1 if no value specified.
+         */
+        this.intensity = intensity;
 
         /**
          * Extension-specific data.
@@ -69,6 +82,25 @@ export class KHREnvironmentMapCubemap extends GLTFProperty {
     static referenceFields = {
         source: { factory: () => Image, collection: ['images'] },
     };
+
+    /**
+     * Loads the KTX image data.
+     * @param {AbortSignal} [signal] - The abort controller signal for the load request
+     * @override
+     */
+    async load(signal) {
+        await this.source.loadOnce(signal);
+        this.#imageDataKTX = readKTX(this.source.getImageData());
+        return super.load(signal);
+    }
+
+    /**
+     * Gets the KTX image data.
+     */
+    getImageDataKTX() {
+        if(!this.#imageDataKTX) throw new Error('Invalid State');
+        return this.#imageDataKTX;
+    }
 }
 
 /**
@@ -87,8 +119,8 @@ export class KHREnvironmentMapCubemap extends GLTFProperty {
  * @typedef {object} khrEnvironmentMapData - KHR_environment_map Environment Map JSON representation.
  * @property {IrradianceCoefficients} irradianceCoefficients - Declares spherical harmonic coefficients for irradiance up to l=2. This is a 9x3 array.
  * @property {number} cubemap - Texture reference to one of the declared cubemaps in this extension.
- * @property {[number, number, number]} boundingBoxMin - Local boundingbox min. The minimum 3D point of the cubemap boundingbox. In world coordinates (meters)
- * @property {[number, number, number]} boundingBoxMax - Local boundingbox max. The maximum 3D point of the cubemap boundingbox. In world coordinates (meters)
+ * @property {[number, number, number]} [boundingBoxMin] - Local boundingbox min. The minimum 3D point of the cubemap boundingbox. In world coordinates (meters)
+ * @property {[number, number, number]} [boundingBoxMax] - Local boundingbox max. The maximum 3D point of the cubemap boundingbox. In world coordinates (meters)
  * @property {khrEnvironmentMapDataExtensions} [extensions] - Extension-specific data.
  */
 
@@ -100,10 +132,10 @@ export class KHREnvironmentMapData extends NamedGLTFProperty {
      * Creates a new instance of KHREnvironmentMapData.
      * @param {{
      *  irradianceCoefficients: khrEnvironmentMapData['irradianceCoefficients'],
-     *  cubemap:        KHREnvironmentMapCubemap,
-     *  boundingBoxMin: [number, number, number],
-     *  boundingBoxMax: [number, number, number],
-     *  extensions?:    KHREnvironmentMapDataExtensions,
+     *  cubemap:         KHREnvironmentMapCubemap,
+     *  boundingBoxMin?: [number, number, number],
+     *  boundingBoxMax?: [number, number, number],
+     *  extensions?:     KHREnvironmentMapDataExtensions,
      * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_environment_map Environment Map object
      */
     constructor(unmarshalled) {
@@ -149,8 +181,8 @@ export class KHREnvironmentMapData extends NamedGLTFProperty {
 
 /**
  * @typedef {object} khrEnvironmentMap - KHR_environment_map JSON representation.
- * @property {khrEnvironmentMapCubemap[]} cubemaps - Array of cubemaps that are referenced by the environment light declaration in a scene.
  * @property {khrEnvironmentMapData[]} environment_maps - Array of lights to be used with this extension, referenced from a scene by the lights property.
+ * @property {khrEnvironmentMapCubemap[]} cubemaps - Array of cubemaps that are referenced by the environment light declaration in a scene.
  * @property {khrEnvironmentMapExtensions} [extensions] - Extension-specific data.
  */
 
@@ -161,15 +193,15 @@ export class KHREnvironmentMap extends GLTFProperty {
     /**
      * Creates a new instance of KHREnvironmentMap.
      * @param {{
-     *  cubemaps:         KHREnvironmentMapCubemap[],
      *  environment_maps: KHREnvironmentMapData[],
+     *  cubemaps?:        KHREnvironmentMapCubemap[],
      *  extensions?:      KHREnvironmentMapExtensions,
      * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_environment_map object
      */
     constructor(unmarshalled) {
         super(unmarshalled);
 
-        const { environment_maps = [], cubemaps = [], extensions } = unmarshalled;
+        const { environment_maps, cubemaps, extensions } = unmarshalled;
 
         /**
          * Array of cubemaps that are referenced by the environment light declaration in a scene.
@@ -196,6 +228,20 @@ export class KHREnvironmentMap extends GLTFProperty {
         cubemaps:         { factory: () => KHREnvironmentMapCubemap },
         environment_maps: { factory: () => KHREnvironmentMapData    },
     };
+
+    /**
+     * Loads all cubemaps
+     * @param {AbortSignal} [signal] - The abort controller signal for the load request
+     * @override
+     */
+    async load(signal) {
+        if(this.cubemaps) {
+            for(const cubemap of this.cubemaps) {
+                await cubemap.load(signal);
+            }
+        }
+        return this;
+    }
 }
 
 /**

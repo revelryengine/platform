@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, sinon } from 'bdd';
+import { describe, it, expect, beforeEach, sinon, browserOnly } from 'bdd';
 
 import { OrbitControl } from '../orbit-control.js';
 import { Vec3, Quat } from 'revelryengine/deps/gl-matrix.js';
@@ -30,8 +30,7 @@ const expectQuatCloseTo = (actual, expected, epsilon = 1e-5) => {
         expect(actual[i]).to.be.closeTo(expected[i], epsilon);
     }
 };
-
-describe('OrbitControl', () => {
+browserOnly('OrbitControl', () => {
     /** @type {OrbitControl} */
     let control;
     /** @type {sinon.SinonSpy} */

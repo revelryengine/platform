@@ -6,8 +6,8 @@
  * To run this server, use the command: `deno task dev:serve`
  */
 import { Application, send } from 'jsr:@oak/oak@17.1.6';
-import { parseArgs  } from 'jsr:@std/cli@1.0.23/parse-args';
-import { debounce   } from "jsr:@std/async@1.0.15/debounce";
+import { parseArgs         } from 'jsr:@std/cli@1.0.23/parse-args';
+import { debounce          } from "jsr:@std/async@1.0.15/debounce";
 
 const { importMode = 'local', port = '8082', reload = false, _: positionals } = parseArgs(Deno.args, {
     string: ['port', 'importMode'],

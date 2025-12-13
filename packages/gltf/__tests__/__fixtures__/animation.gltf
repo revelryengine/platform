@@ -1,0 +1,489 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_animation_pointer"
+  ],
+  "buffers": [
+    {
+      "name": "AnimationData",
+      "uri": "buffers/animation.bin",
+      "byteLength": 292
+    }
+  ],
+  "bufferViews": [
+    {
+      "name": "AnimationTimes",
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 8
+    },
+    {
+      "name": "AnimationTranslation",
+      "buffer": 0,
+      "byteOffset": 8,
+      "byteLength": 24
+    },
+    {
+      "name": "RotationValues",
+      "buffer": 0,
+      "byteOffset": 32,
+      "byteLength": 32
+    },
+    {
+      "name": "CubicTranslationValues",
+      "buffer": 0,
+      "byteOffset": 64,
+      "byteLength": 72
+    },
+    {
+      "name": "MorphWeights",
+      "buffer": 0,
+      "byteOffset": 136,
+      "byteLength": 16
+    },
+    {
+      "name": "StepScale",
+      "buffer": 0,
+      "byteOffset": 152,
+      "byteLength": 24
+    },
+    {
+      "name": "BytePointer",
+      "buffer": 0,
+      "byteOffset": 176,
+      "byteLength": 2
+    },
+    {
+      "name": "UByteColorPointer",
+      "buffer": 0,
+      "byteOffset": 180,
+      "byteLength": 8
+    },
+    {
+      "name": "ShortPointer",
+      "buffer": 0,
+      "byteOffset": 188,
+      "byteLength": 4
+    },
+    {
+      "name": "UShortPointer",
+      "buffer": 0,
+      "byteOffset": 192,
+      "byteLength": 4
+    },
+    {
+      "name": "MeshPositions",
+      "buffer": 0,
+      "byteOffset": 8,
+      "byteLength": 24
+    },
+    {
+      "name": "CubicRotationValues",
+      "buffer": 0,
+      "byteOffset": 196,
+      "byteLength": 96
+    }
+  ],
+  "accessors": [
+    {
+      "name": "TimeAccessor",
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [0],
+      "max": [1]
+    },
+    {
+      "name": "TranslationAccessor",
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [1, 2, 3]
+    },
+    {
+      "name": "RotationAccessor",
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC4"
+    },
+    {
+      "name": "CubicTranslationAccessor",
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 6,
+      "type": "VEC3"
+    },
+    {
+      "name": "WeightAccessor",
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 4,
+      "type": "SCALAR"
+    },
+    {
+      "name": "StepScaleAccessor",
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "name": "BytePointerAccessor",
+      "bufferView": 6,
+      "componentType": 5120,
+      "count": 2,
+      "type": "SCALAR",
+      "normalized": true
+    },
+    {
+      "name": "UByteColorAccessor",
+      "bufferView": 7,
+      "componentType": 5121,
+      "count": 2,
+      "type": "VEC4",
+      "normalized": true
+    },
+    {
+      "name": "ShortPointerAccessor",
+      "bufferView": 8,
+      "componentType": 5122,
+      "count": 2,
+      "type": "SCALAR",
+      "normalized": true
+    },
+    {
+      "name": "UShortPointerAccessor",
+      "bufferView": 9,
+      "componentType": 5123,
+      "count": 2,
+      "type": "SCALAR",
+      "normalized": true
+    },
+    {
+      "name": "MeshPositionAccessor",
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [1, 2, 3]
+    },
+    {
+      "name": "CubicRotationAccessor",
+      "bufferView": 11,
+      "componentType": 5126,
+      "count": 6,
+      "type": "VEC4"
+    }
+  ],
+  "materials": [
+    {
+      "name": "AnimatedMaterial",
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 1
+      },
+      "extras": {}
+    }
+  ],
+  "meshes": [
+    {
+      "name": "MorphMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 10
+          },
+          "mode": 0,
+          "targets": [
+            {
+              "POSITION": 10
+            },
+            {
+              "POSITION": 10
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "AnimatedNode",
+      "translation": [0, 0, 0]
+    },
+    {
+      "name": "RotatingNode",
+      "translation": [0, 0, 0],
+      "rotation": [0, 0, 0, 1]
+    },
+    {
+      "name": "SteppedNode",
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "MorphNode",
+      "mesh": 0,
+      "weights": [0, 0]
+    },
+    {
+      "name": "EmptyNode",
+      "mesh": 0,
+      "extras": {}
+    }
+  ],
+  "animations": [
+    {
+      "name": "TranslateAnim",
+      "samplers": [
+        {
+          "input": 0,
+          "output": 1,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 0,
+            "path": "translation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AdvancedAnim",
+      "samplers": [
+        {
+          "input": 0,
+          "output": 2,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 3,
+          "interpolation": "CUBICSPLINE"
+        },
+        {
+          "input": 0,
+          "output": 4,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 5,
+          "interpolation": "STEP"
+        },
+        {
+          "input": 0,
+          "output": 6,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 7,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 8,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 9,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 1,
+            "path": "rotation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 1,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 2,
+          "target": {
+            "node": 3,
+            "path": "weights"
+          }
+        },
+        {
+          "sampler": 3,
+          "target": {
+            "node": 2,
+            "path": "scale"
+          }
+        },
+        {
+          "sampler": 4,
+          "target": {
+            "path": "pointer",
+            "extensions": {
+              "KHR_animation_pointer": {
+                "pointer": "/materials/0/extras/byteValue"
+              }
+            }
+          }
+        },
+        {
+          "sampler": 5,
+          "target": {
+            "path": "pointer",
+            "extensions": {
+              "KHR_animation_pointer": {
+                "pointer": "/materials/0/pbrMetallicRoughness/baseColorFactor"
+              }
+            }
+          }
+        },
+        {
+          "sampler": 6,
+          "target": {
+            "path": "pointer",
+            "extensions": {
+              "KHR_animation_pointer": {
+                "pointer": "/materials/0/extras/shortValue"
+              }
+            }
+          }
+        },
+        {
+          "sampler": 7,
+          "target": {
+            "path": "pointer",
+            "extensions": {
+              "KHR_animation_pointer": {
+                "pointer": "/materials/0/extras/ushortValue"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "InvalidAnim",
+      "samplers": [
+        {
+          "input": 0,
+          "output": 1,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "path": "translation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "InvalidPointerAnim",
+      "samplers": [
+        {
+          "input": 0,
+          "output": 1,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "path": "pointer"
+          }
+        }
+      ]
+    },
+    {
+        "name": "InitializationAnim",
+        "samplers": [
+          {
+            "input": 0,
+            "output": 1,
+            "interpolation": "LINEAR"
+          },
+          {
+            "input": 0,
+            "output": 6,
+            "interpolation": "LINEAR"
+          }
+        ],
+        "channels": [
+          {
+            "sampler": 0,
+            "target": {
+              "path": "translation",
+              "node": 4
+            }
+          },
+          {
+            "sampler": 0,
+            "target": {
+              "path": "pointer",
+              "extensions": {
+                "KHR_animation_pointer": {
+                  "pointer": "/nodes/4/weights"
+                }
+              }
+            }
+          },
+          {
+            "sampler": 1,
+            "target": {
+              "path": "pointer",
+              "extensions": {
+                "KHR_animation_pointer": {
+                  "pointer": "/nodes/4/extras/foobar"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "SplineRotationAnim",
+        "samplers": [
+          {
+            "input": 0,
+            "output": 11,
+            "interpolation": "CUBICSPLINE"
+          }
+        ],
+        "channels": [
+          {
+            "sampler": 0,
+            "target": {
+              "node": 1,
+              "path": "rotation"
+            }
+          }
+        ]
+      }
+  ],
+  "scenes": [
+    {
+      "name": "AnimationScene",
+      "nodes": [0, 1, 2, 3]
+    }
+  ],
+  "scene": 0
+}

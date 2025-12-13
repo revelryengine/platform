@@ -1,0 +1,45 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "images": [
+    {
+      "name": "InfoBaseColorPNG",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "textures": [
+    {
+      "name": "BaseColorTexture",
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "name": "MaterialTexCoord1",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 1
+        }
+      }
+    },
+    {
+      "name": "MaterialDefaultTexCoord",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "nodes": [{}],
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "scene": 0
+}

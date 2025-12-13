@@ -8,14 +8,13 @@
  * @param {Omit<LockOptions, 'steal'> | LockGrantedCallback<unknown>} options - The lock options or callback.
  * @param {LockGrantedCallback<unknown>} [callback] - The lock callback.
  */
-// deno-coverage-ignore-start
-const lock = globalThis.navigator.locks?.request.bind(globalThis.navigator.locks)/* c8 ignore start - Deno only */ ?? (await (async () => {
+const lock = globalThis.navigator.locks?.request.bind(globalThis.navigator.locks) ?? (await (async () => {
         const Deno = globalThis.Deno;
 
         if (typeof Deno === 'undefined' ) {
             throw new Error('navigator.locks is not available and not running in a Deno environment.');
         }
-        // deno-coverage-ignore-stop
+
         const tempDirPath = Deno.env.get("TMPDIR") || Deno.env.get("TEMP") || "/tmp";
 
         /**
@@ -48,7 +47,7 @@ const lock = globalThis.navigator.locks?.request.bind(globalThis.navigator.locks
                 file.close();
             });
         }
-    })())/* c8 ignore stop */;
+    })());
 
 
 /**
@@ -80,11 +79,9 @@ export function requestLock(name, optionsOrCallback, callback) {
         throw new TypeError('Lock callback must be a function.');
     }
 
-    /* c8 ignore start - Covered by Deno tests */
     if ('ifAvailable' in normalizedOptions && typeof navigator.locks === 'undefined') {
         throw new Error('The ifAvailable option is not supported in this environment.');
     }
-    /* c8 ignore stop */
 
     return lock(name, normalizedOptions, normalizedCallback);
 }

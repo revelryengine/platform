@@ -41,15 +41,11 @@ import {
  * @property {accessorExtensions} [extensions] - Extension-specific data.
  */
 
-const _ArrayBufferClass = typeof SharedArrayBuffer !== 'undefined'
-    ? SharedArrayBuffer
-    : ArrayBuffer;
-
 /**
  * Accessor class representation.
  */
 export class Accessor extends NamedGLTFProperty {
-    /** @type {SharedArrayBuffer|ArrayBuffer|undefined} */
+    /** @type {ArrayBuffer|undefined} */
     #arrayBuffer;
 
     /** @type {Int8Array|Uint8Array|Int16Array|Uint16Array|Uint32Array|Float32Array|undefined} */
@@ -194,7 +190,7 @@ export class Accessor extends NamedGLTFProperty {
         await this.sparse?.loadOnce(signal);
         await super.load(signal);
 
-        this.initBufferData();
+        this.#initBufferData();
 
         return this;
     }
@@ -202,7 +198,7 @@ export class Accessor extends NamedGLTFProperty {
     /**
      * Initializes the buffer data for the accessor.
      */
-    initBufferData() {
+    #initBufferData() {
         const { bufferView, byteOffset, count, componentType } = this;
 
         const numberOfBytes = this.getNumberOfBytes();
@@ -210,12 +206,11 @@ export class Accessor extends NamedGLTFProperty {
         let start = byteOffset;
 
         if (!bufferView) {
-            this.#arrayBuffer = new _ArrayBufferClass(
+            this.#arrayBuffer = new ArrayBuffer(
                 count * numberOfComponents * numberOfBytes,
             );
 
             this.#typedArray = new TYPEDARRAYS[componentType](
-                // @ts-ignore - SharedArrayBuffer is compatible
                 this.#arrayBuffer,
                 byteOffset,
                 count * numberOfComponents,
@@ -267,8 +262,10 @@ export class Accessor extends NamedGLTFProperty {
      * Returns true if accessor has a bufferView whose byteStride does not match the element size.
      */
     get interleaved() {
-        const byteStride = this.bufferView?.byteStride ?? 0;
-        return !!byteStride && byteStride !== this.getElementSize();
+        if(!this.bufferView) return false;
+        if(!this.bufferView.byteStride) return false;
+
+        return this.bufferView.byteStride !== this.getElementSize();
     }
 
     /**
@@ -284,11 +281,10 @@ export class Accessor extends NamedGLTFProperty {
     /**
      * Returns the typed ArrayBuffer for the componentType. (Int8Array, Uint8Array, Int16Array, Uint16Array, Uint32Array,
      * or Float32Array)
-     * This array will not be useful for interleaved attributes
+     * This array will not be useful for interleaved attributes.
      */
     getTypedArray() {
         if(!this.#typedArray) throw new Error('Invalid State');
-        if(this.interleaved) console.warn('Interleaved Attribute not compatible with getTypedArray');
         return this.#typedArray;
     }
 
@@ -319,13 +315,12 @@ export class Accessor extends NamedGLTFProperty {
      * @param {number} [count] - The number of elements.
      */
     createTypedView(offset = 0, count = this.count) {
-        if(!this.#arrayBuffer) throw new Error('Array Buffer does not exist');
+        if(!this.#arrayBuffer) throw new Error('Invalid State');
 
-        const { bufferView, byteOffset, componentType } = this;
+        const { bufferView = { byteOffset: 0 }, byteOffset, componentType } = this;
         const numberOfComponents = this.getNumberOfComponents();
-        const start = (offset * this.getNumberOfBytes()) + byteOffset + (bufferView?.byteOffset ?? 0);
+        const start = (offset * this.getNumberOfBytes()) + byteOffset + bufferView.byteOffset;
         return new TYPEDARRAYS[componentType](
-            // @ts-ignore - SharedArrayBuffer is compatible
             this.#arrayBuffer,
             start,
             count * numberOfComponents,

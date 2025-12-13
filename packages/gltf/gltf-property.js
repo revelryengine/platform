@@ -1,3 +1,5 @@
+/// <reference path="./extensions.types.d.ts" />
+
 /**
  * The core glTF property module. All glTF properties extend from GLTFProperty.
  * @module
@@ -93,7 +95,7 @@ function ensureInstance(graph, src, factory){
  * @return {C} The unmarshalled GLTFProperty instance
  */
 function unmarshall(json, { uri, root, parent = {} }, ctor) {
-    const object = unmarshallObject({ uri, root, parent }, json, ctor.referenceFields);
+    const object = unmarshallObject(json, { uri, root, parent }, ctor.referenceFields);
 
     if(object.extensions) {
         object.extensions = Object.fromEntries(Object.entries(object.extensions).map(([name, value]) => {
@@ -110,11 +112,11 @@ function unmarshall(json, { uri, root, parent = {} }, ctor) {
 
 /**
  * Unmarshalls a JSON object by dereferencing its fields from the root or parent context.
- * @param {FromJSONGraph} graph - Graph for unmarshalling
  * @param {Record<string, unknown>} json - The JSON representation of the GLTFProperty
+ * @param {FromJSONGraph} graph - Graph for unmarshalling
  * @param {Record<string, ReferenceField>} referenceFields - Fields that reference other GLTFProperties
  */
-function unmarshallObject({ uri, root, parent = {} }, json, referenceFields) {
+function unmarshallObject(json, { uri, root, parent = {} }, referenceFields) {
     const locations = /** @type {const} */({ root, parent });
 
     // constructor, collection, location, alias, assign
@@ -134,7 +136,7 @@ function unmarshallObject({ uri, root, parent = {} }, json, referenceFields) {
             let result;
 
             if(referenceFields) { //Nested reference fields, value must be an object
-                result = unmarshallObject({ uri, root, parent }, /** @type {Record<string, unknown>} */(value), referenceFields);
+                result = unmarshallObject(/** @type {Record<string, unknown>} */(value), { uri, root, parent }, referenceFields);
                 references[name] = result;
                 continue;
             }

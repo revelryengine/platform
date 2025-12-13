@@ -1,3 +1,4 @@
+/// <reference path="revelryengine/settings.d.ts" />
 /// <reference path="./KHR_draco_mesh_compression.types.d.ts" />
 
 /**
@@ -11,13 +12,10 @@
  * @module
  */
 
-import { GLTFProperty } from '../gltf-property.js';
+import { GLTFProperty     } from '../gltf-property.js';
 import { BufferView       } from '../buffer-view.js';
 import { Accessor         } from '../accessor.js';
 import { WorkerHelperPool } from 'revelryengine/utils/worker-helper.js';
-
-
-const workerHelper = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_compression.worker.js'), { count: 4, type: 'module' });
 
 /**
  * @import { glTFPropertyData, GLTFPropertyData, FromJSONGraph, ReferenceField } from '../gltf-property.types.d.ts';
@@ -135,7 +133,7 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
      * @override
      */
     async load(signal) {
-        await workerHelper.init();
+        await MeshPrimitiveKHRDracoMeshCompression.workerPool.connect(globalThis.REV?.KHR_draco_mesh_compression?.workerCount ?? 4);
 
         const { buffer, byteOffset = 0, byteLength } = this.bufferView;
 
@@ -152,16 +150,15 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
         }));
 
         const indices = this.primitive.indices.getTypedArray();
-        const response = await workerHelper.callMethod({
+        const response = await MeshPrimitiveKHRDracoMeshCompression.workerPool.callMethod({
             method: 'decode', args: [{ arrayBuffer, byteOffset, byteLength, attributes, indices }], signal
         });
 
-        if(typeof SharedArrayBuffer === 'undefined') {
-            for (const [name, arrayBuffer] of Object.entries(response.attributes)) {
-                const accessor = this.primitive.attributes[/** @type {AttributeName} */(name)];
-                const accessorArray = /** @type {Accessor} */(accessor).getArrayBuffer();
-                new Uint8Array(accessorArray).set(new Uint8Array(arrayBuffer.buffer));
-            }
+        // This loop can be removed if we use SharedArrayBuffer in Accessor, but support for this is tricky so will revisit.
+        for (const [name, arrayBuffer] of Object.entries(response.attributes)) {
+            const accessor = this.primitive.attributes[/** @type {AttributeName} */(name)];
+            const accessorArray = /** @type {Accessor} */(accessor).getArrayBuffer();
+            new Uint8Array(accessorArray).set(new Uint8Array(arrayBuffer.buffer));
         }
 
         const accessor = this.primitive.indices;
@@ -169,6 +166,11 @@ export class MeshPrimitiveKHRDracoMeshCompression extends GLTFProperty {
 
         return this;
     }
+
+    /**
+     * Worker helper pool for decompressing meshes.
+     */
+    static workerPool = new WorkerHelperPool(import.meta.resolve('./KHR_draco_mesh_compression.worker.js'), { type: 'module' });
 }
 
 GLTFProperty.extensions.add('KHR_draco_mesh_compression', {

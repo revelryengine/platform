@@ -1,0 +1,78 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "EXT_texture_webp"
+  ],
+  "buffers": [
+    {
+      "name": "ImageBuffer",
+      "uri": "buffers/image.bin",
+      "byteLength": 444
+    }
+  ],
+  "bufferViews": [
+    {
+      "name": "PngView",
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 88
+    },
+    {
+      "name": "JpegView",
+      "buffer": 0,
+      "byteOffset": 88,
+      "byteLength": 288
+    }
+  ],
+  "images": [
+    {
+      "name": "UndefinedPng",
+      "uri": "textures/baseColor.png"
+    },
+    {
+      "name": "UndefinedJpeg",
+      "uri": "textures/baseColor.jpg"
+    },
+    {
+      "name": "UriPng",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    },
+    {
+      "name": "UriJpeg",
+      "uri": "textures/baseColor.jpg",
+      "mimeType": "image/jpeg"
+    },
+    {
+      "name": "BufferPng",
+      "bufferView": 0,
+      "mimeType": "image/png"
+    },
+    {
+      "name": "BufferJpeg",
+      "bufferView": 1,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "name": "EmbeddedPng",
+      "mimeType": "image/png",
+      "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWL6z8DwHwAAAP//A3ONEwAAAAZJREFUAwAFCgIByRpMngAAAABJRU5ErkJggg=="
+    },
+    {
+      "name": "EmbeddedJpeg",
+      "mimeType": "image/jpeg",
+      "uri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAABgj/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABykX//Z"
+    },
+    {
+      "name": "KtxImage",
+      "uri": "textures/2d_etc1s.ktx2",
+      "extras": {
+        "license": "CC BY-SA 4.0",
+        "source": "https://github.com/donmccurdy/KTX2-Samples"
+      }
+    }
+  ]
+}

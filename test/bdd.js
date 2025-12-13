@@ -1,3 +1,5 @@
+/// <reference path="revelryengine/settings.d.ts" />
+/// <reference path="revelryengine/utils/importmap-content.types.d.ts" />
 /// <reference path="npm:@types/sinonjs__fake-timers@15.0.1" />
 
 // @ts-types="npm:@types/chai"
@@ -19,12 +21,14 @@ use(chaiAsPromised);
  * @typedef {{
  *  describe:   (desc: string, fn: () => (void | Promise<void>)) => void
  *  it:         (desc: string, fn: () => (void | Promise<void>)) => void
+ *  before:     (fn: () => (void | Promise<void>)) => void
+ *  after:      (fn: () => (void | Promise<void>)) => void
  *  beforeEach: (fn: () => (void | Promise<void>)) => void
  *  afterEach:  (fn: () => (void | Promise<void>)) => void
  * }} BDDInterface
  */
 
-export const { describe, it, beforeEach, afterEach } = /** @type {BDDInterface} */(typeof Deno !== 'undefined' ? await import('jsr:@std/testing@1.0.16/bdd') : globalThis);
+export const { describe, it, before, after, beforeEach, afterEach } = /** @type {BDDInterface} */(typeof Deno !== 'undefined' ? await import('jsr:@std/testing@1.0.16/bdd') : globalThis);
 
 export { expect, sinon };
 
@@ -34,12 +38,10 @@ export class PromiseDeferred extends Promise {
      * @param {(resolve: (value?: any) => void, reject: (reason?: any) => void) => void} [resolver]
      */
     constructor(resolver) {
-        // deno-coverage-ignore-start
         /** @type {(value?: any) => void} */
         let resolve = () => {};
         /** @type {(reason?: any) => void} */
         let reject = () => {};
-        // deno-coverage-ignore-stop
 
         super((res, rej) => { resolve = res; reject = rej; });
 
@@ -57,9 +59,37 @@ export class PromiseDeferred extends Promise {
      */
     static async timeout(promise, ms, message = 'Promise timed out') {
         const deferred = new PromiseDeferred();
-        // deno-coverage-ignore-start
+
         const timeout = setTimeout(() => deferred.reject(new Error(message)), ms);
-        // deno-coverage-ignore-stop
+
         return Promise.race([promise, deferred]).finally(() => clearTimeout(timeout));
     }
+}
+
+/**
+ * Run a callback only in browser environments.
+ * @param {string} summary
+ * @param {() => void} callback
+ */
+export function browserOnly(summary, callback) {
+    if (typeof Deno === 'undefined') {
+        describe(`[Browser Only]: ${summary}`, callback);
+    }
+}
+
+/**
+ * Run a callback only in deno environments.
+ * @param {string} summary
+ * @param {() => void} callback
+ */
+export function denoOnly(summary, callback) {
+    if (typeof Deno !== 'undefined') {
+        describe(`[Deno Only]: ${summary}`, callback);
+    }
+}
+
+if (typeof Deno !== 'undefined') {
+    globalThis.REV ??= {};
+    globalThis.REV.importmap ??= {};
+    globalThis.REV.importmap.url ??= new URL('../importmap.dev.json', import.meta.url);
 }

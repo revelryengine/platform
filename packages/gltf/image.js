@@ -9,7 +9,8 @@
 
 import { NamedGLTFProperty } from './gltf-property.js';
 import { BufferView        } from './buffer-view.js';
-import { read as readKTX   } from "revelryengine/deps/ktx-parse.js";
+
+import { IMAGE_MIME_SNIFFING_PATTERNS } from './constants.js';
 
 /**
  * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
@@ -32,11 +33,6 @@ export class Image extends NamedGLTFProperty {
      * @type {ImageBitmap|Uint8Array|undefined}
      */
     #imageData;
-
-    /**
-     * @type {import("revelryengine/deps/ktx-parse.js").KTX2Container|undefined}
-     */
-    #imageDataKTX;
 
     /**
      * Creates an Image instance.
@@ -84,55 +80,27 @@ export class Image extends NamedGLTFProperty {
     };
 
     /**
-     * Loads the image data as a Uint8Array.
-     * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
-     */
-    async loadBufferAsUint8Array(signal) {
-        if(!this.bufferView) throw new Error('Invalid State');
-
-        const { buffer, byteOffset, byteLength } = this.bufferView;
-        await buffer.loadOnce(signal);
-        return new Uint8Array(buffer.getArrayBuffer(), byteOffset, byteLength);
-    }
-
-    /**
-     * Loads the image data as a Blob.
-     * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
-     */
-    async loadBufferAsBlob(signal) {
-        const uint8Array = await this.loadBufferAsUint8Array(signal)
-        return new Blob([uint8Array], { type: this.mimeType });
-    }
-
-    /**
-     * Loads the image data.
+     * Loads the image data using {@link createImageBitmap} or by reading the raw buffer for unsupported image types.
+     *
+     * [Deno does not yet support WebP in createImageBitmap](https://github.com/denoland/deno/pull/25517#issuecomment-2627763074).
+     *
      * @param {AbortSignal} [signal] - AbortSignal to cancel the load request.
      * @override
      */
     async load(signal) {
-        switch(this.mimeType) {
-            case undefined: // If undefined presumed to be standard browser supported image type
+        const { data, mimeType } = await this.#loadData(signal);
+
+        switch(mimeType) {
+            case 'image/webp':
             case 'image/png':
             case 'image/jpeg':
-            case 'image/webp': {
-                const blob = this.uri ? await fetch(this.uri.href, { signal }).then(response => response.blob()) : await this.loadBufferAsBlob(signal);
-                this.#imageData = await createImageBitmap(blob, { premultiplyAlpha: 'none' });
+                this.#imageData = await createImageBitmap(new Blob([data], { type: mimeType }), { premultiplyAlpha: 'none' });
                 break;
-            }
-            default: //not browser supported image type so store the data as a buffer
-                if(this.uri) {
-                    const buffer = await fetch(this.uri, { signal }).then(response => response.arrayBuffer())
-                    this.#imageData = new Uint8Array(buffer);
-                } else {
-                    this.#imageData = await this.loadBufferAsUint8Array();
-                }
-                if(this.mimeType === 'image/ktx2') {
-                    this.#imageDataKTX = readKTX(this.#imageData);
-                }
+            default: //not createImageBitmap supported image type so just use the raw data
+                this.#imageData = data;
         }
-        await super.load(signal);
 
-        return this;
+        return super.load(signal);
     }
 
     /**
@@ -152,10 +120,43 @@ export class Image extends NamedGLTFProperty {
     }
 
     /**
-     * Gets the KTX image data.
+     *
+     * @param {AbortSignal} [signal]
      */
-    getImageDataKTX() {
-        if(!this.#imageDataKTX) throw new Error('Invalid State');
-        return this.#imageDataKTX;
+    async #loadData(signal) {
+        let data, mimeType;
+        if(this.uri) {
+            const response = await fetch(this.uri, { signal });
+
+            data = new Uint8Array(await response.arrayBuffer());
+            mimeType = this.mimeType ?? response.headers.get('Content-Type') ?? this.#mimeSniff(data);
+        } else if(this.bufferView) {
+            const { buffer, byteOffset, byteLength } = this.bufferView;
+            await buffer.loadOnce(signal);
+
+            data = new Uint8Array(buffer.getArrayBuffer(), byteOffset, byteLength);
+            mimeType = /** @type {string} */(this.mimeType);
+        } else {
+            throw new Error('Invalid Data');
+        }
+
+        return { data, mimeType };
+    }
+    /**
+     * See [Matching a mime type pattern](https://mimesniff.spec.whatwg.org/#matching-a-mime-type-pattern)
+     * @param {Uint8Array} data - The image data to sniff.
+     */
+    #mimeSniff(data) {
+        for(const { pattern, mask, mime } of IMAGE_MIME_SNIFFING_PATTERNS) {
+            let match = true;
+            for(let p = 0; p < pattern.length; p++) {
+                if((data[p] & mask[p]) !== pattern[p]) {
+                    match = false;
+                    break;
+                }
+            }
+            if(match) return mime;
+        }
+        return null;
     }
 }

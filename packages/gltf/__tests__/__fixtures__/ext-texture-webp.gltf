@@ -1,0 +1,32 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "EXT_texture_webp"
+  ],
+  "images": [
+    {
+      "name": "BaseColorPNG",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    },
+    {
+      "name": "BaseColorWebP",
+      "uri": "textures/baseColor.webp",
+      "mimeType": "image/webp"
+    }
+  ],
+  "textures": [
+    {
+      "name": "TextureWithWebPExtension",
+      "source": 0,
+      "extensions": {
+        "EXT_texture_webp": {
+          "source": 1
+        }
+      }
+    }
+  ]
+}

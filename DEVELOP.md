@@ -18,4 +18,19 @@ deno task dev:cache
 deno task dev:serve
 ```
 
+## Run tests
+
+```bash
+# Run all tests
+deno task test
+
+# Run with coverage
+deno task test --coverage
+
+# Run specific package
+deno task test --pkg=utils
+
+# See test/README.md for more options
+```
+
 

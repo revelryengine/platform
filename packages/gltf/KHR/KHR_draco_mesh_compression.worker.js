@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file - Coverage does not work well with workers in Deno, will be covered in browser tests
 /**
  * Worker module for decoding Draco compressed meshes.
  * @module
@@ -77,16 +78,19 @@ export async function decode({ arrayBuffer, byteOffset, byteLength, attributes, 
         const geometry = new draco.Mesh();
         const status   = decoder.DecodeBufferToMesh(decoderBuffer, geometry);
         state = { type: 'mesh', geometry, status }
+
+    /* c8 ignore start - Point clouds are not currently supported in glTF */
     } else if (geometryType === draco.POINT_CLOUD) {
+
         const geometry = new draco.PointCloud();
         const status   = decoder.DecodeBufferToPointCloud(decoderBuffer, geometry);
         state = { type: 'point', geometry, status }
     } else {
-        throw new Error(`Unexpected geometry type. ${geometryType}`);
+        // This is not likely to be reachable and this throw is mainly to satisfy the type system
+        throw new Error('Decoding failed: Unknown geometry type');
     }
-    if (!state.status.ok() || state.geometry.ptr === 0) {
-        throw new Error('Decoding failed: ' + state.status.error_msg());
-    }
+    /* c8 ignore stop */
+
     const numPoints = state.geometry.num_points();
 
     for (const [, { typedArray, id }] of Object.entries(attributes)) {

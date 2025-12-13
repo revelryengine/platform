@@ -26,3 +26,15 @@ declare module '@revelryengine/gltf/extensions' {
     interface TextureKHRTextureBasisuExtensions {}
 }
 
+declare module '@revelryengine/settings' {
+    interface RevelryEngineSettings {
+        /** KHR_texture_basisu settings. */
+        KHR_texture_basisu?: {
+            /**
+             * The number of web workers to use for transcoding basisu textures. Default is 4.
+             */
+            workerCount?: number
+        },
+    }
+}
+

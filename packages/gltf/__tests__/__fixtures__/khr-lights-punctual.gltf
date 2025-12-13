@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_lights_punctual"
+  ],
+  "extensions": {
+    "KHR_lights_punctual": {
+      "lights": [
+        {
+          "name": "DirectionalLight",
+          "type": "directional",
+          "color": [1, 0.95, 0.9],
+          "intensity": 0.8
+        },
+        {
+          "name": "SpotLight",
+          "type": "spot",
+          "range": 15,
+          "color": [0.2, 0.6, 1],
+          "intensity": 25,
+          "spot": {
+            "innerConeAngle": 0.2,
+            "outerConeAngle": 0.5
+          }
+        }
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "name": "DirectionalLightNode",
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 0
+        }
+      }
+    },
+    {
+      "name": "SpotLightNode",
+      "extensions": {
+        "KHR_lights_punctual": {
+          "light": 1
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "name": "LightsScene",
+      "nodes": [0, 1]
+    }
+  ],
+  "scene": 0
+}

@@ -75,7 +75,7 @@ class EnvironmentResampleNode extends CubeRenderNode {
     reconfigure() {
         super.reconfigure();
 
-        const ktx = this.environment.cubemap.source.getImageDataKTX();
+        const ktx = this.environment.cubemap.getImageDataKTX();
 
         const { format, pad, TypedArray } = VK_FORMAT_ENVIRONMENT[ktx.vkFormat];
 

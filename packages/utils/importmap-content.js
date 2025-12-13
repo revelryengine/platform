@@ -1,12 +1,9 @@
+/// <reference path="revelryengine/settings.d.ts" />
+/// <reference path="./importmap-content.types.d.ts" />
+
 /**
  * Import map content utility.
  * @module
- */
-
-/**
- * @typedef {object} ImportMap - An import map structure. See [MDN - importmap](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap)
- * @property {Record<string, string>} imports - A map of module specifiers to their resolved URLs.
- * @property {Record<string, Record<string, string>>} [scopes] - A map of scopes to their import maps.
  */
 
 /**
@@ -28,44 +25,46 @@
  * </script>
  * <script type="module">
  * import { importmapContent } from './lib/importmap-content.js';
- * const importMap = importmapContent();
+ * const importMap = await importmapContent();
  * console.log(importMap.imports['module-a']); // Resolved URL of module-a
  * ```
  *
  * @example
  * ```js
  * // Example usage in JavaScript
- * const importMap = importmapContent();
+ * const importMap = await importmapContent();
  * console.log(importMap.imports['module-a']); // Resolved URL of module-a
- *
  */
-export function importmapContent() {
-
-
-    const globalImportMap = /** @type {globalThis & { importmapContent: ImportMap }} */(globalThis).importmapContent;
-
-    if (globalImportMap) {
-        return structuredClone(globalImportMap);
+export async function importmapContent() {
+    let content = globalThis.REV?.importmap?.content;
+    if (content) {
+        return structuredClone(content);
     }
 
-    const documentImportMap = /** @type {ImportMap} */(JSON.parse(globalThis.document?.querySelector('script[type="importmap"]')?.textContent ?? '{ "imports": {} }'));
-
-    for (const key of Object.keys(documentImportMap.imports)) {
-       documentImportMap.imports[key] = new URL(documentImportMap.imports[key], location.href).href;
+    const url = globalThis.REV?.importmap?.url;
+    if (url) {
+        content = /** @type {ImportMap} */(await fetch(url).then(res => res.json()));
+    } else {
+        content = /** @type {ImportMap} */(JSON.parse(globalThis.document?.querySelector('script[type="importmap"]')?.textContent ?? '{ "imports": {} }'));
     }
 
-    if (documentImportMap.scopes) {
-        for (const [scope, imports] of Object.entries(documentImportMap.scopes)) {
 
-            const scopeKey = new URL(scope, location.href).href;
+    for (const key of Object.keys(content.imports)) {
+       content.imports[key] = new URL(content.imports[key], url ?? location.href).href;
+    }
+
+    if (content.scopes) {
+        for (const [scope, imports] of Object.entries(content.scopes)) {
+
+            const scopeKey = new URL(scope, url ?? location.href).href;
             for (const [key, value] of Object.entries(imports)) {
-                imports[key] = new URL(value, location.href).href;
+                imports[key] = new URL(value, url ?? location.href).href;
             }
 
-            documentImportMap.scopes[scopeKey] = imports;
-            delete documentImportMap.scopes[scope];
+            content.scopes[scopeKey] = imports;
+            delete content.scopes[scope];
         }
     }
 
-    return documentImportMap;
+    return content;
 }

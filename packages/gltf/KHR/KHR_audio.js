@@ -8,11 +8,11 @@
  * @module
  */
 
-import { GLTFProperty } from '../gltf-property.js';
+import { GLTFProperty, NamedGLTFProperty } from '../gltf-property.js';
 import { BufferView   } from '../buffer-view.js';
 
 /**
- * @import { GLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
+ * @import { GLTFPropertyData, NamedGLTFPropertyData, ReferenceField } from '../gltf-property.types.d.ts';
  * @import {
  *  khrAudioExtensions, KHRAudioExtensions,
  *  khrAudioAudioExtensions, KHRAudioAudioExtensions,
@@ -119,11 +119,11 @@ import { BufferView   } from '../buffer-view.js';
 /**
  * KHR_audio audio data class representation.
  */
-export class KHRAudioAudio extends GLTFProperty {
+export class KHRAudioAudio extends NamedGLTFProperty {
     /**
-     * @type {ArrayBuffer|Uint8Array|undefined}
+     * @type {Uint8Array|undefined}
      */
-    #arrayBuffer;
+    #audioData;
 
     /**
      * Creates a new instance of KHRAudioAudio.
@@ -132,7 +132,7 @@ export class KHRAudioAudio extends GLTFProperty {
      *  mimeType?:   string,
      *  bufferView?: BufferView,
      *  extensions?: KHRAudioAudioExtensions,
-     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio audio data object
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_audio audio data object
      */
     constructor(unmarshalled) {
         super(unmarshalled);
@@ -189,9 +189,10 @@ export class KHRAudioAudio extends GLTFProperty {
     async load(signal) {
         await (async () => {
             if(this.uri) {
-                this.#arrayBuffer = await fetch(this.uri.href, { signal }).then(res => res.arrayBuffer());
+                const buffer = await fetch(this.uri.href, { signal }).then(res => res.arrayBuffer());
+                this.#audioData = new Uint8Array(buffer);
             } else if(this.bufferView) {
-                this.#arrayBuffer = await this.loadBufferAsUint8Array(signal);
+                this.#audioData = await this.loadBufferAsUint8Array(signal);
             }
         })();
 
@@ -199,11 +200,11 @@ export class KHRAudioAudio extends GLTFProperty {
     }
 
     /**
-     * Gets the audio data as an ArrayBuffer.
+     * Gets the audio data as a Uint8Array.
      */
-    getArrayBuffer() {
-        if(!this.#arrayBuffer) throw new Error('Invalid State');
-        return this.#arrayBuffer;
+    getAudioData() {
+        if(!this.#audioData) throw new Error('Invalid State');
+        return this.#audioData;
     }
 }
 
@@ -219,7 +220,7 @@ export class KHRAudioAudio extends GLTFProperty {
 /**
  * KHR_audio source class representation.
  */
-export class KHRAudioSource extends GLTFProperty {
+export class KHRAudioSource extends NamedGLTFProperty {
     /**
      * Creates a new instance of KHRAudioSource.
      * @param {{
@@ -228,7 +229,7 @@ export class KHRAudioSource extends GLTFProperty {
      *  loop?:        boolean,
      *  audio:        KHRAudioAudio,
      *  extensions?:  KHRAudioSourceExtensions,
-     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio source object
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_audio source object
      */
     constructor(unmarshalled) {
         super(unmarshalled);
@@ -282,7 +283,7 @@ export class KHRAudioSource extends GLTFProperty {
 /**
  * KHR_audio emitter class representation.
  */
-export class KHRAudioEmitter extends GLTFProperty {
+export class KHRAudioEmitter extends NamedGLTFProperty {
     /**
      * Creates a new instance of KHRAudioEmitter.
      * @param {{
@@ -291,7 +292,7 @@ export class KHRAudioEmitter extends GLTFProperty {
      *  sources?:    KHRAudioSource[],
      *  positional?: KHRAudioEmitterPositional,
      *  extensions?: KHRAudioEmitterExtensions,
-     * } & GLTFPropertyData} unmarshalled - Unmarshalled KHR_audio emitter object
+     * } & NamedGLTFPropertyData} unmarshalled - Unmarshalled KHR_audio emitter object
      */
     constructor(unmarshalled) {
         super(unmarshalled);

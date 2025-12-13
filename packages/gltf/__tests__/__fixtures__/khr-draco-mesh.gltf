@@ -1,0 +1,86 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_draco_mesh_compression"
+  ],
+  "extensionsRequired": [
+    "KHR_draco_mesh_compression"
+  ],
+  "buffers": [
+    {
+      "name": "MeshData",
+      "uri": "buffers/draco-mesh.bin",
+      "byteLength": 196
+    }
+  ],
+  "bufferViews": [
+    { "name": "CompressedDraco", "buffer": 0, "byteOffset": 0, "byteLength": 115 },
+    { "name": "Indices", "buffer": 0, "byteOffset": 116, "byteLength": 6 },
+    { "name": "Positions", "buffer": 0, "byteOffset": 124, "byteLength": 36 },
+    { "name": "Normals", "buffer": 0, "byteOffset": 160, "byteLength": 36 }
+  ],
+  "accessors": [
+    {
+      "name": "AccessorPositions",
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [1, 1, 0]
+    },
+    {
+      "name": "AccessorNormals",
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "name": "AccessorIndices",
+      "bufferView": 1,
+      "componentType": 5123,
+      "count": 3,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "DracoMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "extensions": {
+            "KHR_draco_mesh_compression": {
+              "bufferView": 0,
+              "attributes": {
+                "POSITION": 0,
+                "NORMAL": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "DracoNode",
+      "mesh": 0
+    }
+  ],
+  "scenes": [
+    {
+      "name": "DracoScene",
+      "nodes": [0]
+    }
+  ],
+  "scene": 0
+}

@@ -69,25 +69,28 @@ let promise = null;
 export async function BasisUFactory() {
     promise ??= new Promise(async (resolve, reject) => {
         //import from UMD by setting global AMD define function
-        const global   = /** @type {{ define: AMDDefine }} */(/** @type {unknown} */(globalThis));
-        const original = global.define;
+        const global = /** @type {{ define: AMDDefine, process: unknown }} */(/** @type {unknown} */(globalThis));
+        const originalDefine  = global.define;
+        const originalProcess = global.process;
 
         try {
+            //We need to ensure that module treats it as web (i.e. ENVIRONMENT_IS_WEB)
+            delete global.process;
             global.define = (_, factory) => {
                 factory()({
-                    locateFile: () => import.meta.resolve('basis_universal/basis_transcoder.wasm')
+                    locateFile: () => import.meta.resolve('basis_universal/basis_transcoder.wasm'),
                 }).then(module => {
                     module.initializeBasis();
                     resolve(module);
                 });
-                global.define = original;
             };
             global.define.amd = true;
             await import('basis_universal/basis_transcoder.js');
         } catch(e) {
             reject(e);
         } finally {
-            global.define = original;
+            global.process = originalProcess;
+            global.define  = originalDefine;
         }
     });
     return promise;

@@ -2,12 +2,10 @@
  * WorkerHelper utility module for managing web workers and shared workers.
  * @module
  */
-import { NonNull          } from './non-null.js';
 import { importmapContent } from './importmap-content.js';
 import { requestLock      } from './lock.js';
 
 const esModuleShimsURL = import.meta.resolve('es-module-shims');
-const importmap        = `${JSON.stringify(importmapContent())}`;
 
 /** @type {Promise<string>} */
 let esModuleShimsPromise;
@@ -16,12 +14,10 @@ let esModuleShimsPromise;
  * @typedef {object} WorkerHelperOptions - Options for the WorkerHelper.
  * @property {boolean} [shared] - If true, creates a SharedWorker instead of a Worker.
  *
- * @typedef {object} WorkerHelperPoolOptions - Options for the WorkerHelperPool constructor.
- * @property {number} count - The number of workers in the pool.
- *
- * @typedef {object} WorkerHelperState - The state of the WorkerHelper.
- * @property {Worker|SharedWorker} worker - The Worker or SharedWorker instance.
- * @property {MessageChannel} channel - The MessageChannel used for communication with the worker.
+ * @callback AsyncModuleMethod - A method that can be called asynchronously on the worker module.
+ * @param {...unknown} args - The arguments to pass to the method.
+ * @param {AbortSignal} [signal] - An optional AbortSignal to cancel the method call.
+ * @returns {Promise<{ result: unknown, transfer: Transferable[] }>}
  */
 
 /**
@@ -35,42 +31,63 @@ let esModuleShimsPromise;
  *
  * @example
  * ```javascript
- * const workerHelper = new WorkerHelper('path/to/worker/script.js');
- * await workerHelper.init();
+ * const workerHelper = new WorkerHelper('path/to/worker/script.js', { type: 'module' });
+ * await workerHelper.connect();
  * const result = await workerHelper.callMethod({ method: 'myMethod', args: [1, 2, 3] });
  * ```
  */
 export class WorkerHelper {
     /** @type {Promise<any>|null} */
-    #initPromise = null;
+    #connectPromise = null;
 
     #abortCtl = new AbortController();
 
+    /** @type {'disconnected'|'connecting'|'connected'|'error'} */
+    #status = 'disconnected';
+
     /**
-     * @type {WorkerHelperState | null}
+     * The current status of the WorkerHelper.
      */
-    #state = null;
+    get status() {
+        return this.#status;
+    }
+
+    #error = '';
     /**
-     * The current state of the WorkerHelper.
+     * The error message if the WorkerHelper is in an error state.
      */
-    get state() {
-        return NonNull(this.#state, 'WorkerHelper has not been initialized. Call init() before accessing the worker state.')
+    get error() {
+        return this.#error;
     }
 
     /**
+     * @type {Worker|SharedWorker|null}
+     */
+    #worker = null;
+
+    /**
      * The Worker or SharedWorker instance.
-     * @type {Worker|SharedWorker}
      */
     get worker () {
-        return this.state.worker
+        return this.#worker
+    };
+
+    /**
+     * @type {MessageChannel|null}
+     */
+    #channel = null;
+
+    /**
+     * The MessageChannel used for communication with the worker
+     */
+    get channel () {
+        return this.#channel
     };
 
     get #target() {
-        // deno-coverage-ignore-start - Not yet supported in Deno
         if (this.options?.shared) {
             return  /** @type {SharedWorker} */(this.worker).port;
         }
-        // deno-coverage-ignore-stop
         return /** @type {Worker} */(this.worker);
     }
 
@@ -89,11 +106,10 @@ export class WorkerHelper {
          */
         this.options = options;
 
-        /* c8 ignore start - Covered by Deno tests */
         if (this.options?.shared && typeof SharedWorker === 'undefined') {
             throw new Error('SharedWorker is not supported in this environment');
         }
-        /* c8 ignore stop */
+
     }
 
     /**
@@ -104,109 +120,127 @@ export class WorkerHelper {
         return URL.createObjectURL(new Blob([`${preamble}`], { type: 'application/javascript' }));
     }
 
-    // deno-coverage-ignore-start - Not yet supported in Deno
     /**
      * Creates a blob URL for a SharedWorker script.
+     * @return {Promise<string>}
      */
     async #createSharedWorkerBlobURL() {
-        return await new Promise((resolve, reject) => {
-            const channel = new BroadcastChannel(`SharedWorker:${this.uri}`);
-
+        return new Promise((resolve, reject) => {
             requestLock(`SharedWorker:${this.uri}`, { ifAvailable: true }, async (lock) => {
                 if (lock) {
                     const blob = await this.#createWorkerBlobURL();
-
-                    channel.onmessage = () => channel.postMessage(blob);
                     resolve(blob);
-
-                    // maintain lock for the lifetime of this tab if the original tab is closed or helper disconnected
-                    return new Promise((resolve) => this.#abortCtl.signal.addEventListener('abort', resolve));
                 } else {
+                    const channel = new BroadcastChannel(`SharedWorker:${this.uri}`);
                     return new Promise((resolve, reject) => {
                         channel.onmessage = (e) => resolve(e.data);
                         channel.postMessage(null);
                         setTimeout(() => reject('timeout'), 1000);
-                    }).then((/** @type {string} */blob) => {
-                        resolve(blob);
-
-                        // Attempt to aquire new lock, if original tab gets closed, we will take over
-                        return requestLock(`SharedWorker:${this.uri}`, { signal: this.#abortCtl.signal }, () => {
-                            channel.onmessage = () => channel.postMessage(blob);
-                            // maintain lock for the lifetime of this tab if the original tab is closed or helper disconnected
-                            return new Promise((resolve) => this.#abortCtl.signal.addEventListener('abort', resolve));
-                        });
+                    }).then(resolve).catch(reject).finally(() => {
+                        channel.close();
                     });
                 }
-            }).catch(reject).finally(() => {
-                channel.close()
             });
         });
     }
-    // deno-coverage-ignore-stop
 
     /**
      * Creates a new Worker instance using the generated blob URL.
      * @return {Promise<Worker|SharedWorker>}
      */
     async #createWorker() {
-        // deno-coverage-ignore-start - Not yet supported in Deno:
         if (this.options?.shared) {
             return new SharedWorker(await this.#createSharedWorkerBlobURL(), this.options);
         }
-        // deno-coverage-ignore-stop
-
         return new Worker(await this.#createWorkerBlobURL(), this.options);
     }
 
     /**
      * Initializes the worker and prepares it for communication.
      */
-    init() {
-        this.#initPromise ??= (async () => {
+    connect() {
+        this.#connectPromise ??= (async () => {
             this.#abortCtl?.abort('Re-initializing worker');
             this.#abortCtl = new AbortController();
 
-            this.#state = Object.freeze({
-                worker:   await this.#createWorker(),
-                channel:  new MessageChannel(),
-            });
+            this.#status = 'connecting';
+            this.#worker  = await this.#createWorker();
+            this.#channel = new MessageChannel();
 
-            this.state.channel.port1.onmessage = async ({ data: { uri, options }, ports: [port]}) => {
-                const res     = await fetch(uri, options);
-                const headers = new Headers(res.headers);
+            try {
+                await new Promise((resolve, reject) => {
+                    const channel = /** @type {MessageChannel} */(this.#channel);
 
-                const buffer = await res.arrayBuffer();
+                    channel.port1.onmessage = async ({ data: { type, error, uri, options }, ports: [port]}) => {
+                        switch(type) {
+                            case 'connect':
+                                resolve(null);
+                                break;
+                            case 'error':
+                                reject(error);
+                                break;
+                            case 'fetch': {
+                                try {
+                                    const res = await fetch(uri, options);
+                                    const headers = new Headers(res.headers);
 
-                /* c8 ignore start - This is covered by the deno tests */
-                if (res.ok && !res.headers.get('content-type') && uri.startsWith('file://') && uri.endsWith('.js')) {
-                    headers.set('Content-Type', 'application/javascript');
-                }
-                /* c8 ignore stop */
+                                    const buffer = await res.arrayBuffer();
 
-                port.postMessage({ uri, headers: Object.fromEntries(headers), status: res.status, statusText: res.statusText, body: buffer }, [buffer]);
-                port.close();
+                                    if (res.ok && !res.headers.get('content-type') && uri.startsWith('file://') && uri.endsWith('.js')) {
+                                        headers.set('Content-Type', 'application/javascript');
+                                    }
+                                    port.postMessage({ uri, headers: Object.fromEntries(headers), status: res.status, statusText: res.statusText, body: buffer }, [buffer]);
+                                } catch {
+                                    // Deno throws network errors on missing files so just simulate a 404 here.
+                                    port.postMessage({ uri, status: 404, statusText: 'Not Found' });
+
+                                }
+                                port.close()
+                            }
+                        }
+
+                    }
+
+                    globalThis.addEventListener('pagehide', () => this.disconnect(), { signal: this.#abortCtl.signal });
+
+                    this.#target.postMessage({ type: 'connect' }, [channel.port2]);
+                });
+
+                this.#status = 'connected';
+            } catch(e) {
+                this.#status = 'error';
+                this.#error  = String(e);
+                throw e;
             }
 
-            // deno-coverage-ignore - Only used for SharedWorker which is not supported in Deno
-            globalThis.addEventListener('pagehide', () => this.disconnect(), { signal: this.#abortCtl.signal });
-
-            this.#target.postMessage({ type: 'connect' }, [this.state.channel.port2]);
         })();
-        return this.#initPromise;
+        return this.#connectPromise;
+    }
+
+    /**
+     * Checks if the worker is connected.
+     * @return {this is { status: 'connected', worker: Worker|SharedWorker, channel: MessageChannel}}
+     */
+    isConnected() {
+        return this.#status === 'connected' && this.#worker !== null && this.#channel !== null;
     }
 
     /**
      * Disconnects from the worker.
      */
     disconnect() {
-        if (this.#state) {
-            this.#state.channel.port1.postMessage({ type: 'disconnect' });
-            this.#state.channel.port1.close();
-            this.#state.channel.port2.close();
-            this.#state = null;
+        if (this.channel) {
+            this.channel.port1.postMessage({ type: 'disconnect' });
+            this.channel.port1.close();
+            this.channel.port2.close();
+
+            this.#worker  = null;
+            this.#channel = null;
         }
         this.#abortCtl.abort('Worker disconnected');
         this.#abortCtl = new AbortController();
+
+        this.#status = 'disconnected';
     }
 
     /**
@@ -218,7 +252,10 @@ export class WorkerHelper {
      * @param {AbortSignal} [details.signal] - An optional AbortSignal to cancel the method call.
      */
     async callMethod({ method, args, transfer, signal }) {
-        const response = await WorkerHelper.#asyncPostMessage(this.state.channel.port1, { type: 'method', method, args }, transfer, signal);
+        if (!this.isConnected()) {
+            throw new Error('Worker not connected');
+        }
+        const response = await WorkerHelper.#asyncPostMessage(this.channel.port1, { type: 'method', method, args }, transfer, signal);
 
         if (response.data?.ok) {
             return response.data.result;
@@ -235,15 +272,16 @@ export class WorkerHelper {
         esModuleShimsPromise ??= fetch(esModuleShimsURL).then((res) => res.text());
 
         const esModuleShimsContent = await esModuleShimsPromise;
-
         return /* javascript */`// @ts-nocheck
-            const _fetch = globalThis.fetch;
-
-            const clients = [];
-
-            ${WorkerHelper.#asyncPostMessage.toString().replace('async #asyncPostMessage', 'async function asyncPostMessage')}
-
-            /** This is required for es-module-shims to work correctly */
+            // === Fetch Proxy ======================================
+            ${WorkerHelper.#asyncPostMessage.toString()
+                .replace('async #asyncPostMessage', 'async function asyncPostMessage')
+                .replace(/^ {4}/gm, '            ')
+                .trim()
+            }
+            /**
+             * This is required for es-module-shims to work correctly
+             */
             class ResponseWrapper extends Response {
                 #url;
                 get url() { return this.#url; }
@@ -257,13 +295,15 @@ export class WorkerHelper {
                 const client = clients[0];
                 clients.push(clients.shift());
 
-                return asyncPostMessage(client, { uri: uri.toString(), options }).catch(e => {
-                    console.warn('Fetch proxy failed', e);
-                }).then(response => {
+                return asyncPostMessage(client, { type: 'fetch', uri: uri.toString(), options }).then(response => {
                     const { uri, headers, status, statusText, body } = response.data;
                     return new ResponseWrapper(body, { headers, status, statusText, url: uri });
                 });
             }
+            // === es-module-shims ===================================
+            ${esModuleShimsContent}
+            // === Preamble ==========================================
+            const clients = [];
 
             globalThis.Worker ??= class {
                 constructor() {
@@ -277,16 +317,18 @@ export class WorkerHelper {
                 }
             }
 
-            globalThis.importmapContent = ${importmap};
-            ${esModuleShimsContent};
-            importShim.addImportMap(globalThis.importmapContent);
+            globalThis.REV = { importmap: { content: ${JSON.stringify(await importmapContent())} } };
+            importShim.addImportMap(globalThis.REV.importmap.content);
 
-            let modulePromise;
+            let initPromise;
+            let workerModule;
 
-            self.onmessage = ({ ports: [client] }) => {
+            async function init(moduleUrl) {
+                workerModule = await importShim(moduleUrl);
+            }
+
+            self.onmessage = async ({ ports: [client] }) => {
                 clients.push(client);
-
-                modulePromise ??= importShim('${uri}');
 
                 client.onmessage = async ({ data, ports: [port] }) => {
                     switch(data.type) {
@@ -298,8 +340,6 @@ export class WorkerHelper {
                             }
                             break;
                         case 'method':
-                            const module = await modulePromise;
-
                             const { method, args = [] } = data;
 
                             const abortCtl = new AbortController();
@@ -307,7 +347,7 @@ export class WorkerHelper {
                             port.onmessage = (message) => abortCtl.abort(message.data);
 
                             try {
-                                const { result, transfer } = await module[method]?.(...args, abortCtl.signal);
+                                const { result, transfer } = await workerModule[method]?.(...args, abortCtl.signal);
 
                                 if (abortCtl.signal.aborted){ // check aborted in case method does not honor signal
                                     throw new DOMException(abortCtl.signal.reason, 'AbortError');
@@ -321,20 +361,32 @@ export class WorkerHelper {
                     }
                     port.close();
                 }
+
+                try {
+                    initPromise ??= init('${uri}');
+                    await initPromise;
+                    client.postMessage({ type: 'connect' });
+                } catch(e) {
+                    client.postMessage({ type: 'error', error: e });
+                }
             }
 
-            // Wrapper for SharedWorker
+            // SharedWorker Support
+            let lock;
             self.onconnect = ({ ports: [port] }) => {
-                console.log('SharedWorker connected');
+                lock ??= navigator.locks.request('SharedWorker:${uri}', () => {
+                    const blobChannel = new BroadcastChannel('SharedWorker:${uri}');
+                    blobChannel.onmessage = () => blobChannel.postMessage(import.meta.url);
+                    return new Promise(() => {});
+                });
                 port.onmessage = ({ ports: [client] }) => {
-                    console.log('SharedWorker onmessage received');
                     self.onmessage({ ports: [client] });
                     port.close();
                 }
             }
-        `
+            //# sourceURL=${uri}?preamble
+        `.replace(/^ {12}/gm, '').trim();
     }
-
 
     /**
      * Extends a postMessage call with MessageChannel and returns a promise that resolves when the MessagePort responds on the worker side.
@@ -368,32 +420,55 @@ export class WorkerHelper {
  * balancing the load by assigning tasks to the least busy worker.
  * @example
  * ```javascript
- * const pool = new WorkerHelperPool('path/to/worker/script.js', 4);
- * await pool.init();
+ * const pool = new WorkerHelperPool('path/to/worker/script.js', { type: 'module' });
+ * await pool.connect(4);
  * const result = await pool.callMethod({ method: 'myMethod', args: [1, 2, 3] });
  * ```
  */
 export class WorkerHelperPool {
     /** @type {Promise<this>|null} */
-    #initPromise = null;
+    #connectPromise = null;
 
-    /** @type {{ tasks: number, worker: WorkerHelper }[]} */
-    #workerPool = [];
+    /** @type {'disconnected'|'connecting'|'connected'|'error'} */
+    #status = 'disconnected';
 
-    #count;
+    /**
+     * The current status of the WorkerHelperPool.
+     */
+    get status() {
+        return this.#status;
+    }
+
+    /**
+     * The number of workers in the pool.
+     */
+    get count() {
+        return this.#workers.length;
+    }
+
+    /** @type {WorkerHelper[]} */
+    #workers = [];
+
+    get workers() {
+        return this.#workers;
+    }
+
+    /**
+     * @type {WeakMap<WorkerHelper, number>} - Map to track the number of tasks per worker.
+     */
+    #tasks = new WeakMap();
 
     /**
      * Creates an instance of WorkerHelperPool.
      * @param {URL|string} uri - a string representing the URL of the module script the worker will execute.
-     * @param {WorkerOptions & WorkerHelperPoolOptions} options - options to pass to the Worker constructor along with the number of workers in the pool.
+     * @param {WorkerOptions} options - options to pass to the Worker constructor.
      */
-    constructor(uri, { count, ...options }) {
+    constructor(uri, options) {
         /**
          * The URI of the worker script.
          */
         this.uri    = uri;
 
-        this.#count = count;
         /**
          * The options for the Worker constructor.
          */
@@ -401,22 +476,40 @@ export class WorkerHelperPool {
     }
 
     /**
-     * Initializes the worker pool.
+     * Connects the worker pool based on the specified number of workers.
+     *
+     * @param {number} [n] - The number of workers to connect in the pool.
      */
-    init() {
-        this.#initPromise ??= (async () => {
-            this.#workerPool = [...new Array(this.#count)].map(() => {
-                return { tasks: 0, worker: new WorkerHelper(this.uri, this.options) };
-            });
+    connect(n = 2) {
+        if (n !== this.#workers.length) {
+            this.#connectPromise = null;
 
-            for (const worker of this.#workerPool) {
-                await worker.worker.init();
+            for (let i = 0; i < n; i++) { // Create new workers
+                this.#workers[i] ??= new WorkerHelper(this.uri, this.options);
             }
 
+            for (let i = n; i < this.#workers.length; i++) { // Disconnect extra workers
+                this.#workers[i]?.disconnect();
+            }
+
+            this.#workers.length = n;
+        }
+
+        this.#connectPromise ??= (async () => {
+            this.#status = 'connecting';
+            try {
+                for (const worker of this.#workers) {
+                    await worker.connect();
+                }
+                this.#status = 'connected';
+            } catch(e) {
+                this.#status = 'error';
+                throw e;
+            }
             return this;
         })();
 
-        return this.#initPromise;
+        return this.#connectPromise;
     }
 
     /**
@@ -428,21 +521,50 @@ export class WorkerHelperPool {
      * @param {AbortSignal} [details.signal] - An optional AbortSignal to cancel the method call.
      */
     async callMethod({ method, args, transfer, signal }) {
-        const [target] = this.#workerPool.sort((a, b) => a.tasks - b.tasks);
+        if (!this.isConnected()) {
+            throw new Error('Worker not connected');
+        }
 
-        target.tasks++;
+        const [target] = this.#workers.sort((a, b) => this.#getTasksCount(a) - this.#getTasksCount(b));
 
-        return target.worker.callMethod({ method, args, transfer, signal }).finally(() => target.tasks--);
+        this.#incTasksCount(target, 1);
+
+        return target.callMethod({ method, args, transfer, signal }).finally(() => this.#incTasksCount(target, -1));
+    }
+
+    /**
+     * @param {WorkerHelper} worker
+     */
+    #getTasksCount(worker) {
+        return this.#tasks.get(worker) ?? 0;
+    }
+
+    /**
+     * @param {WorkerHelper} worker
+     * @param {number} n
+     */
+    #incTasksCount(worker, n) {
+        const count = this.#getTasksCount(worker);
+        this.#tasks.set(worker, count + n);
+    }
+
+    /**
+     * Returns true if the worker pool is connected.
+     * @return {this is { status: 'connected', pool: ({ worker: Worker|SharedWorker, channel: MessageChannel })[] }}
+     */
+    isConnected() {
+        return this.#status === 'connected';
     }
 
     /**
      * Disconnects all workers in the pool.
      */
     disconnect() {
-        for (const worker of this.#workerPool) {
-            worker.worker.disconnect();
+        for (const worker of this.#workers) {
+            worker.disconnect();
         }
-        this.#workerPool.length = 0;
-        this.#initPromise = null;
+        this.#workers.length = 0;
+        this.#connectPromise = null;
+        this.#status = 'disconnected';
     }
 }

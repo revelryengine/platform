@@ -1,0 +1,103 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "buffers": [
+    {
+      "name": "AccessorData",
+      "uri": "buffers/accessor.bin",
+      "byteLength": 96
+    },
+    {
+      "name": "BinaryData",
+      "uri": "buffers/accessor.bin",
+      "byteLength": 96
+    },
+    {
+      "name": "EmbeddedData",
+      "uri": "data:application/octet-stream;base64,AACAPwAAAEAAAEBAAACAQAAAoEAAAMBAAADgQAAAAEEAABBBAAAAAAAAIEEAAKBBAADIQgAA8EEAACBCAABIQgAASEMBAAIAAAAgQQAAIEEAACBBAACgQQAAoEEAAKBB",
+      "byteLength": 96
+    }
+  ],
+  "bufferViews": [
+    {
+      "name": "PackedPositions",
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 36
+    },
+    {
+      "name": "InterleavedData",
+      "buffer": 0,
+      "byteOffset": 36,
+      "byteLength": 32,
+      "byteStride": 16
+    },
+    {
+      "name": "SparseIndexData",
+      "buffer": 0,
+      "byteOffset": 68,
+      "byteLength": 4
+    },
+    {
+      "name": "SparseValueData",
+      "buffer": 0,
+      "byteOffset": 72,
+      "byteLength": 24
+    }
+  ],
+  "accessors": [
+    {
+      "name": "PackedPositions",
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [1, 2, 3],
+      "max": [7, 8, 9]
+    },
+    {
+      "name": "InterleavedAccessor",
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "name": "SparseAccessor",
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "sparse": {
+        "count": 2,
+        "indices": {
+          "bufferView": 2,
+          "componentType": 5123
+        },
+        "values": {
+          "bufferView": 3
+        }
+      }
+    },
+    {
+      "name": "ZeroAccessor",
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC2"
+    }
+  ],
+  "nodes": [
+    {
+      "name": "AccessorNode"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "AccessorScene",
+      "nodes": [0]
+    }
+  ],
+  "scene": 0
+}

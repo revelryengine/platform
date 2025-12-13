@@ -7,20 +7,20 @@
  */
 
 import { GLTFProperty } from './gltf-property.js';
-import { Accessor     } from  './accessor.js';
-import { Animation    } from  './animation.js';
-import { Asset        } from  './asset.js';
-import { Buffer       } from  './buffer.js';
-import { BufferView   } from  './buffer-view.js';
-import { Camera       } from  './camera.js';
-import { Image        } from  './image.js';
-import { Material     } from  './material.js';
-import { Mesh         } from  './mesh.js';
-import { Node         } from  './node.js';
-import { Sampler      } from  './sampler.js';
-import { Scene        } from  './scene.js';
-import { Skin         } from  './skin.js';
-import { Texture      } from  './texture.js';
+import { Accessor     } from './accessor.js';
+import { Animation    } from './animation.js';
+import { Asset        } from './asset.js';
+import { Buffer       } from './buffer.js';
+import { BufferView   } from './buffer-view.js';
+import { Camera       } from './camera.js';
+import { Image        } from './image.js';
+import { Material     } from './material.js';
+import { Mesh         } from './mesh.js';
+import { Node         } from './node.js';
+import { Sampler      } from './sampler.js';
+import { Scene        } from './scene.js';
+import { Skin         } from './skin.js';
+import { Texture      } from './texture.js';
 
 import { GLTF_SUPPORTED_VERSION, GLTF_MAGIC_NUMBER_BINARY_FORMAT } from './constants.js';
 
@@ -35,8 +35,8 @@ import { GLTF_SUPPORTED_VERSION, GLTF_MAGIC_NUMBER_BINARY_FORMAT } from './const
 function ensureSupport({ asset: { version, minVersion }, extensionsRequired = [] }) {
     const [major, minor] = (minVersion ?? version).split('.').map(v => Number(v));
 
-    if ((major !== GLTF_SUPPORTED_VERSION.major) || (minVersion && (minor > GLTF_SUPPORTED_VERSION.minor))) {
-        throw new Error(`Unsupported glTF version ${minVersion ?? version}`);
+    if ((major !== GLTF_SUPPORTED_VERSION.major) || (minor > GLTF_SUPPORTED_VERSION.minor)) {
+        throw new Error(`Unsupported glTF version ${major}.${minor}`);
     }
 
     for(const ext of extensionsRequired) {
@@ -315,6 +315,7 @@ export class GLTF extends GLTFProperty {
             'textures',
         ]);
 
+        await this.asset.loadOnce(signal);
         await Promise.all(collections.map(collection => Promise.all(this[collection].map(item => {
             return item.loadOnce(signal);
         }))));

@@ -1,56 +1,43 @@
-import { parseArgs } from "jsr:@std/cli@1.0.23/parse-args";
+/**
+ * @param {{ pkg?: string, coverage?: boolean, debug?: boolean }} options
+ */
+export async function runTests({ pkg, coverage, debug }) {
+    console.log(`Running Deno tests for: ${pkg ?? 'all packages'}`);
 
-const { pkg, debug, coverage } = parseArgs(Deno.args, {
-    boolean: ["debug", "coverage"],
-    string: ["pkg"],
-});
-
-const config = {
-    groups: [
-        {
-            name: 'utils',
-            files: [
-                'packages/utils/**/__tests__/**/*.test.js',
-                `!packages/utils/**/__tests__/**/*.browser.test.js`
-            ]
+    const config = {
+        groups: [
+            {
+                name: 'utils',
+                files: [
+                    'packages/utils/**/__tests__/**/*.test.js'
+                ]
+            },
+            {
+                name: 'ecs',
+                files: [
+                    'packages/ecs/**/__tests__/**/*.test.js'
+                ]
+            },
+            {
+                name: 'gltf',
+                files: [
+                    'packages/gltf/**/__tests__/**/*.test.js'
+                ]
+            }
+        ],
+        debug,
+        coverage,
+        coverageConfig: {
+            reportDir: 'coverage/deno',
+            exclude: [`test/`, `__tests__/`, `deps/`],
         },
-        {
-            name: 'ecs',
-            files: [
-                'packages/ecs/**/__tests__/**/*.test.js',
-                `!packages/ecs/**/__tests__/**/*.browser.test.js`
-            ]
-        },
-        {
-            name: 'gltf',
-            files: [
-                'packages/gltf/**/__tests__/**/*.test.js',
-                `!packages/gltf/**/__tests__/**/*.browser.test.js`
-            ]
-        }
-    ],
-    debug,
-    coverage,
-    coverageConfig: {
-        reportDir: 'coverage/deno',
-        exclude: [`test/`, `__tests__/`, `deps/`],
-    },
-};
+    };
 
-await (async () => {
     const include = [];
-    const ignore = [];
 
     for (const groupConfig of (pkg ? config.groups.filter(g => g.name === pkg) : config.groups)) {
-        for(const filePattern of groupConfig.files ?? []) {
-            if (filePattern.startsWith('!')) {
-                ignore.push(filePattern.slice(1));
-            } else {
-                include.push(filePattern);
-            }
-        }
+        include.push(...(groupConfig.files ?? []));
     }
-    console.log(`Running Deno tests for group: ${pkg ?? 'all groups'}`);
 
     const command = new Deno.Command(Deno.execPath(), {
         args: [
@@ -64,28 +51,48 @@ await (async () => {
                 !debug ? `--coverage=${config.coverageConfig.reportDir}` : '',
                 !debug ? '--coverage-raw-data-only': ''
             ].filter(Boolean),
-            ...ignore.map(pattern => `--ignore=${pattern}`),
             ...include,
         ],
-        stdout: "inherit",
-        stderr: "inherit"
+        stdout: 'inherit',
+        stderr: 'inherit',
     }).spawn();
 
-    await command.output();
+    const result = await command.output();
 
     if(config.coverage && !debug) {
-        console.log('Generating coverage report...');
-        const coverageCmd = new Deno.Command(Deno.execPath(), {
+        // Generate LCOV using Deno's built-in coverage tool
+        console.log('Generating Deno coverage report...');
+        const lcovCmd = new Deno.Command(Deno.execPath(), {
             args: [
-                'coverage', config.coverageConfig.reportDir, '--html',
+                'coverage', config.coverageConfig.reportDir,
+                '--lcov',
+                `--output=${config.coverageConfig.reportDir}/lcov.info`,
                 ...config.coverageConfig.exclude.map(pattern =>`--exclude=${pattern}`)
-
-            ],
-            stdout: "inherit",
-            stderr: "inherit"
+            ].filter(Boolean),
+            stdout: 'inherit',
+            stderr: 'inherit',
         }).spawn();
 
-        await coverageCmd.output();
+        await lcovCmd.output();
+
+        const htmlCmd = new Deno.Command(Deno.execPath(), {
+            args: [
+                'coverage', config.coverageConfig.reportDir,
+                '--html',
+                ...config.coverageConfig.exclude.map(pattern =>`--exclude=${pattern}`)
+            ].filter(Boolean),
+            stdout: 'inherit',
+            stderr: 'inherit',
+        }).spawn();
+
+        await htmlCmd.output();
+
+        // Update lcov paths to be relative
+        const lcovPath = `${config.coverageConfig.reportDir}/lcov.info`;
+        const lcovData = await Deno.readTextFile(lcovPath);
+        await Deno.writeTextFile(lcovPath, lcovData.replaceAll(Deno.cwd() + '\\', ''));
     }
-})();
+
+    return result.success;
+}
 

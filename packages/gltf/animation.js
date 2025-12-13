@@ -15,13 +15,14 @@ import { quat              } from 'revelryengine/deps/gl-matrix.js';
 
 /**
  * @import { NamedGLTFPropertyData, ReferenceField } from './gltf-property.types.d.ts';
- * @import { animationExtensions, AnimationExtensions } from '@revelryengine/gltf/extensions';
+ * @import { animationExtensions, AnimationExtensions, AnimationChannelTargetExtensions } from '@revelryengine/gltf/extensions';
  */
 
 /**
  * @import { animationChannel } from './animation-channel.js';
  * @import { animationSampler } from './animation-sampler.js';
  * @import { TypedArray } from 'revelryengine/utils/buffers.js';
+ * @import { AnimationChannelTargetKHRAnimationPointer } from './KHR/KHR_animation_pointer.js';
  */
 
 /**
@@ -245,14 +246,14 @@ export class Animator {
             const { target: { node, path }, sampler: { output: { type }} } = channel;
 
             if(path === 'pointer') {
-                if(!channel.target.extensions?.KHR_animation_pointer) throw new Error('Invalid State');
+                if(!channel.target.extensions?.KHR_animation_pointer) throw new Error('Invalid Animation Channel: Missing KHR_animation_pointer extension');
                 const { target, rootTarget, collection, path } = channel.target.extensions.KHR_animation_pointer.pointer;
                 this.targets[collection] ??= new Set();
                 this.targets[collection].add(rootTarget);
 
                 target[path] ??= type !== 'SCALAR' || path === 'weights' ? [] : 0;
             } else {
-                if(!node) throw new Error('Invalid State');
+                if(!node) throw new Error('Invalid Animation Channel: Missing target node');
                 this.targets['/nodes'] ??= new Set();
                 this.targets['/nodes'].add(node);
 
@@ -281,20 +282,17 @@ export class Animator {
         for (const channel of animation.channels) {
             const { sampler: { input, output, interpolation } } = channel;
 
-            if(!input.min || !input.max) continue;
-
             const inputArray  = input.getTypedArray();
             const outputArray = output.getTypedArray();
 
             let target, path;
             if(channel.target.path === 'pointer'){
-                if(!channel.target.extensions?.KHR_animation_pointer) continue;
-                const resolved = channel.target.extensions.KHR_animation_pointer.pointer;
+                const extensions = /** @type {AnimationChannelTargetExtensions} */(channel.target.extensions);
+                const resolved   = /** @type {AnimationChannelTargetKHRAnimationPointer} */(extensions.KHR_animation_pointer).pointer;
                 target = resolved.target;
                 path   = resolved.path;
             } else {
-                if(!channel.target.node) continue;
-                target = channel.target.node;
+                target = /** @type {Node} */(channel.target.node);
                 path   = channel.target.path;
             }
 
@@ -306,11 +304,11 @@ export class Animator {
              * Clamp keyframes to start and end if outside time range
              * See [Issue 1179](https://github.com/KhronosGroup/glTF/issues/1179)
              */
-            if (time <= input.min[0]) {
+            if (time <= /** @type {number[]} */(input.min)[0]) {
                 const t = 0;
                 this.#clamp(outputArray, target, path, stride, t, normalizer, interpolation);
 
-            } else if (time >= input.max[0]) {
+            } else if (time >= /** @type {number[]} */(input.max)[0]) {
                 const t = outputArray.length - stride;
                 this.#clamp(outputArray, target, path, stride, t, normalizer, interpolation);
             } else {
@@ -349,6 +347,9 @@ export class Animator {
 
     /**
      * Finds the next key frame based on time t using a binary search.
+     *
+     * Expects that t is within the range of input keyframe times. (Pre clamped/looped)
+     *
      * @param {TypedArray} input - The input keyframe times.
      * @param {number} t - The time to find the next keyframe for.
      */
@@ -366,7 +367,6 @@ export class Animator {
                 low = mid + 1;
             }
         }
-
-        return candidate > 0 ? candidate : input.length - 1;
+        return candidate;
     }
 }

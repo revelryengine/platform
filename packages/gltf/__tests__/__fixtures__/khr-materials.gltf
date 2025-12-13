@@ -1,0 +1,265 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Revelry Engine GTLF Tests"
+  },
+  "extensionsUsed": [
+    "KHR_materials_clearcoat",
+    "KHR_materials_emissive_strength",
+    "KHR_materials_unlit",
+    "KHR_materials_variants",
+    "KHR_materials_transmission",
+    "KHR_materials_specular",
+    "KHR_materials_sheen",
+    "KHR_materials_volume",
+    "KHR_materials_iridescence",
+    "KHR_materials_ior",
+    "KHR_materials_pbrSpecularGlossiness"
+  ],
+  "buffers": [
+    {
+      "name": "MeshData",
+      "uri": "buffers/mesh.bin",
+      "byteLength": 128
+    }
+  ],
+  "bufferViews": [
+    { "name": "Positions", "buffer": 0, "byteOffset": 0, "byteLength": 36 },
+    { "name": "Normals", "buffer": 0, "byteOffset": 36, "byteLength": 36 },
+    { "name": "TargetPositions", "buffer": 0, "byteOffset": 72, "byteLength": 36 },
+    { "name": "Indices", "buffer": 0, "byteOffset": 108, "byteLength": 6 }
+  ],
+  "accessors": [
+    {
+      "name": "AccessorPositions",
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [0, 0, 0],
+      "max": [1, 1, 0]
+    },
+    {
+      "name": "AccessorNormals",
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "name": "AccessorIndices",
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 3,
+      "type": "SCALAR"
+    },
+    {
+      "name": "AccessorTargetPositions",
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    }
+  ],
+  "images": [
+    {
+      "name": "SharedTexture",
+      "uri": "textures/baseColor.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "textures": [
+    { "name": "BaseColorTexture", "source": 0 },
+    { "name": "ClearcoatTexture", "source": 0 },
+    { "name": "ClearcoatRoughnessTexture", "source": 0 },
+    { "name": "ClearcoatNormalTexture", "source": 0 },
+    { "name": "TransmissionTexture", "source": 0 },
+    { "name": "SpecularTexture", "source": 0 },
+    { "name": "SpecularColorTexture", "source": 0 },
+    { "name": "SheenColorTexture", "source": 0 },
+    { "name": "SheenRoughnessTexture", "source": 0 },
+    { "name": "ThicknessTexture", "source": 0 },
+    { "name": "IridescenceTexture", "source": 0 },
+    { "name": "IridescenceThicknessTexture", "source": 0 },
+    { "name": "SpecGlossDiffuseTexture", "source": 0 },
+    { "name": "SpecGlossCombinedTexture", "source": 0 }
+  ],
+  "materials": [
+    {
+      "name": "ClearcoatMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": { "index": 0 }
+      },
+      "extensions": {
+        "KHR_materials_clearcoat": {
+          "clearcoatFactor": 0.9,
+          "clearcoatTexture": { "index": 1 },
+          "clearcoatRoughnessFactor": 0.3,
+          "clearcoatRoughnessTexture": { "index": 2 },
+          "clearcoatNormalTexture": { "index": 3, "scale": 0.5 }
+        }
+      }
+    },
+    {
+      "name": "EmissiveStrengthMaterial",
+      "emissiveFactor": [1, 0.5, 0.25],
+      "extensions": {
+        "KHR_materials_emissive_strength": {
+          "emissiveStrength": 2.5
+        }
+      }
+    },
+    {
+      "name": "UnlitMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.8, 0.8, 0.8, 1],
+        "baseColorTexture": { "index": 0 }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "TransmissionMaterial",
+      "extensions": {
+        "KHR_materials_transmission": {
+          "transmissionFactor": 0.6,
+          "transmissionTexture": { "index": 4 }
+        }
+      }
+    },
+    {
+      "name": "SpecularMaterial",
+      "extensions": {
+        "KHR_materials_specular": {
+          "specularFactor": 0.85,
+          "specularTexture": { "index": 5 },
+          "specularColorFactor": [0.9, 0.95, 1],
+          "specularColorTexture": { "index": 6 }
+        }
+      }
+    },
+    {
+      "name": "SheenMaterial",
+      "extensions": {
+        "KHR_materials_sheen": {
+          "sheenColorFactor": [0.1, 0.2, 0.3],
+          "sheenColorTexture": { "index": 7 },
+          "sheenRoughnessFactor": 0.4,
+          "sheenRoughnessTexture": { "index": 8 }
+        }
+      }
+    },
+    {
+      "name": "VolumeMaterial",
+      "extensions": {
+        "KHR_materials_volume": {
+          "thicknessFactor": 0.2,
+          "thicknessTexture": { "index": 9 },
+          "attenuationDistance": 0.8,
+          "attenuationColor": [0.7, 0.8, 0.9]
+        },
+        "KHR_materials_transmission": {
+          "transmissionFactor": 1,
+          "transmissionTexture": { "index": 4 }
+        }
+      }
+    },
+    {
+      "name": "IridescenceMaterial",
+      "extensions": {
+        "KHR_materials_iridescence": {
+          "iridescenceFactor": 0.75,
+          "iridescenceTexture": { "index": 10 },
+          "iridescenceIor": 1.4,
+          "iridescenceThicknessMinimum": 200,
+          "iridescenceThicknessMaximum": 600,
+          "iridescenceThicknessTexture": { "index": 11 }
+        }
+      }
+    },
+    {
+      "name": "IORMaterial",
+      "extensions": {
+        "KHR_materials_ior": {
+          "ior": 1.8
+        }
+      }
+    },
+    {
+      "name": "VariantBaseMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1, 1, 1, 1]
+      }
+    },
+    {
+      "name": "VariantRedMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1, 0.2, 0.2, 1]
+      }
+    },
+    {
+      "name": "VariantBlueMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.2, 0.2, 1, 1]
+      }
+    },
+    {
+      "name": "SpecGlossMaterial",
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseFactor": [0.6, 0.7, 0.8, 0.9],
+          "specularFactor": [0.2, 0.25, 0.3],
+          "glossinessFactor": 0.45,
+          "diffuseTexture": { "index": 12 },
+          "specularGlossinessTexture": { "index": 13 }
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "VariantMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "material": 9,
+          "mode": 4,
+          "extensions": {
+            "KHR_materials_variants": {
+              "mappings": [
+                { "material": 10, "variants": [0] },
+                { "material": 11, "variants": [1] }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "VariantNode",
+      "mesh": 0
+    }
+  ],
+  "scenes": [
+    {
+      "name": "MaterialsScene",
+      "nodes": [0]
+    }
+  ],
+  "scene": 0,
+  "extensions": {
+    "KHR_materials_variants": {
+      "variants": [
+        { "name": "VariantRed" },
+        { "name": "VariantBlue" }
+      ]
+    }
+  }
+}
